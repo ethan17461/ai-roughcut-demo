@@ -1,15 +1,43 @@
 {
-  "name": "冷知识路线类 v0.3",
-  "from": "从业务方 12 个爆款剪映工程里提炼的剪辑规则（Demo 中为人工整理的示例规则）",
-  "voice": {"engine":"macOS 系统语音（Demo）/ ElevenLabs（落地）","voice":"Daniel（英式男声）","rate_wpm":175},
-  "gap_between_lines_s": 0.15,
-  "tail_s": 0.6,
-  "max_shot_s": 3.2,
-  "clip_skip_head_s": 0.5,
-  "subtitle": {"size":7.0,"color":[1,1,1],"bold":true,"border_width":45,"y":-0.62,"max_chars_per_line":42},
-  "huazi": {"size":11.0,"color":[1.0,0.84,0.18],"bold":true,"border_width":55,"y":0.40},
-  "opening_huazi_max_s": 2.8,
-  "benefit_sticker_offset_s": 0.3,
-  "benefit_sticker_len_s": 2.6,
-  "cta_min_s": 1.5
+ "name": "冷知识路线类 v0.3",
+ "from": "从业务方 12 个爆款剪映工程里提炼的剪辑规则（Demo 中为人工整理的示例规则）",
+ "voice": {
+  "engine": "MiniMax 配音接口（有 key 时）/ macOS 系统语音（没 key 时兜底）",
+  "voice": "Daniel（英式男声）",
+  "rate_wpm": 175,
+  "minimax_voice": "English_Graceful_Lady",
+  "minimax_speed": 1.15,
+  "minimax_note": "账号里唯一的英式口音英文音色（女声）；想换美式男声改成 English_Trustworthy_Man"
+ },
+ "gap_between_lines_s": 0.15,
+ "tail_s": 0.6,
+ "max_shot_s": 3.2,
+ "clip_skip_head_s": 0.5,
+ "subtitle": {
+  "size": 7.0,
+  "color": [
+   1,
+   1,
+   1
+  ],
+  "bold": true,
+  "border_width": 45,
+  "y": -0.62,
+  "max_chars_per_line": 42
+ },
+ "huazi": {
+  "size": 11.0,
+  "color": [
+   1.0,
+   0.84,
+   0.18
+  ],
+  "bold": true,
+  "border_width": 55,
+  "y": 0.4
+ },
+ "opening_huazi_max_s": 2.8,
+ "benefit_sticker_offset_s": 0.3,
+ "benefit_sticker_len_s": 2.6,
+ "cta_min_s": 1.5
 }

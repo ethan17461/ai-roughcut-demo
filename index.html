@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
-/* Layout: editing workbench — settings + pipeline left, 9:16 monitor center, score + inspector right, multi-track timeline across the bottom. Dark-only by design, like the editors it mimics. */
+/* Layout: editing workbench — (studio: topic input on top) settings + pipeline left, 9:16 monitor center, score + per-line shot inspector right. Fine editing happens in 剪映, so there is no timeline here. Dark-only by design, like the editors it mimics. */
 :root{
   --bg:#0f1218; --panel:#161a22; --panel-2:#1d222c; --panel-3:#232a36; --line:#2a3140; --fg:#e9ebf1; --muted:#9aa1b2; --dim:#687084;
   --accent:#f3c04d; --accent-ink:#1b1505;
@@ -115,31 +115,19 @@ a{color:var(--muted)}
 .rules li{display:grid;grid-template-columns:16px 1fr;gap:6px;font-size:12px;color:var(--muted)}
 .rules b{color:var(--fg);font-weight:500}
 .ok-ic{color:var(--good)} .bad-ic{color:var(--bad)}
-.tl-panel{padding:0;overflow:hidden}
-.tl-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
-.tl-bar h2{margin:0}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
-.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
-.tl-scroll{overflow-x:auto}
-.tl{position:relative;min-width:780px;padding:6px 16px 14px}
-.tl-row{display:grid;grid-template-columns:72px 1fr;align-items:center;min-height:46px}
-.tl-row .nm{font-size:12px;color:var(--muted)}
-.lane{position:relative;height:38px;border-radius:5px;background:rgba(255,255,255,.025)}
-.ruler{height:22px;background:none;cursor:pointer}
-.ruler span{position:absolute;top:3px;font-size:10.5px;color:var(--dim);transform:translateX(-50%)}
-.clip{position:absolute;top:2px;bottom:2px;border-radius:6px;padding:3px 7px;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;border:1px solid rgba(0,0,0,.35);text-align:left;line-height:1.35}
-.clip.v{background:var(--trk-v);color:#062523;display:flex;gap:6px;align-items:center;padding:2px}
-.clip.v img{height:100%;aspect-ratio:9/16;object-fit:cover;border-radius:4px;flex:none}
-.clip.v span{overflow:hidden;text-overflow:ellipsis}
-.clip.v.active{outline:2px solid var(--accent);outline-offset:1px}
-.clip.v.flag{background:var(--bad);color:#2a0606}
-.clip.v.long{box-shadow:inset 0 -3px 0 var(--warn)}
-.clip.a{background:color-mix(in srgb,var(--trk-a) 28%,var(--panel-2));border-color:var(--trk-a);color:#d9d4ff}
-.clip.t{background:var(--trk-t);color:#241f12}
-.clip.s{background:var(--trk-s);color:#2b0d06}
-.clip small{display:block;opacity:.8;font-size:10px}
-.playhead{position:absolute;top:6px;bottom:10px;width:2px;background:var(--accent);pointer-events:none;z-index:3}
-.tl-empty{padding:20px 16px;color:var(--muted);font-size:13px}
+.seg-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.seg-tabs button{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2)}
+.seg-tabs button.on{border-color:var(--accent);color:var(--accent)}
+.seg-tabs button.gapped{border-style:dashed}
+.ask{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;align-items:center}
+.ask input,.ask select{font:inherit;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:9px 12px;min-width:0}
+.ask input:focus,.ask select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.ask-hint{margin:8px 0 0;font-size:12px;color:var(--muted)}
+.ask-hint b{color:var(--warn);font-weight:500}
+.edits{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--panel-2);border:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.edits .btn{margin-left:auto}
+.err{color:var(--bad);font-size:12.5px;white-space:pre-wrap}
+@media (max-width:740px){.ask{grid-template-columns:1fr 1fr}.ask input{grid-column:1 / -1}}
 .foot{font-size:12px;color:var(--dim);display:grid;gap:4px}
 .modal{position:fixed;inset:0;background:rgba(5,7,10,.72);display:grid;place-items:center;padding:16px;z-index:20}
 .modal-card{width:min(720px,100%);max-height:86vh;overflow:auto;display:grid;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
@@ -164,6 +152,17 @@ a{color:var(--muted)}
     <button class="btn" id="draftBtn" disabled>查看生成的剪映草稿</button>
   </header>
 
+  <section class="panel" id="askPanel" hidden aria-labelledby="ask-h">
+    <h2 id="ask-h">输入选题，现场生成</h2>
+    <form class="ask" id="askForm">
+      <input id="askTopic" placeholder="例如：从巴黎坐火车去阿姆斯特丹，周末两日游" required maxlength="80" aria-label="选题">
+      <select id="askMarket" aria-label="目标观众所在国家"><option>英国</option></select>
+      <select id="askPlatform" aria-label="发布平台"><option>TikTok</option><option>Instagram</option><option>YouTube Shorts</option></select>
+      <button class="btn primary" id="askGo" type="submit">生成粗剪</button>
+    </form>
+    <p class="ask-hint" id="askHint">DeepSeek 现写 3 版脚本 → 审核挑一版 → MiniMax 英文配音 → 从素材库配画面 → 写进剪映草稿。大约 30–60 秒。</p>
+  </section>
+
   <div class="grid">
     <section class="panel" aria-labelledby="in-h">
       <h2 id="in-h">本次任务</h2>
@@ -183,28 +182,21 @@ a{color:var(--muted)}
         <span class="tc mono" id="tc">00:00.0 / 00:00.0</span>
       </div>
       <div class="zh" id="zh"></div>
-      <p class="note">画面是素材库里的真实镜头，配音是系统语音合成的真实音频（英式男声）。网页里换镜头只影响预览和评分，正式修改在剪映里做。</p>
+      <p class="note" id="monNote"></p>
     </section>
 
     <section class="panel inspector" aria-labelledby="sc-h">
       <h2 id="sc-h">粗剪评分（满分 100）</h2>
       <div id="scoreBox"><p class="empty">生成后显示评分。</p></div>
       <hr class="sep">
-      <h2>当前片段</h2>
-      <div id="inspect"><p class="empty">点时间线上的画面片段，查看召回的候选镜头。</p></div>
+      <h2>逐句检查画面</h2>
+      <div id="inspect"><p class="empty">生成后可以逐句查看召回的候选镜头，不满意就换一个。</p></div>
+      <div class="edits" id="edits" hidden></div>
       <hr class="sep">
       <h2>国家 / 平台规则（RAG）</h2>
       <ul class="rules" id="rules"><li><span></span><span>生成后显示规则检查结果。</span></li></ul>
     </section>
   </div>
-
-  <section class="panel tl-panel" aria-labelledby="tl-h">
-    <div class="tl-bar">
-      <h2 id="tl-h">时间线（和剪映草稿的轨道一致）</h2>
-      <div class="legend"><span style="--c:var(--trk-v)">画面</span><span style="--c:var(--trk-a)">配音</span><span style="--c:var(--trk-t)">字幕</span><span style="--c:var(--trk-s)">花字</span></div>
-    </div>
-    <div class="tl-scroll"><div class="tl" id="tl"><div class="tl-empty">生成后在这里出现画面、配音、字幕、花字四条轨道。</div></div></div>
-  </section>
 
   <div class="foot" id="foot"></div>
 </div>
@@ -215,6 +207,8 @@ a{color:var(--muted)}
 
 <script>
 const R = {
+  "mode": "live",
+  "run_id": "20261109040746",
   "topic": {
     "note": "示例数据：历史爆款率为模拟值，真实落地时从 BI 的播放数据算出；营销节点来自营销部门的年度 roadmap。",
     "month": "11 月",
@@ -280,43 +274,79 @@ const R = {
         "score": 0.609
       }
     ],
-    "chosen": "T1"
+    "chosen": "INPUT",
+    "input": "坐火车穿越瑞士阿尔卑斯，窗外就是马特洪峰"
   },
   "scripts": {
-    "generated_by": "Claude Opus 5.5（按 data/script_prompt.md 生成，2026-11-09 存档）",
+    "generated_by": "DeepSeek（deepseek-chat，2026-11-09 04:07 现场生成，2241 tokens，7.0 秒）",
     "variants": [
       {
         "id": "A",
+        "idea": "以马特洪峰是“山中之王”的冷知识开头，突出阿尔卑斯火车路线的壮丽。",
         "lines": [
           {
-            "en": "Most people don't know you can sleep your way from London to Scotland.",
-            "zh": "很多人不知道，从伦敦睡一觉就能到苏格兰。",
+            "en": "The Matterhorn is one of the most iconic peaks in the Alps.",
+            "zh": "马特洪峰是阿尔卑斯山脉最具标志性的山峰之一。",
             "role": "开头 · 冷知识",
-            "on_screen": "LONDON → SCOTLAND\nWHILE YOU SLEEP"
+            "on_screen": "ICONIC ALPINE PEAK",
+            "tags": [
+              "matterhorn",
+              "mountain"
+            ],
+            "places": [
+              "阿尔卑斯"
+            ]
           },
           {
-            "en": "The Highlander sleeper leaves London Euston every evening.",
-            "zh": "Highlander 卧铺列车每天晚上从伦敦尤斯顿站出发。",
-            "role": "铺垫 · 路线"
+            "en": "Trains in Switzerland offer panoramic windows with views of the Alps.",
+            "zh": "瑞士的火车提供全景车窗，可以欣赏阿尔卑斯山景。",
+            "role": "铺垫 · 路线",
+            "tags": [
+              "train",
+              "window",
+              "scenery"
+            ],
+            "places": [
+              "瑞士"
+            ]
           },
           {
-            "en": "You fall asleep in the city and wake up to Highland lochs.",
-            "zh": "在城市睡着，醒来窗外是高地湖泊。",
-            "role": "画面 · 情绪"
+            "en": "Imagine gliding past snow-capped peaks and lush valleys.",
+            "zh": "想象一下滑过白雪覆盖的山峰和郁郁葱葱的山谷。",
+            "role": "画面 · 情绪",
+            "tags": [
+              "scenery",
+              "snow"
+            ],
+            "places": [
+              "阿尔卑斯"
+            ]
           },
           {
-            "en": "Book the two legs separately and you can save up to 30%.",
-            "zh": "分两段买票，最多能省 30%。",
+            "en": "Split ticketing can save you up to 30% on train travel.",
+            "zh": "分段买票可以节省高达30%的火车旅行费用。",
             "role": "利益点 · 省钱",
-            "on_screen": "SAVE UP TO 30%"
+            "on_screen": "SAVE UP TO 30%",
+            "tags": [
+              "ticket"
+            ],
+            "places": [
+              "英国"
+            ]
           },
           {
-            "en": "Open the app, search code UK20, and get an extra 20% off.",
-            "zh": "打开 App 搜 UK20，再减 20%。",
+            "en": "Search UK20 in the app for an extra 20% off your first trip.",
+            "zh": "在App中搜索UK20，首次旅行额外享受20%折扣。",
             "role": "结尾 · 搜码钩子",
-            "on_screen": "SEARCH: UK20"
+            "on_screen": "UK20",
+            "tags": [
+              "app",
+              "phone"
+            ],
+            "places": []
           }
         ],
+        "claims": [],
         "checks": [
           {
             "name": "开头不放利益点（R1）",
@@ -336,43 +366,78 @@ const R = {
           {
             "name": "事实核查（对照事实库）",
             "ok": true,
-            "msg": "所用事实都能在事实库找到出处"
+            "msg": "没有和事实库冲突的说法"
           }
         ],
         "ok": true
       },
       {
         "id": "B",
+        "idea": "以冰川快车是世界上最慢的快车这一冷知识开头，强调旅程的悠闲与风景。",
         "lines": [
           {
-            "en": "Here's a train secret most tourists never hear about.",
-            "zh": "这是大多数游客都不知道的火车冷知识。",
+            "en": "The Glacier Express is known as the world's slowest express train.",
+            "zh": "冰川快车被称为世界上最慢的快车。",
             "role": "开头 · 冷知识",
-            "on_screen": "UK TRAIN SECRET"
+            "on_screen": "SLOWEST EXPRESS TRAIN",
+            "tags": [
+              "train",
+              "scenery"
+            ],
+            "places": [
+              "瑞士"
+            ]
           },
           {
-            "en": "The sleeper train leaves London Euston just before midnight.",
-            "zh": "卧铺列车午夜前从伦敦尤斯顿站出发。",
-            "role": "铺垫 · 路线"
+            "en": "It winds through the Swiss Alps, offering breathtaking views.",
+            "zh": "它蜿蜒穿过瑞士阿尔卑斯山，提供令人惊叹的景色。",
+            "role": "铺垫 · 路线",
+            "tags": [
+              "train",
+              "mountain",
+              "scenery"
+            ],
+            "places": [
+              "瑞士",
+              "阿尔卑斯"
+            ]
           },
           {
-            "en": "By breakfast, you're looking out at Highland mountains.",
-            "zh": "到早餐时间，窗外已经是高地山景。",
-            "role": "画面 · 情绪"
+            "en": "You can relax and watch the world go by from your seat.",
+            "zh": "你可以放松身心，从座位上看着世界流逝。",
+            "role": "画面 · 情绪",
+            "tags": [
+              "window",
+              "scenery",
+              "train"
+            ],
+            "places": []
           },
           {
-            "en": "Split your ticket in two and save up to 30%.",
-            "zh": "把票分成两段买，最多省 30%。",
+            "en": "With split ticketing, you could save up to 30% on your journey.",
+            "zh": "通过分段买票，你的旅程可以节省高达30%。",
             "role": "利益点 · 省钱",
-            "on_screen": "SAVE UP TO 30%"
+            "on_screen": "SAVE UP TO 30%",
+            "tags": [
+              "ticket"
+            ],
+            "places": [
+              "英国"
+            ]
           },
           {
-            "en": "Search UK20 in the app for an extra 20% off.",
-            "zh": "在 App 搜 UK20，再减 20%。",
+            "en": "Open the app and search UK20 for an extra 20% off.",
+            "zh": "打开App搜索UK20，额外享受20%折扣。",
             "role": "结尾 · 搜码钩子",
-            "on_screen": "SEARCH: UK20"
+            "on_screen": "UK20",
+            "tags": [
+              "app",
+              "phone"
+            ],
+            "places": []
           }
         ],
+        "claims": [],
         "checks": [
           {
             "name": "开头不放利益点（R1）",
@@ -391,49 +456,85 @@ const R = {
           },
           {
             "name": "事实核查（对照事实库）",
-            "ok": false,
-            "msg": "事实冲突：午夜前发车的是去爱丁堡、格拉斯哥的 Lowlander；去高地的 Highlander 晚上 8–9 点就发车（F2）"
+            "ok": true,
+            "msg": "没有和事实库冲突的说法"
           }
         ],
-        "ok": false
+        "ok": true
       },
       {
         "id": "C",
+        "idea": "以瑞士火车以准点闻名这一冷知识开头，突出高效与美景的结合。",
         "lines": [
           {
-            "en": "Get 20% off the London to Scotland sleeper with code UK20.",
-            "zh": "用优惠码 UK20，伦敦到苏格兰卧铺立减 20%。",
+            "en": "Swiss trains are famous for their punctuality and efficiency.",
+            "zh": "瑞士火车以其准点和高效而闻名。",
             "role": "开头 · 冷知识",
-            "on_screen": "20% OFF"
+            "on_screen": "PUNCTUAL & EFFICIENT",
+            "tags": [
+              "train",
+              "station"
+            ],
+            "places": [
+              "瑞士"
+            ]
           },
           {
-            "en": "It leaves London Euston every evening and runs overnight.",
-            "zh": "它每天晚上从伦敦尤斯顿站出发，连夜行驶。",
-            "role": "铺垫 · 路线"
+            "en": "You can travel through the Alps with ease and comfort.",
+            "zh": "你可以轻松舒适地穿越阿尔卑斯山。",
+            "role": "铺垫 · 路线",
+            "tags": [
+              "train",
+              "mountain"
+            ],
+            "places": [
+              "瑞士",
+              "阿尔卑斯"
+            ]
           },
           {
-            "en": "Wake up to lochs and mountains outside your window.",
-            "zh": "醒来时窗外是湖泊和山。",
-            "role": "画面 · 情绪"
+            "en": "Picture yourself gazing at the Matterhorn from a cozy train.",
+            "zh": "想象一下在舒适的火车的凝视马特洪峰。",
+            "role": "画面 · 情绪",
+            "tags": [
+              "matterhorn",
+              "train",
+              "window"
+            ],
+            "places": [
+              "阿尔卑斯"
+            ]
           },
           {
-            "en": "Splitting the journey can save you up to 30%.",
-            "zh": "分段出行最多能省 30%。",
+            "en": "Split ticketing can offer up to 30% savings on your trip.",
+            "zh": "分段买票可以为你的旅行提供高达30%的节省。",
             "role": "利益点 · 省钱",
-            "on_screen": "SAVE UP TO 30%"
+            "on_screen": "SAVE UP TO 30%",
+            "tags": [
+              "ticket"
+            ],
+            "places": [
+              "英国"
+            ]
           },
           {
-            "en": "Open the app and search UK20 before it's gone.",
-            "zh": "趁还有，打开 App 搜 UK20。",
+            "en": "Search UK20 in the app for an extra 20% off.",
+            "zh": "在App中搜索UK20，额外享受20%折扣。",
             "role": "结尾 · 搜码钩子",
-            "on_screen": "SEARCH: UK20"
+            "on_screen": "UK20",
+            "tags": [
+              "app",
+              "phone"
+            ],
+            "places": []
           }
         ],
+        "claims": [],
         "checks": [
           {
             "name": "开头不放利益点（R1）",
-            "ok": false,
-            "msg": "第 1 句出现利益点：Get 20% off the London to Scotland sleeper with code UK20."
+            "ok": true,
+            "msg": "第 1 句没有价格或优惠"
           },
           {
             "name": "每句不超过 14 个词",
@@ -442,23 +543,20 @@ const R = {
           },
           {
             "name": "价格写 up to / extra（R4）",
-            "ok": false,
-            "msg": "有价格没写 up to"
+            "ok": true,
+            "msg": "价格表述合规"
           },
           {
             "name": "事实核查（对照事实库）",
             "ok": true,
-            "msg": "所用事实都能在事实库找到出处"
+            "msg": "没有和事实库冲突的说法"
           }
         ],
-        "ok": false
+        "ok": true
       }
     ],
     "chosen": "A",
-    "rejected": [
-      "B 版：事实冲突：午夜前发车的是去爱丁堡、格拉斯哥的 Lowlander；去高地的 Highlander 晚上 8–9 点就发车（F2）",
-      "C 版：第 1 句出现利益点：Get 20% off the London to Scotland sleeper with code UK20."
-    ],
+    "rejected": [],
     "facts": [
       {
         "id": "F1",
@@ -482,16 +580,20 @@ const R = {
       }
     ]
   },
-  "title": "伦敦 → 苏格兰卧铺冷知识",
+  "title": "坐火车穿越瑞士阿尔卑斯，窗外就是马特洪峰",
   "country": "英国",
   "platform": "TikTok",
   "skill": {
     "name": "冷知识路线类 v0.3",
     "from": "从业务方 12 个爆款剪映工程里提炼的剪辑规则（Demo 中为人工整理的示例规则）",
     "voice": {
-      "engine": "macOS 系统语音（Demo）/ ElevenLabs（落地）",
+      "engine": "minimax",
       "voice": "Daniel（英式男声）",
-      "rate_wpm": 175
+      "rate_wpm": 175,
+      "minimax_voice": "English_Graceful_Lady",
+      "minimax_speed": 1.15,
+      "minimax_note": "账号里唯一的英式口音英文音色（女声）；想换美式男声改成 English_Trustworthy_Man",
+      "used": "MiniMax English_Graceful_Lady"
     },
     "gap_between_lines_s": 0.15,
     "tail_s": 0.6,
@@ -525,85 +627,112 @@ const R = {
     "benefit_sticker_len_s": 2.6,
     "cta_min_s": 1.5
   },
-  "total_s": 19.57,
+  "total_s": 23.79,
   "segments": [
     {
       "i": 0,
-      "en": "Most people don't know you can sleep your way from London to Scotland.",
-      "zh": "很多人不知道，从伦敦睡一觉就能到苏格兰。",
+      "en": "The Matterhorn is one of the most iconic peaks in the Alps.",
+      "zh": "马特洪峰是阿尔卑斯山脉最具标志性的山峰之一。",
       "role": "开头 · 冷知识",
       "start": 0.0,
-      "dur": 3.8,
-      "voice_s": 3.65,
+      "dur": 4.38,
+      "voice_s": 4.23,
       "audio": "output/tts/line1",
       "need": [
-        "sleeper",
-        "london"
+        "matterhorn",
+        "mountain"
       ],
       "places": [
-        "伦敦",
-        "苏格兰"
+        "阿尔卑斯"
       ],
       "candidates": [
         {
-          "id": "m06",
-          "title": "伦敦夜景（泰晤士河）",
-          "coverage": 0.5,
+          "id": "m40",
+          "title": "马特洪峰下的山地铁路",
+          "coverage": 1.0,
           "matched": [
-            "london"
+            "matterhorn",
+            "mountain"
           ],
           "quality": 4,
           "issues": [],
           "excluded": null,
           "loc_hit": 1,
-          "clip_s": 11.68
+          "clip_s": 11.97
         },
         {
-          "id": "m07",
-          "title": "伦敦塔桥夜景",
-          "coverage": 0.5,
+          "id": "m42",
+          "title": "马特洪峰与弯道铁路",
+          "coverage": 1.0,
           "matched": [
-            "london"
+            "matterhorn",
+            "mountain"
           ],
           "quality": 4,
           "issues": [],
           "excluded": null,
           "loc_hit": 1,
-          "clip_s": 12.5
+          "clip_s": 6.67
         },
         {
-          "id": "m04",
-          "title": "卧铺铺位（车厢内）",
-          "coverage": 0.5,
+          "id": "m12",
+          "title": "阿尔卑斯雪山湖",
+          "coverage": 0.33,
           "matched": [
-            "sleeper"
+            "mountain"
+          ],
+          "quality": 5,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 9.19
+        },
+        {
+          "id": "m41",
+          "title": "瑞士雪山小火车",
+          "coverage": 0.33,
+          "matched": [
+            "mountain"
+          ],
+          "quality": 5,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 12.0
+        },
+        {
+          "id": "m03",
+          "title": "列车穿过绿色山谷",
+          "coverage": 0.33,
+          "matched": [
+            "mountain"
           ],
           "quality": 4,
           "issues": [],
           "excluded": null,
           "loc_hit": 0,
-          "clip_s": 3.5
+          "clip_s": 8.6
         }
       ],
       "shots": [
         {
-          "clip": "m06",
-          "title": "伦敦夜景（泰晤士河）",
+          "clip": "m40",
+          "title": "马特洪峰下的山地铁路",
           "start": 0.0,
-          "dur": 1.9,
+          "dur": 2.19,
           "src_in": 0.5,
-          "coverage": 0.5,
+          "coverage": 1.0,
           "quality": 4,
           "issues": [],
           "excluded": null
         },
         {
-          "clip": "m04",
-          "title": "卧铺铺位（车厢内）",
-          "start": 1.9,
-          "dur": 1.9,
+          "clip": "m42",
+          "title": "马特洪峰与弯道铁路",
+          "start": 2.19,
+          "dur": 2.19,
           "src_in": 0.5,
-          "coverage": 0.5,
+          "coverage": 1.0,
           "quality": 4,
           "issues": [],
           "excluded": null
@@ -612,140 +741,91 @@ const R = {
       "stickers": [
         {
           "kind": "开头花字",
-          "text": "LONDON → SCOTLAND\nWHILE YOU SLEEP",
+          "text": "ICONIC ALPINE PEAK",
           "start": 0.0,
           "dur": 2.8
         }
       ],
       "gap": null,
-      "subtitle": "Most people don't know you can sleep your\nway from London to Scotland."
+      "subtitle": "The Matterhorn is one of the most iconic\npeaks in the Alps."
     },
     {
       "i": 1,
-      "en": "The Highlander sleeper leaves London Euston every evening.",
-      "zh": "Highlander 卧铺列车每天晚上从伦敦尤斯顿站出发。",
+      "en": "Trains in Switzerland offer panoramic windows with views of the Alps.",
+      "zh": "瑞士的火车提供全景车窗，可以欣赏阿尔卑斯山景。",
       "role": "铺垫 · 路线",
-      "start": 3.8,
-      "dur": 3.13,
-      "voice_s": 2.98,
+      "start": 4.38,
+      "dur": 5.11,
+      "voice_s": 4.96,
       "audio": "output/tts/line2",
       "need": [
-        "sleeper",
         "train",
-        "depart",
-        "station",
-        "london",
-        "night"
+        "window",
+        "scenery"
       ],
       "places": [
-        "伦敦"
+        "瑞士"
       ],
       "candidates": [
         {
-          "id": "m02",
-          "title": "夜间站台停靠列车",
-          "coverage": 0.67,
+          "id": "m41",
+          "title": "瑞士雪山小火车",
+          "coverage": 0.55,
           "matched": [
-            "train",
-            "depart",
-            "station",
-            "night"
+            "train"
           ],
-          "quality": 4,
+          "quality": 5,
           "issues": [],
           "excluded": null,
-          "loc_hit": 0,
-          "clip_s": 12.47
+          "loc_hit": 1,
+          "clip_s": 12.0
         },
         {
-          "id": "m01",
-          "title": "夜间列车进站",
-          "coverage": 0.5,
+          "id": "m40",
+          "title": "马特洪峰下的山地铁路",
+          "coverage": 0.55,
           "matched": [
-            "train",
-            "station",
-            "night"
-          ],
-          "quality": 4,
-          "issues": [],
-          "excluded": null,
-          "loc_hit": 0,
-          "clip_s": 11.47
-        },
-        {
-          "id": "m06",
-          "title": "伦敦夜景（泰晤士河）",
-          "coverage": 0.33,
-          "matched": [
-            "london",
-            "night"
+            "train"
           ],
           "quality": 4,
           "issues": [],
           "excluded": null,
           "loc_hit": 1,
-          "clip_s": 11.68
+          "clip_s": 11.97
         },
         {
-          "id": "m08",
-          "title": "克鲁火车站站台（英格兰）",
-          "coverage": 0.33,
+          "id": "m42",
+          "title": "马特洪峰与弯道铁路",
+          "coverage": 0.55,
           "matched": [
-            "train",
-            "station"
+            "train"
           ],
           "quality": 4,
           "issues": [],
-          "excluded": "地点不符：画面是克鲁，脚本说的是伦敦",
-          "loc_hit": 0,
-          "clip_s": 11.0
-        }
-      ],
-      "shots": [
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 6.67
+        },
         {
-          "clip": "m02",
-          "title": "夜间站台停靠列车",
-          "start": 3.8,
-          "dur": 3.13,
-          "src_in": 0.5,
-          "coverage": 0.67,
+          "id": "m14",
+          "title": "火车上用手机",
+          "coverage": 0.82,
+          "matched": [
+            "train",
+            "window"
+          ],
           "quality": 4,
           "issues": [],
-          "excluded": null
-        }
-      ],
-      "stickers": [],
-      "gap": null,
-      "subtitle": "The Highlander sleeper leaves London\nEuston every evening."
-    },
-    {
-      "i": 2,
-      "en": "You fall asleep in the city and wake up to Highland lochs.",
-      "zh": "在城市睡着，醒来窗外是高地湖泊。",
-      "role": "画面 · 情绪",
-      "start": 6.93,
-      "dur": 3.25,
-      "voice_s": 3.1,
-      "audio": "output/tts/line3",
-      "need": [
-        "sleeper",
-        "city",
-        "morning",
-        "window",
-        "mountain",
-        "lake"
-      ],
-      "places": [
-        "苏格兰"
-      ],
-      "candidates": [
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 5.29
+        },
         {
           "id": "m16",
           "title": "卧铺包厢窗景（清晨）",
-          "coverage": 0.5,
+          "coverage": 0.82,
           "matched": [
-            "sleeper",
-            "morning",
+            "train",
             "window"
           ],
           "quality": 4,
@@ -755,67 +835,51 @@ const R = {
           "clip_s": 8.89
         },
         {
-          "id": "m10",
-          "title": "山丘与湖泊（阴天）",
-          "coverage": 0.33,
+          "id": "m43",
+          "title": "格林德瓦山谷小镇",
+          "coverage": 0.18,
           "matched": [
-            "mountain",
-            "lake"
+            "scenery"
           ],
           "quality": 4,
           "issues": [],
           "excluded": null,
-          "loc_hit": 0,
-          "clip_s": 18.0
+          "loc_hit": 1,
+          "clip_s": 7.23
         },
         {
-          "id": "m11",
-          "title": "阴天山湖",
-          "coverage": 0.33,
+          "id": "m08",
+          "title": "克鲁火车站站台（英格兰）",
+          "coverage": 0.55,
           "matched": [
-            "mountain",
-            "lake"
+            "train"
           ],
           "quality": 4,
           "issues": [],
-          "excluded": null,
+          "excluded": "地点不符：画面是克鲁，脚本说的是瑞士",
           "loc_hit": 0,
-          "clip_s": 10.7
-        },
-        {
-          "id": "m12",
-          "title": "阿尔卑斯雪山湖",
-          "coverage": 0.33,
-          "matched": [
-            "mountain",
-            "lake"
-          ],
-          "quality": 5,
-          "issues": [],
-          "excluded": "地点不符：画面是阿尔卑斯，脚本说的是苏格兰",
-          "loc_hit": 0,
-          "clip_s": 9.19
+          "clip_s": 11.0
         }
       ],
       "shots": [
         {
-          "clip": "m16",
-          "title": "卧铺包厢窗景（清晨）",
-          "start": 6.93,
-          "dur": 1.625,
+          "clip": "m41",
+          "title": "瑞士雪山小火车",
+          "start": 4.38,
+          "dur": 2.555,
           "src_in": 0.5,
-          "coverage": 0.5,
-          "quality": 4,
+          "coverage": 0.55,
+          "quality": 5,
           "issues": [],
           "excluded": null
         },
         {
-          "clip": "m10",
-          "title": "山丘与湖泊（阴天）",
-          "start": 8.555,
-          "dur": 1.625,
+          "clip": "m16",
+          "title": "卧铺包厢窗景（清晨）",
+          "start": 6.935,
+          "dur": 2.555,
           "src_in": 0.5,
-          "coverage": 0.33,
+          "coverage": 0.82,
           "quality": 4,
           "issues": [],
           "excluded": null
@@ -823,22 +887,174 @@ const R = {
       ],
       "stickers": [],
       "gap": null,
-      "subtitle": "You fall asleep in the city and wake up\nto Highland lochs."
+      "subtitle": "Trains in Switzerland offer panoramic\nwindows with views of the Alps."
+    },
+    {
+      "i": 2,
+      "en": "Imagine gliding past snow-capped peaks and lush valleys.",
+      "zh": "想象一下滑过白雪覆盖的山峰和郁郁葱葱的山谷。",
+      "role": "画面 · 情绪",
+      "start": 9.49,
+      "dur": 4.33,
+      "voice_s": 4.18,
+      "audio": "output/tts/line3",
+      "need": [
+        "scenery",
+        "snow"
+      ],
+      "places": [
+        "阿尔卑斯"
+      ],
+      "candidates": [
+        {
+          "id": "m43",
+          "title": "格林德瓦山谷小镇",
+          "coverage": 0.67,
+          "matched": [
+            "scenery"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 7.23
+        },
+        {
+          "id": "m44",
+          "title": "阿尔卑斯湖与山崖",
+          "coverage": 0.67,
+          "matched": [
+            "scenery"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 12.0
+        },
+        {
+          "id": "m45",
+          "title": "国王湖（德国巴伐利亚）",
+          "coverage": 0.67,
+          "matched": [
+            "scenery"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 11.97
+        },
+        {
+          "id": "m18",
+          "title": "意大利乡村风景（车上拍）",
+          "coverage": 0.67,
+          "matched": [
+            "scenery"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 12.0
+        },
+        {
+          "id": "m47",
+          "title": "悬崖边的大海（西班牙北部）",
+          "coverage": 0.67,
+          "matched": [
+            "scenery"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 7.97
+        },
+        {
+          "id": "m41",
+          "title": "瑞士雪山小火车",
+          "coverage": 0.33,
+          "matched": [
+            "snow"
+          ],
+          "quality": 5,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 12.0
+        },
+        {
+          "id": "m46",
+          "title": "海岸悬崖（北爱尔兰）",
+          "coverage": 0.67,
+          "matched": [
+            "scenery"
+          ],
+          "quality": 3,
+          "issues": [],
+          "excluded": "地点不符：画面是北爱尔兰，脚本说的是阿尔卑斯",
+          "loc_hit": 0,
+          "clip_s": 9.17
+        }
+      ],
+      "shots": [
+        {
+          "clip": "m43",
+          "title": "格林德瓦山谷小镇",
+          "start": 9.49,
+          "dur": 2.165,
+          "src_in": 0.5,
+          "coverage": 0.67,
+          "quality": 4,
+          "issues": [],
+          "excluded": null
+        },
+        {
+          "clip": "m41",
+          "title": "瑞士雪山小火车",
+          "start": 11.655,
+          "dur": 2.165,
+          "src_in": 0.5,
+          "coverage": 0.33,
+          "quality": 5,
+          "issues": [],
+          "excluded": null
+        }
+      ],
+      "stickers": [],
+      "gap": null,
+      "subtitle": "Imagine gliding past snow-capped peaks\nand lush valleys."
     },
     {
       "i": 3,
-      "en": "Book the two legs separately and you can save up to 30%.",
-      "zh": "分两段买票，最多能省 30%。",
+      "en": "Split ticketing can save you up to 30% on train travel.",
+      "zh": "分段买票可以节省高达30%的火车旅行费用。",
       "role": "利益点 · 省钱",
-      "start": 10.18,
-      "dur": 3.74,
-      "voice_s": 3.59,
+      "start": 13.82,
+      "dur": 4.51,
+      "voice_s": 4.36,
       "audio": "output/tts/line4",
       "need": [
         "ticket"
       ],
-      "places": [],
+      "places": [
+        "英国"
+      ],
       "candidates": [
+        {
+          "id": "m52",
+          "title": "手机上的二维码电子票",
+          "coverage": 1.0,
+          "matched": [
+            "ticket"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 8.63
+        },
         {
           "id": "m13",
           "title": "售票机出票口",
@@ -851,14 +1067,40 @@ const R = {
           "excluded": null,
           "loc_hit": 0,
           "clip_s": 10.16
+        },
+        {
+          "id": "m53",
+          "title": "刷卡过闸机",
+          "coverage": 1.0,
+          "matched": [
+            "ticket"
+          ],
+          "quality": 4,
+          "issues": [
+            "people"
+          ],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 7.17
         }
       ],
       "shots": [
         {
+          "clip": "m52",
+          "title": "手机上的二维码电子票",
+          "start": 13.82,
+          "dur": 2.255,
+          "src_in": 0.5,
+          "coverage": 1.0,
+          "quality": 4,
+          "issues": [],
+          "excluded": null
+        },
+        {
           "clip": "m13",
           "title": "售票机出票口",
-          "start": 10.18,
-          "dur": 3.74,
+          "start": 16.075,
+          "dur": 2.255,
           "src_in": 0.5,
           "coverage": 1.0,
           "quality": 3,
@@ -870,21 +1112,21 @@ const R = {
         {
           "kind": "利益点贴纸",
           "text": "SAVE UP TO 30%",
-          "start": 10.48,
+          "start": 14.12,
           "dur": 2.6
         }
       ],
-      "gap": "素材缺口：和「ticket」相关的镜头只有 1 个，这句只能用单镜头 3.7 秒",
-      "subtitle": "Book the two legs separately and you can\nsave up to 30%."
+      "gap": null,
+      "subtitle": "Split ticketing can save you up to 30% on\ntrain travel."
     },
     {
       "i": 4,
-      "en": "Open the app, search code UK20, and get an extra 20% off.",
-      "zh": "打开 App 搜 UK20，再减 20%。",
+      "en": "Search UK20 in the app for an extra 20% off your first trip.",
+      "zh": "在App中搜索UK20，首次旅行额外享受20%折扣。",
       "role": "结尾 · 搜码钩子",
-      "start": 13.92,
-      "dur": 5.65,
-      "voice_s": 5.05,
+      "start": 18.33,
+      "dur": 5.46,
+      "voice_s": 4.86,
       "audio": "output/tts/line5",
       "need": [
         "app",
@@ -907,9 +1149,23 @@ const R = {
           "clip_s": 30.95
         },
         {
+          "id": "m52",
+          "title": "手机上的二维码电子票",
+          "coverage": 1.0,
+          "matched": [
+            "app",
+            "phone"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 8.63
+        },
+        {
           "id": "m14",
           "title": "火车上用手机",
-          "coverage": 0.5,
+          "coverage": 0.33,
           "matched": [
             "phone"
           ],
@@ -922,7 +1178,7 @@ const R = {
         {
           "id": "m15",
           "title": "手持手机（背面）",
-          "coverage": 0.5,
+          "coverage": 0.33,
           "matched": [
             "phone"
           ],
@@ -939,8 +1195,8 @@ const R = {
         {
           "clip": "m05",
           "title": "手机上打开 App",
-          "start": 13.92,
-          "dur": 2.825,
+          "start": 18.33,
+          "dur": 2.73,
           "src_in": 0.5,
           "coverage": 1.0,
           "quality": 4,
@@ -948,12 +1204,12 @@ const R = {
           "excluded": null
         },
         {
-          "clip": "m14",
-          "title": "火车上用手机",
-          "start": 16.745,
-          "dur": 2.825,
+          "clip": "m52",
+          "title": "手机上的二维码电子票",
+          "start": 21.06,
+          "dur": 2.73,
           "src_in": 0.5,
-          "coverage": 0.5,
+          "coverage": 1.0,
           "quality": 4,
           "issues": [],
           "excluded": null
@@ -962,13 +1218,13 @@ const R = {
       "stickers": [
         {
           "kind": "结尾钩子",
-          "text": "SEARCH: UK20",
-          "start": 14.12,
-          "dur": 5.45
+          "text": "UK20",
+          "start": 18.53,
+          "dur": 5.26
         }
       ],
       "gap": null,
-      "subtitle": "Open the app, search code UK20, and get\nan extra 20% off."
+      "subtitle": "Search UK20 in the app for an extra 20%\noff your first trip."
     }
   ],
   "rules": [
@@ -1020,8 +1276,8 @@ const R = {
       {
         "n": "脚本和画面语义匹配",
         "max": 30,
-        "v": 18.8,
-        "why": "8 个镜头平均覆盖所在句子 62% 的关键词"
+        "v": 25.1,
+        "why": "10 个镜头平均覆盖所在句子 84% 的关键词"
       },
       {
         "n": "配音和画面对齐",
@@ -1033,19 +1289,19 @@ const R = {
         "n": "结构和开头",
         "max": 15,
         "v": 13,
-        "why": "开头 3.8 秒，建议压到 3.5 秒内；利益点在后半段"
+        "why": "开头 4.4 秒，建议压到 3.5 秒内；利益点在后半段"
       },
       {
         "n": "剪辑规则还原",
         "max": 15,
-        "v": 12,
-        "why": "Skill 规则命中 4/5；有镜头超过 3.2 秒（素材缺口）"
+        "v": 15,
+        "why": "Skill 规则命中 5/5"
       },
       {
         "n": "画面质量",
         "max": 10,
-        "v": 7.8,
-        "why": "所用镜头平均清晰度 3.9 / 5（540p 竖屏素材）"
+        "v": 8.2,
+        "why": "所用镜头平均清晰度 4.1 / 5（540p 竖屏素材）"
       },
       {
         "n": "合规",
@@ -1054,66 +1310,88 @@ const R = {
         "why": "所选镜头里没有可识别人脸（人工标注）；没有第三方品牌标识；价格都写了 up to / extra"
       }
     ],
-    "total": 77,
-    "band": "70–79：粗剪合格，交人工精修"
+    "total": 86,
+    "band": "80–89：精修后可发布"
   },
   "log": [
     {
       "step": "选题",
-      "msg": "4 个候选选题，按 历史爆款率×0.5 + 营销节点×0.3 + 利益点可植入×0.2 打分，选中 T1「伦敦到苏格兰，睡一觉就到（卧铺冷知识）」（0.98）",
-      "ms": 0
+      "msg": "人工输入选题「坐火车穿越瑞士阿尔卑斯，窗外就是马特洪峰」（英国 · TikTok），跳过选题池打分",
+      "ms": 1
     },
     {
       "step": "写脚本",
-      "msg": "脚本 Agent 出 3 版初稿，审核拦下 2 版，采用 A 版",
-      "ms": 1
+      "msg": "DeepSeek 出 3 版初稿，审核拦下 0 版，采用 A 版",
+      "ms": 7032
     },
     {
       "step": "读取 Skill",
       "msg": "冷知识路线类 v0.3：单镜头 ≤ 3.2 秒、字幕/花字样式、利益点和结尾钩子规则",
-      "ms": 1
+      "ms": 7032
     },
     {
       "step": "读取素材库",
-      "msg": "16 段实拍，已打标签（地点、场景、清晰度、风险）",
-      "ms": 119
+      "msg": "53 段实拍，已打标签（地点、场景、清晰度、风险）",
+      "ms": 7289
     },
     {
       "step": "生成配音",
-      "msg": "5 句，共 18.4 秒（Daniel（英式男声））",
-      "ms": 2387
+      "msg": "5 句，共 22.6 秒（MiniMax English_Graceful_Lady）",
+      "ms": 12203
     },
     {
       "step": "按语义和气口分段",
-      "msg": "5 段，总时长 19.57 秒",
-      "ms": 2387
+      "msg": "5 段，总时长 23.79 秒",
+      "ms": 12204
     },
     {
       "step": "本地素材库召回",
-      "msg": "每句按关键词召回 3 个候选；排除地点不符 2 个；8 个镜头",
-      "ms": 2387
+      "msg": "每句按画面概念召回 5 个候选；排除地点不符 2 个；10 个镜头",
+      "ms": 12204
     },
     {
       "step": "检索国家 / 平台规则",
       "msg": "英国 × TikTok，命中 6 条，通过 6 条",
-      "ms": 2388
+      "ms": 12204
     },
     {
       "step": "编排剪映轨道",
-      "msg": "已生成剪映草稿「AI粗剪_伦敦苏格兰卧铺_v1」：画面 8 段、配音 5 段、字幕 5 段、花字 3 个",
-      "ms": 2445
+      "msg": "已生成剪映草稿「AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407」：画面 10 段、配音 5 段、字幕 5 段、花字 3 个",
+      "ms": 12272
     },
     {
       "step": "自动评分",
-      "msg": "77 分 · 70–79：粗剪合格，交人工精修",
-      "ms": 2445
+      "msg": "86 分 · 80–89：精修后可发布",
+      "ms": 12272
+    },
+    {
+      "step": "人工换镜头",
+      "msg": "换了 1 个镜头，重新写入剪映草稿「AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407」，重新评分 86 分",
+      "ms": 12337
     }
   ],
   "draft": {
-    "name": "AI粗剪_伦敦苏格兰卧铺_v1",
-    "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1",
-    "shots": 8,
+    "name": "AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407",
+    "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407",
+    "shots": 10,
     "stickers": 3
+  },
+  "usage": {
+    "deepseek": {
+      "prompt_tokens": 838,
+      "completion_tokens": 1403,
+      "total_tokens": 2241,
+      "prompt_tokens_details": {
+        "cached_tokens": 640
+      },
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 198,
+      "seconds": 7.0
+    },
+    "minimax": {
+      "characters": 299,
+      "voice": "English_Graceful_Lady"
+    }
   },
   "clips": {
     "m01": {
@@ -1336,30 +1614,607 @@ const R = {
       "issues": [],
       "pexels": "https://www.pexels.com/video/tranquil-train-cabin-view-with-passenger-38302461/",
       "clip_s": 8.89
+    },
+    "m17": {
+      "title": "荷兰乡村列车（航拍）",
+      "file": "clips/m17.mp4",
+      "tags": [
+        "train",
+        "countryside",
+        "field",
+        "day",
+        "aerial",
+        "journey"
+      ],
+      "location": "荷兰",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/a-train-is-traveling-through-a-field-20770650/",
+      "clip_s": 11.97
+    },
+    "m18": {
+      "title": "意大利乡村风景（车上拍）",
+      "file": "clips/m18.mp4",
+      "tags": [
+        "countryside",
+        "mountain",
+        "journey",
+        "day",
+        "scenery"
+      ],
+      "location": "意大利",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-italian-countryside-from-a-train-32878229/",
+      "clip_s": 12.0
+    },
+    "m19": {
+      "title": "夕阳下驶过乡村的列车",
+      "file": "clips/m19.mp4",
+      "tags": [
+        "train",
+        "countryside",
+        "sunset",
+        "journey"
+      ],
+      "location": "荷兰",
+      "quality": 3,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-train-passing-through-dutch-countryside-33122062/",
+      "clip_s": 10.27
+    },
+    "m20": {
+      "title": "田野中的铁路（航拍）",
+      "file": "clips/m20.mp4",
+      "tags": [
+        "train",
+        "countryside",
+        "field",
+        "aerial",
+        "journey"
+      ],
+      "location": "荷兰",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/a-train-is-traveling-over-a-bridge-in-a-field-27636378/",
+      "clip_s": 11.97
+    },
+    "m21": {
+      "title": "车窗外的风景",
+      "file": "clips/m21.mp4",
+      "tags": [
+        "window",
+        "cabin",
+        "train",
+        "journey"
+      ],
+      "location": "未知",
+      "quality": 3,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-views-through-train-window-36620147/",
+      "clip_s": 11.2
+    },
+    "m22": {
+      "title": "车窗外的乡村",
+      "file": "clips/m22.mp4",
+      "tags": [
+        "window",
+        "cabin",
+        "train",
+        "countryside",
+        "journey"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-train-journey-through-countryside-35110516/",
+      "clip_s": 11.97
+    },
+    "m23": {
+      "title": "车窗外的城市天际线",
+      "file": "clips/m23.mp4",
+      "tags": [
+        "window",
+        "train",
+        "city",
+        "journey"
+      ],
+      "location": "未知",
+      "quality": 3,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/a-view-of-the-city-from-a-window-19057954/",
+      "clip_s": 11.97
+    },
+    "m24": {
+      "title": "车门边看乡村风景",
+      "file": "clips/m24.mp4",
+      "tags": [
+        "window",
+        "cabin",
+        "train",
+        "countryside",
+        "journey"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-train-journey-through-green-countryside-37533823/",
+      "clip_s": 11.97
+    },
+    "m25": {
+      "title": "斯特拉斯堡火车站大厅",
+      "file": "clips/m25.mp4",
+      "tags": [
+        "station",
+        "day"
+      ],
+      "location": "斯特拉斯堡",
+      "quality": 4,
+      "issues": [
+        "people"
+      ],
+      "pexels": "https://www.pexels.com/video/busy-train-station-in-strasbourg-france-32442350/",
+      "clip_s": 8.2
+    },
+    "m26": {
+      "title": "雪山下的欧洲火车站",
+      "file": "clips/m26.mp4",
+      "tags": [
+        "station",
+        "train",
+        "mountain",
+        "day"
+      ],
+      "location": "阿尔卑斯",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/busy-european-train-station-with-mountain-views-38076064/",
+      "clip_s": 6.63
+    },
+    "m27": {
+      "title": "英国火车站站台",
+      "file": "clips/m27.mp4",
+      "tags": [
+        "station",
+        "platform",
+        "day"
+      ],
+      "location": "英国",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/charming-train-station-platform-view-31273252/",
+      "clip_s": 11.6
+    },
+    "m28": {
+      "title": "空站台（晴天）",
+      "file": "clips/m28.mp4",
+      "tags": [
+        "station",
+        "platform",
+        "day"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/empty-train-station-platform-on-sunny-day-34710735/",
+      "clip_s": 11.3
+    },
+    "m29": {
+      "title": "埃菲尔铁塔与塞纳河",
+      "file": "clips/m29.mp4",
+      "tags": [
+        "paris",
+        "landmark",
+        "city",
+        "river",
+        "day"
+      ],
+      "location": "巴黎",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/eiffel-tower-and-seine-river-19197245/",
+      "clip_s": 7.6
+    },
+    "m30": {
+      "title": "埃菲尔铁塔（晴天）",
+      "file": "clips/m30.mp4",
+      "tags": [
+        "paris",
+        "landmark",
+        "city",
+        "river",
+        "boat",
+        "day"
+      ],
+      "location": "巴黎",
+      "quality": 5,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/stunning-daytime-view-of-eiffel-tower-31449922/",
+      "clip_s": 11.7
+    },
+    "m31": {
+      "title": "罗马斗兽场（白天）",
+      "file": "clips/m31.mp4",
+      "tags": [
+        "rome",
+        "landmark",
+        "city",
+        "day"
+      ],
+      "location": "罗马",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/majestic-colosseum-in-rome-during-daytime-39488183/",
+      "clip_s": 7.2
+    },
+    "m32": {
+      "title": "罗马斗兽场航拍（日落）",
+      "file": "clips/m32.mp4",
+      "tags": [
+        "rome",
+        "landmark",
+        "city",
+        "sunset",
+        "aerial"
+      ],
+      "location": "罗马",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/aerial-view-of-colosseum-at-sunset-in-rome-31791491/",
+      "clip_s": 11.97
+    },
+    "m33": {
+      "title": "阿姆斯特丹运河边的老房子",
+      "file": "clips/m33.mp4",
+      "tags": [
+        "amsterdam",
+        "canal",
+        "city",
+        "day"
+      ],
+      "location": "阿姆斯特丹",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/charming-amsterdam-canal-view-with-historic-buildings-34704500/",
+      "clip_s": 11.37
+    },
+    "m34": {
+      "title": "阿姆斯特丹运河游船",
+      "file": "clips/m34.mp4",
+      "tags": [
+        "amsterdam",
+        "canal",
+        "boat",
+        "city",
+        "day"
+      ],
+      "location": "阿姆斯特丹",
+      "quality": 4,
+      "issues": [
+        "people"
+      ],
+      "pexels": "https://www.pexels.com/video/scenic-boat-ride-through-amsterdam-canals-29719988/",
+      "clip_s": 12.0
+    },
+    "m35": {
+      "title": "爱丁堡城市街景",
+      "file": "clips/m35.mp4",
+      "tags": [
+        "edinburgh",
+        "city",
+        "landmark",
+        "day"
+      ],
+      "location": "爱丁堡",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-edinburgh-cityscape-featuring-iconic-landmarks-35818153/",
+      "clip_s": 11.97
+    },
+    "m36": {
+      "title": "爱丁堡司各特纪念塔（航拍）",
+      "file": "clips/m36.mp4",
+      "tags": [
+        "edinburgh",
+        "landmark",
+        "city",
+        "aerial",
+        "day"
+      ],
+      "location": "爱丁堡",
+      "quality": 5,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/iconic-scott-monument-tower-in-edinburgh-39638121/",
+      "clip_s": 12.0
+    },
+    "m37": {
+      "title": "威尼斯运河与小桥",
+      "file": "clips/m37.mp4",
+      "tags": [
+        "venice",
+        "canal",
+        "bridge",
+        "city",
+        "day"
+      ],
+      "location": "威尼斯",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/picturesque-venice-canal-with-historic-buildings-39617920/",
+      "clip_s": 6.57
+    },
+    "m38": {
+      "title": "威尼斯贡多拉",
+      "file": "clips/m38.mp4",
+      "tags": [
+        "venice",
+        "canal",
+        "boat",
+        "city",
+        "day"
+      ],
+      "location": "威尼斯",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/gondola-ride-through-venice-s-iconic-canals-35739115/",
+      "clip_s": 12.0
+    },
+    "m39": {
+      "title": "巴塞罗那圣家堂",
+      "file": "clips/m39.mp4",
+      "tags": [
+        "barcelona",
+        "landmark",
+        "city",
+        "day"
+      ],
+      "location": "巴塞罗那",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/sagrada-familia-under-vibrant-blue-sky-35134132/",
+      "clip_s": 6.7
+    },
+    "m40": {
+      "title": "马特洪峰下的山地铁路",
+      "file": "clips/m40.mp4",
+      "tags": [
+        "train",
+        "mountain",
+        "snow",
+        "journey",
+        "day",
+        "matterhorn"
+      ],
+      "location": "阿尔卑斯",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-train-ride-through-swiss-alps-33853666/",
+      "clip_s": 11.97
+    },
+    "m41": {
+      "title": "瑞士雪山小火车",
+      "file": "clips/m41.mp4",
+      "tags": [
+        "train",
+        "mountain",
+        "snow",
+        "station",
+        "day"
+      ],
+      "location": "阿尔卑斯",
+      "quality": 5,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-train-ride-through-snowy-swiss-alps-36041445/",
+      "clip_s": 12.0
+    },
+    "m42": {
+      "title": "马特洪峰与弯道铁路",
+      "file": "clips/m42.mp4",
+      "tags": [
+        "train",
+        "mountain",
+        "snow",
+        "journey",
+        "day",
+        "matterhorn"
+      ],
+      "location": "阿尔卑斯",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-train-journey-with-matterhorn-in-view-33841182/",
+      "clip_s": 6.67
+    },
+    "m43": {
+      "title": "格林德瓦山谷小镇",
+      "file": "clips/m43.mp4",
+      "tags": [
+        "mountain",
+        "village",
+        "countryside",
+        "day",
+        "scenery"
+      ],
+      "location": "阿尔卑斯",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/breathtaking-alpine-scenery-in-grindelwald-switzerland-34963042/",
+      "clip_s": 7.23
+    },
+    "m44": {
+      "title": "阿尔卑斯湖与山崖",
+      "file": "clips/m44.mp4",
+      "tags": [
+        "lake",
+        "mountain",
+        "scenery"
+      ],
+      "location": "阿尔卑斯",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-alpine-lake-and-mountain-view-35761474/",
+      "clip_s": 12.0
+    },
+    "m45": {
+      "title": "国王湖（德国巴伐利亚）",
+      "file": "clips/m45.mp4",
+      "tags": [
+        "lake",
+        "mountain",
+        "scenery",
+        "day"
+      ],
+      "location": "阿尔卑斯",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-aerial-view-of-konigssee-lake-37617124/",
+      "clip_s": 11.97
+    },
+    "m46": {
+      "title": "海岸悬崖（北爱尔兰）",
+      "file": "clips/m46.mp4",
+      "tags": [
+        "coast",
+        "sea",
+        "cliff",
+        "scenery"
+      ],
+      "location": "北爱尔兰",
+      "quality": 3,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/majestic-coastal-cliffs-with-ocean-waves-32549520/",
+      "clip_s": 9.17
+    },
+    "m47": {
+      "title": "悬崖边的大海（西班牙北部）",
+      "file": "clips/m47.mp4",
+      "tags": [
+        "coast",
+        "sea",
+        "scenery"
+      ],
+      "location": "西班牙",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/breathtaking-cliffside-view-over-the-vast-ocean-30326499/",
+      "clip_s": 7.97
+    },
+    "m48": {
+      "title": "罗卡角海岸（葡萄牙）",
+      "file": "clips/m48.mp4",
+      "tags": [
+        "coast",
+        "sea",
+        "cliff",
+        "scenery",
+        "day"
+      ],
+      "location": "葡萄牙",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/cabo-da-roca-27968170/",
+      "clip_s": 6.07
+    },
+    "m49": {
+      "title": "绿色田野（航拍）",
+      "file": "clips/m49.mp4",
+      "tags": [
+        "countryside",
+        "field",
+        "aerial",
+        "day"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/drone-footage-of-green-fields-12172344/",
+      "clip_s": 11.97
+    },
+    "m50": {
+      "title": "田间小路（航拍）",
+      "file": "clips/m50.mp4",
+      "tags": [
+        "countryside",
+        "field",
+        "aerial",
+        "day"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/rural-road-among-fields-12204555/",
+      "clip_s": 11.97
+    },
+    "m51": {
+      "title": "云下的田野",
+      "file": "clips/m51.mp4",
+      "tags": [
+        "countryside",
+        "field",
+        "day"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/clouds-over-fields-12196080/",
+      "clip_s": 11.97
+    },
+    "m52": {
+      "title": "手机上的二维码电子票",
+      "file": "clips/m52.mp4",
+      "tags": [
+        "phone",
+        "ticket",
+        "app"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/qr-code-on-a-smartphone-8384432/",
+      "clip_s": 8.63
+    },
+    "m53": {
+      "title": "刷卡过闸机",
+      "file": "clips/m53.mp4",
+      "tags": [
+        "ticket",
+        "station",
+        "gate"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [
+        "people"
+      ],
+      "pexels": "https://www.pexels.com/video/city-metro-turnstile-in-busy-station-39685624/",
+      "clip_s": 7.17
     }
   }
 };
+const STUDIO = /*__STUDIO__*/false;  // 本地工作台（studio.py 提供）时为 true：能输入选题现场生成、能把换过的镜头写回剪映
 const $=id=>document.getElementById(id);
 const S=R.segments;
+const V=R.run_id?`?v=${R.run_id}`:'';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=t=>{const m=Math.floor(t/60),s=t-m*60;return String(m).padStart(2,'0')+':'+s.toFixed(1).padStart(4,'0')};
 const thumb=id=>`thumbs/${id}.jpg`;
 const state={gen:false,t:0,playing:false,seg:0,shot:0};
-// shots are editable in the page (preview + score only)
 S.forEach(seg=>seg.shots.forEach(sh=>{sh.orig=sh.clip}));
+const voiceName=R.skill.voice.used||R.skill.voice.voice;
+const isInput=R.topic.chosen==='INPUT';
 
 /* ---------- static info ---------- */
-$('kv').innerHTML=`<dt>国家 / 平台</dt><dd>${R.country} · ${R.platform}</dd><dt>剪辑 Skill</dt><dd>${R.skill.name}</dd><dt>配音</dt><dd>${R.skill.voice.voice}</dd><dt>选题</dt><dd>${R.topic.chosen} · ${R.title}</dd><dt>脚本</dt><dd>AI 初稿 ${R.scripts.variants.length} 版 → 采用 ${R.scripts.chosen} 版</dd>`;
-const used=[...new Set(S.flatMap(s=>s.candidates.map(c=>c.id)))];
-$('foot').innerHTML=`<div>素材：Pexels 免费可商用实拍，共 ${Object.keys(R.clips).length} 段（${Object.entries(R.clips).map(([id,c])=>`<a href="${c.pexels}" target="_blank" rel="noopener">${id}</a>`).join(' ')}）。</div><div>说明：素材标签为人工看画面标注，召回用关键词匹配；真实落地时换成多模态模型自动打标和向量检索。剪映草稿由开源工具 pyJianYingDraft 生成。</div>`;
+$('kv').innerHTML=`<dt>国家 / 平台</dt><dd>${esc(R.country)} · ${esc(R.platform)}</dd><dt>剪辑 Skill</dt><dd>${esc(R.skill.name)}</dd><dt>配音</dt><dd>${esc(voiceName)}</dd><dt>选题</dt><dd>${isInput?'人工输入':esc(R.topic.chosen)} · ${esc(R.title)}</dd><dt>脚本</dt><dd>${R.mode==='live'?'DeepSeek':'AI'} 初稿 ${R.scripts.variants.length} 版 → 采用 ${R.scripts.chosen} 版</dd>`;
+$('monNote').textContent=`画面是素材库里的真实镜头，配音是真实合成的音频（${voiceName}）。${STUDIO?'右边换了镜头后，点「写入剪映」就会重新生成剪映草稿。':'网页里换镜头只影响预览和评分，正式修改在剪映里做。'}`;
+$('foot').innerHTML=`<div>素材：Pexels 免费可商用实拍，共 ${Object.keys(R.clips).length} 段（${Object.entries(R.clips).map(([id,c])=>`<a href="${c.pexels}" target="_blank" rel="noopener">${id}</a>`).join(' ')}）。</div><div>说明：素材标签为人工看画面标注；${R.mode==='live'?'脚本由 DeepSeek 现写，并给每句标出需要的画面概念和地点，':'存档脚本按关键词表找画面概念，'}召回按概念和地点匹配。真实落地时换成多模态模型自动打标和向量检索。剪映草稿由开源工具 pyJianYingDraft 生成。</div>`;
 
 /* ---------- video / audio elements ---------- */
 const vids={};
-function vid(id){ if(!vids[id]){ const v=document.createElement('video'); v.src=R.clips[id].file.replace('library/','clips/'); v.muted=true; v.playsInline=true; v.preload='auto'; $('screen').insertBefore(v,$('huazi')); vids[id]=v; } return vids[id]; }
-const auds=S.map(seg=>{const a=new Audio(seg.audio.replace('output/tts/','audio/')+'.m4a'); a.preload='auto'; return a;});
+function vid(id){ if(!vids[id]){ const v=document.createElement('video'); v.src=R.clips[id].file; v.muted=true; v.playsInline=true; v.preload='auto'; $('screen').insertBefore(v,$('huazi')); vids[id]=v; } return vids[id]; }
+const auds=S.map(seg=>{const a=new Audio(seg.audio.replace('output/tts/','audio/')+'.m4a'+V); a.preload='auto'; return a;});
 S.forEach(seg=>seg.shots.forEach(sh=>vid(sh.clip)));
 
 /* ---------- scoring (same rubric as pipeline.py) ---------- */
-function candOf(seg,id){return seg.candidates.find(c=>c.id===id)}
+function candOf(seg,id){return seg.candidates.find(c=>c.id===id)||{id,title:R.clips[id].title,coverage:0,matched:[],quality:R.clips[id].quality,issues:R.clips[id].issues,excluded:null}}
 function score(){
   const dims=R.score.dims.map(d=>({...d}));
   const shots=S.flatMap(seg=>seg.shots.map(sh=>({sh,seg,c:candOf(seg,sh.clip)})));
@@ -1369,56 +2224,51 @@ function score(){
   dims[0].why=wrong.length?`「${wrong[0].c.title}」${wrong[0].c.excluded}，本项记 0 分`:`${shots.length} 个镜头平均覆盖所在句子 ${Math.round(avg*100)}% 的关键词`;
   const q=shots.reduce((a,x)=>a+x.c.quality,0)/shots.length;
   dims[4].v=Math.round(100*q/5)/10; dims[4].why=`所用镜头平均清晰度 ${q.toFixed(1)} / 5（540p 竖屏素材）`;
-  const brand=shots.filter(x=>x.c.issues.includes('brand')).length;
-  dims[5].v=15-(brand?3:0);
-  dims[5].why=`所选镜头里没有可识别人脸（人工标注）；${brand?brand+' 个镜头露出手机品牌标识':'没有第三方品牌标识'}；价格都写了 up to / extra`;
+  const brand=shots.filter(x=>x.c.issues.includes('brand')).length, faces=shots.filter(x=>x.c.issues.includes('faces')).length;
+  const r4=R.rules.find(r=>r.id==='R4');
+  dims[5].v=15-(faces?8:0)-(brand?3:0)-(r4&&!r4.ok?5:0);
+  dims[5].why=`${faces?faces+' 个镜头有可识别人脸':'所选镜头里没有可识别人脸（人工标注）'}；${brand?brand+' 个镜头露出手机品牌标识':'没有第三方品牌标识'}；${r4?r4.msg:''}`;
   const total=Math.round(dims.reduce((a,d)=>a+d.v,0));
-  return {dims,total,brand,wrong:wrong.length};
+  return {dims,total,brand,faces,wrong:wrong.length};
 }
 const band=t=>t<70?['bad','低于 70：退回重做']:t<80?['mid','70–79：粗剪合格，交人工精修']:t<90?['ok','80–89：精修后可发布']:['ok','90+：有爆款潜力'];
+const swaps=()=>{const o={};S.forEach(seg=>seg.shots.forEach((sh,j)=>{if(sh.clip!==sh.orig){(o[seg.i]=o[seg.i]||{})[j]=sh.clip}}));return o};
 
 /* ---------- render ---------- */
-function renderSteps(done,run){
-  $('steps').innerHTML=R.log.map((l,i)=>`<li data-step="${l.step}" class="${i<done?'done':i===run?'run':''} ${l.step==='选题'||l.step==='写脚本'?'link':''}"><span class="dot" aria-hidden="true"></span><span><span class="k">${l.step}</span><span class="v">${i<done?l.msg:i===run?'处理中…':'等待'}</span></span><span class="ms mono">${i<done?l.ms+' ms':''}</span></li>`).join('');
+function renderSteps(done,run,log=R.log){
+  $('steps').innerHTML=log.map((l,i)=>`<li data-step="${esc(l.step)}" class="${i<done?'done':i===run?'run':''} ${l.step==='选题'||l.step==='写脚本'?'link':''}"><span class="dot" aria-hidden="true"></span><span><span class="k">${esc(l.step)}</span><span class="v">${i<done?esc(l.msg):i===run?'处理中…':'等待'}</span></span><span class="ms mono">${i<done&&l.ms!=null?l.ms+' ms':''}</span></li>`).join('');
 }
 function renderScore(){
   const {dims,total}=score();const [cls,txt]=band(total);
-  $('scoreBox').innerHTML=`<div class="score-head"><span class="score-num mono">${total}</span><span class="band ${cls}">${txt}</span></div><div class="dims">${dims.map(d=>{const r=d.v/d.max;const c=r<.4?'b':r<.75?'w':'';return `<div class="dim"><div class="t"><span>${d.n}</span><span class="mono">${d.v} / ${d.max}</span></div><div class="bar"><i class="${c}" style="width:${r*100}%"></i></div><div class="why">${d.why}</div></div>`}).join('')}</div>`;
+  $('scoreBox').innerHTML=`<div class="score-head"><span class="score-num mono">${total}</span><span class="band ${cls}">${txt}</span></div><div class="dims">${dims.map(d=>{const r=d.v/d.max;const c=r<.4?'b':r<.75?'w':'';return `<div class="dim"><div class="t"><span>${d.n}</span><span class="mono">${d.v} / ${d.max}</span></div><div class="bar"><i class="${c}" style="width:${r*100}%"></i></div><div class="why">${esc(d.why)}</div></div>`}).join('')}</div>`;
 }
 function renderRules(){
   const sc=score();
   $('rules').innerHTML=R.rules.map(r=>{let ok=r.ok,msg=r.msg;
+    if(r.id==='R2'){ok=!sc.faces;msg=ok?'所选镜头里没有可识别人脸（人工标注）':`${sc.faces} 个镜头有可识别人脸`}
     if(r.id==='R3'){ok=!sc.brand;msg=ok?'没有第三方品牌标识':`${sc.brand} 个镜头露出手机品牌标识`}
     if(r.id==='R6'&&sc.wrong){ok=false;msg='有镜头地点和脚本不符'}
-    return `<li><span class="${ok?'ok-ic':'bad-ic'}">${ok?'✓':'✕'}</span><span><b>${r.name}</b> · ${msg}</span></li>`}).join('');
+    return `<li><span class="${ok?'ok-ic':'bad-ic'}">${ok?'✓':'✕'}</span><span><b>${esc(r.name)}</b> · ${esc(msg)}</span></li>`}).join('');
 }
 function renderInspect(){
   const seg=S[state.seg]; const sh=seg.shots[state.shot]||seg.shots[0];
   const cur=candOf(seg,sh.clip);
-  $('inspect').innerHTML=`<div class="seg-head"><div><div class="seg-title">第 ${seg.i+1} 句 · ${seg.role}</div><div class="seg-en">${seg.en}</div><div class="seg-zh">${seg.zh}</div></div></div>
-   <div class="chips">${seg.need.map(k=>`<span class="chip ${cur.matched.includes(k)?'hit':''}">${k}</span>`).join('')}${seg.places.map(p=>`<span class="chip">地点：${p}</span>`).join('')}</div>
-   ${seg.gap?`<div class="gap">${seg.gap}</div>`:''}
+  $('inspect').innerHTML=`<div class="seg-tabs" role="tablist">${S.map(s=>`<button data-seg="${s.i}" class="${s.i===state.seg?'on':''} ${s.gap?'gapped':''}" title="${s.gap?'有素材缺口':''}">第 ${s.i+1} 句</button>`).join('')}</div>
+   <div class="seg-head"><div><div class="seg-title">第 ${seg.i+1} 句 · ${esc(seg.role)}</div><div class="seg-en">${esc(seg.en)}</div><div class="seg-zh">${esc(seg.zh)}</div></div></div>
+   <div class="chips">${seg.need.map(k=>`<span class="chip ${cur.matched.includes(k)?'hit':''}">${esc(k)}</span>`).join('')}${seg.places.map(p=>`<span class="chip">地点：${esc(p)}</span>`).join('')}</div>
+   ${seg.gap?`<div class="gap">${esc(seg.gap)}</div>`:''}
    ${seg.shots.length>1?`<div class="shot-tabs">${seg.shots.map((x,i)=>`<button data-shot="${i}" class="${i===state.shot?'on':''}">镜头 ${i+1}</button>`).join('')}</div>`:''}
-   <div class="cands">${seg.candidates.map(c=>{const sel=c.id===sh.clip;const flags=(c.excluded?`<span class="chip bad">${c.excluded}</span>`:'')+(c.issues.includes('brand')?'<span class="chip warn">品牌露出</span>':'');
-     return `<div class="cand ${sel?'sel':''} ${c.excluded?'x':''}"><img src="${thumb(c.id)}" alt=""><div><div class="nm">${c.id} · ${c.title}</div><div class="meta">命中：${c.matched.join('、')||'无'} · 清晰度 ${c.quality}/5 · ${c.clip_s} 秒</div>${flags?`<div class="chips">${flags}</div>`:''}</div><div class="pct"><span class="mono">${Math.round(c.coverage*100)}%</span><br>${sel?'<span class="meta">使用中</span>':`<button data-use="${c.id}">${c.excluded?'仍要替换':'替换'}</button>`}</div></div>`}).join('')}</div>`;
+   <div class="cands">${seg.candidates.map(c=>{const sel=c.id===sh.clip;const flags=(c.excluded?`<span class="chip bad">${esc(c.excluded)}</span>`:'')+(c.issues.includes('brand')?'<span class="chip warn">品牌露出</span>':'')+(c.issues.includes('people')?'<span class="chip">有路人（不可辨认）</span>':'');
+     return `<div class="cand ${sel?'sel':''} ${c.excluded?'x':''}"><img src="${thumb(c.id)}" alt=""><div><div class="nm">${c.id} · ${esc(c.title)}</div><div class="meta">命中：${c.matched.join('、')||'无'} · 清晰度 ${c.quality}/5 · ${c.clip_s} 秒</div>${flags?`<div class="chips">${flags}</div>`:''}</div><div class="pct"><span class="mono">${Math.round(c.coverage*100)}%</span><br>${sel?'<span class="meta">使用中</span>':`<button data-use="${c.id}">${c.excluded?'仍要替换':'替换'}</button>`}</div></div>`}).join('')}</div>`;
+  renderEdits();
 }
-let pps=40;
-function renderTimeline(){
-  const tl=$('tl');const laneW=Math.max(tl.clientWidth-32-72,680);pps=laneW/R.total_s;const x=t=>t*pps;
-  let ruler='';for(let t=0;t<=Math.floor(R.total_s);t+=2)ruler+=`<span class="mono" style="left:${x(t)}px">${fmt(t).slice(1)}</span>`;
-  const row=(nm,inner,cls='')=>`<div class="tl-row"><span class="nm">${nm}</span><div class="lane ${cls}">${inner}</div></div>`;
-  const box=(cls,st,len,html)=>`<div class="clip ${cls}" style="left:${x(st)}px;width:${Math.max(4,x(len)-2)}px">${html}</div>`;
-  const vids=S.flatMap(seg=>seg.shots.map((sh,j)=>{const c=candOf(seg,sh.clip);const act=state.seg===seg.i&&state.shot===j;
-    return `<button class="clip v ${act?'active':''} ${c.excluded?'flag':''} ${sh.dur>R.skill.max_shot_s+.05?'long':''}" data-seg="${seg.i}" data-shot="${j}" style="left:${x(sh.start)}px;width:${x(sh.dur)-2}px" title="${c.title}"><img src="${thumb(sh.clip)}" alt=""><span>${sh.clip} ${c.title}<small>${Math.round(c.coverage*100)}%</small></span></button>`}));
-  tl.innerHTML=row('',`<div id="ruler" style="position:absolute;inset:0">${ruler}</div>`,'ruler')+
-    row('画面',vids.join(''))+
-    row('配音',S.map(seg=>box('a',seg.start,seg.voice_s,`配音 ${seg.i+1} · ${seg.voice_s}s`)).join(''))+
-    row('字幕',S.map(seg=>box('t',seg.start,seg.dur,seg.subtitle.replace('\n',' '))).join(''))+
-    row('花字',S.flatMap(seg=>seg.stickers.map(st=>box('s',st.start,st.dur,st.text.replace('\n',' ')))).join(''))+
-    '<div class="playhead" id="ph2"></div>';
-  placeHead();
+function renderEdits(){
+  const sw=swaps(), n=Object.values(sw).reduce((a,o)=>a+Object.keys(o).length,0);
+  $('edits').hidden=!STUDIO||!state.gen;
+  if(!STUDIO)return;
+  $('edits').innerHTML=n?`<span>已换 ${n} 个镜头，还没写进剪映草稿</span><button class="btn" id="undoSw">撤销</button><button class="btn primary" id="writeDraft">写入剪映</button>`
+    :`<span>画面不满意就点候选镜头的「替换」，再写入剪映。裁剪、转场、调字幕在剪映里做。</span>`;
 }
-function placeHead(){const p=$('ph2');if(p)p.style.left=(16+72+state.t*pps)+'px'}
 function segAt(t){for(const s of S){if(t<s.start+s.dur)return s}return S[S.length-1]}
 function shotAt(seg,t){for(let j=0;j<seg.shots.length;j++){const sh=seg.shots[j];if(t<sh.start+sh.dur)return j}return seg.shots.length-1}
 function renderMonitor(){
@@ -1432,10 +2282,10 @@ function renderMonitor(){
   $('huazi').hidden=!st; if(st)$('huazi').textContent=st.text;
   $('zh').textContent='中文对照：'+seg.zh;
   $('tc').textContent=fmt(state.t)+' / '+fmt(R.total_s);
-  if(state.playing&&(seg.i!==state.seg||j!==state.shot)){state.seg=seg.i;state.shot=j;renderInspect();renderTimeline()}
-  placeHead();
+  if(state.playing&&(seg.i!==state.seg||j!==state.shot)){state.seg=seg.i;state.shot=j;renderInspect()}
 }
-function renderAll(){renderScore();renderRules();renderInspect();renderTimeline();renderMonitor()}
+function renderAll(){renderScore();renderRules();renderInspect();renderMonitor()}
+function showDone(t=1){renderSteps(R.log.length,-1);state.gen=true;state.t=t;const sg=segAt(t);state.seg=sg.i;state.shot=shotAt(sg,t);$('ph').hidden=true;$('sub').hidden=false;['play','draftBtn'].forEach(id=>$(id).disabled=false);$('gen').textContent=STUDIO?'回放上一次运行':'回放流水线';renderAll();}
 
 /* ---------- playback ---------- */
 let raf=0,last=0;
@@ -1445,69 +2295,105 @@ function tick(ts){if(!state.playing)return;if(last)state.t+=(ts-last)/1000;last=
 function setPlaying(p){state.playing=p;last=0;$('play').setAttribute('aria-label',p?'暂停':'播放');
   $('playIc').innerHTML=p?'<path d="M3 2h4v12H3zM9 2h4v12H9z"/>':'<path d="M4 2l10 6-10 6z"/>';
   if(p){if(state.t>=R.total_s-.05)state.t=0;raf=requestAnimationFrame(tick)}else cancelAnimationFrame(raf);renderMonitor()}
+function jumpTo(segI,shotI){state.seg=segI;state.shot=shotI;const sh=S[segI].shots[shotI];state.t=sh.start+.05;renderInspect();renderMonitor()}
 
 /* ---------- interactions ---------- */
-document.addEventListener('click',e=>{
+document.addEventListener('click',async e=>{
   if(!state.gen)return;
-  const c=e.target.closest('.clip.v');
-  if(c){state.seg=+c.dataset.seg;state.shot=+c.dataset.shot;const sh=S[state.seg].shots[state.shot];state.t=sh.start+.05;renderInspect();renderTimeline();renderMonitor();return}
+  const sg=e.target.closest('.seg-tabs [data-seg]');
+  if(sg){jumpTo(+sg.dataset.seg,0);return}
   const tab=e.target.closest('[data-shot]');
-  if(tab&&tab.closest('#inspect')){state.shot=+tab.dataset.shot;const sh=S[state.seg].shots[state.shot];state.t=sh.start+.05;renderInspect();renderTimeline();renderMonitor();return}
+  if(tab&&tab.closest('#inspect')){jumpTo(state.seg,+tab.dataset.shot);return}
   const use=e.target.closest('[data-use]');
-  if(use){const sh=S[state.seg].shots[state.shot];sh.clip=use.dataset.use;vid(sh.clip);sh.src_in=Math.min(R.skill.clip_skip_head_s,Math.max(0,R.clips[sh.clip].clip_s-sh.dur));renderAll();return}
-  if(e.target.closest('#ruler')){const r=$('ruler').getBoundingClientRect();state.t=Math.max(0,Math.min(R.total_s-.01,(e.clientX-r.left)/pps));const seg=segAt(state.t);state.seg=seg.i;state.shot=shotAt(seg,state.t);renderInspect();renderTimeline();renderMonitor()}
+  if(use){const sh=S[state.seg].shots[state.shot];sh.clip=use.dataset.use;vid(sh.clip);sh.src_in=Math.min(R.skill.clip_skip_head_s,Math.max(0,R.clips[sh.clip].clip_s-sh.dur));state.t=sh.start+.05;renderAll();return}
+  if(e.target.id==='undoSw'){S.forEach(seg=>seg.shots.forEach(sh=>{sh.clip=sh.orig}));renderAll();return}
+  if(e.target.id==='writeDraft'){
+    const b=e.target;b.disabled=true;b.textContent='写入中…';
+    try{const r=await fetch('/api/redraft',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({swaps:swaps()})});const j=await r.json();
+      if(!r.ok)throw new Error(j.error||r.status);location.replace('/#done-'+state.t.toFixed(1));location.reload()}
+    catch(err){b.disabled=false;b.textContent='写入剪映';$('edits').insertAdjacentHTML('beforeend',`<div class="err">写入失败：${esc(err.message)}</div>`)}
+  }
 });
 $('play').addEventListener('click',()=>setPlaying(!state.playing));
 $('gen').addEventListener('click',async()=>{
-  if(state.busy)return;state.busy=true;setPlaying(false);['gen','play','draftBtn'].forEach(id=>$(id).disabled=true);$('gen').textContent='生成中…';
+  if(state.busy)return;state.busy=true;setPlaying(false);['gen','play','draftBtn'].forEach(id=>$(id).disabled=true);$('gen').textContent='回放中…';
   const fast=matchMedia('(prefers-reduced-motion: reduce)').matches;
   for(let i=0;i<R.log.length;i++){renderSteps(i,i);await new Promise(r=>setTimeout(r,fast?0:560))}
-  renderSteps(R.log.length,-1);
-  state.gen=true;state.t=0;state.seg=0;state.shot=0;$('ph').hidden=true;$('sub').hidden=false;renderAll();
-  ['gen','play','draftBtn'].forEach(id=>$(id).disabled=false);$('gen').textContent='重新回放';state.busy=false;setPlaying(true);
+  state.t=0;showDone(0);state.busy=false;setPlaying(true);
 });
 $('draftBtn').addEventListener('click',()=>{
   const shots=S.flatMap(s=>s.shots);
   $('modalCard').innerHTML=`<h3>已生成的剪映草稿</h3><p>流水线用开源工具 pyJianYingDraft 把轨道写成剪映草稿，打开剪映就能在草稿列表里看到，直接接着精修。</p>
-   <div><p style="margin-bottom:6px">草稿名称</p><div class="path">${R.draft.name}</div></div>
-   <div><p style="margin-bottom:6px">本机位置</p><div class="path">${R.draft.path}</div></div>
+   <div><p style="margin-bottom:6px">草稿名称</p><div class="path">${esc(R.draft.name)}</div></div>
+   <div><p style="margin-bottom:6px">本机位置</p><div class="path">${esc(R.draft.path)}</div></div>
    <table><tr><th>轨道</th><th>内容</th></tr>
    <tr><td>画面</td><td>${shots.length} 段：${shots.map(s=>s.orig).join('、')}</td></tr>
-   <tr><td>配音</td><td>${S.length} 段（${R.skill.voice.voice}）</td></tr>
+   <tr><td>配音</td><td>${S.length} 段（${esc(voiceName)}）</td></tr>
    <tr><td>字幕</td><td>${S.length} 段，白字黑边，按 ${R.skill.subtitle.max_chars_per_line} 字符断行</td></tr>
-   <tr><td>花字</td><td>${S.flatMap(s=>s.stickers).map(s=>s.kind+'「'+s.text.replace('\n',' ')+'」').join('；')}</td></tr></table>
-   <p>草稿文件：<a href="draft/draft_info.json" target="_blank" rel="noopener">draft_info.json</a>（素材路径指向本机，换电脑需重新关联素材）。</p>
+   <tr><td>花字</td><td>${S.flatMap(s=>s.stickers).map(s=>s.kind+'「'+esc(s.text.replace('\n',' '))+'」').join('；')}</td></tr></table>
+   ${STUDIO?'':`<p>草稿文件：<a href="draft/draft_info.json" target="_blank" rel="noopener">draft_info.json</a>（素材路径指向本机，换电脑需重新关联素材）。</p>`}
    <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
   $('modal').hidden=false;$('closeM').focus();
 });
 function openTopic(){
   const T=R.topic;
-  $('modalCard').innerHTML=`<h3>选题卡 · ${T.month}</h3><p>${T.note}</p><p>营销节点：${T.nodes.map(n=>n.name+'（权重 '+n.weight+'）').join('、')}</p>
+  $('modalCard').innerHTML=isInput?`<h3>选题 · 人工输入</h3><p>这次的选题是在工作台里直接输入的：<b style="color:var(--fg)">${esc(T.input)}</b></p><p>没有走选题池打分。选题池的打分方式：历史爆款率（按题材，归一化）× 0.5 + 营销节点权重 × 0.3 + 利益点可植入度 × 0.2（${esc(T.note)}）</p>
+   <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`
+  :`<h3>选题卡 · ${T.month}</h3><p>${esc(T.note)}</p><p>营销节点：${T.nodes.map(n=>n.name+'（权重 '+n.weight+'）').join('、')}</p>
    <table><tr><th>选题</th><th>题材</th><th>历史爆款率</th><th>节点</th><th>利益点可植入</th><th>得分</th></tr>
-   ${T.pool.map(t=>`<tr style="${t.id===T.chosen?'color:var(--accent)':''}"><td>${t.id} ${t.title}${t.id===T.chosen?'（选中）':''}</td><td>${t.genre.join('、')}</td><td class="mono">${t.hit}</td><td>${t.node}</td><td class="mono">${t.benefit_fit}</td><td class="mono">${t.score}</td></tr>`).join('')}</table>
+   ${T.pool.map(t=>`<tr style="${t.id===T.chosen?'color:var(--accent)':''}"><td>${t.id} ${esc(t.title)}${t.id===T.chosen?'（选中）':''}</td><td>${t.genre.join('、')}</td><td class="mono">${t.hit}</td><td>${t.node}</td><td class="mono">${t.benefit_fit}</td><td class="mono">${t.score}</td></tr>`).join('')}</table>
    <p>得分 = 历史爆款率（按题材，归一化）× 0.5 + 营销节点权重 × 0.3 + 利益点可植入度 × 0.2</p>
    <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
   $('modal').hidden=false;
 }
 function openScript(){
   const X=R.scripts;
-  $('modalCard').innerHTML=`<h3>脚本 Agent 初稿与审核</h3><p>生成：${X.generated_by}。三版都按"冷知识开头 → 路线 → 画面 → 利益点 → 搜码钩子"的结构写，再按规则和事实库逐条审核。</p>
-   <div class="vt">${X.variants.map(v=>`<div class="var ${v.ok?'ok':''}"><h4>${v.id} 版 <span class="band ${v.ok?'ok':'bad'}">${v.ok?'采用':'拦下'}</span></h4>
-     <ol>${v.lines.map(l=>`<li>${l.en}<br><small>${l.zh}</small></li>`).join('')}</ol>
-     <ul class="ck">${v.checks.map(c=>`<li><span class="${c.ok?'ok-ic':'bad-ic'}">${c.ok?'✓':'✕'}</span> ${c.name}：${c.msg}</li>`).join('')}</ul></div>`).join('')}</div>
-   <p>事实库：${X.facts.map(f=>f.id+' '+f.text).join('；')}</p>
+  $('modalCard').innerHTML=`<h3>脚本初稿与审核</h3><p>生成：${esc(X.generated_by)}。三版都按"冷知识开头 → 路线 → 画面 → 利益点 → 搜码钩子"的结构写，再按规则和事实库逐条审核。</p>
+   <div class="vt">${X.variants.map(v=>`<div class="var ${v.id===X.chosen?'ok':''}"><h4>${v.id} 版 <span class="band ${v.id===X.chosen?'ok':v.ok?'mid':'bad'}">${v.id===X.chosen?'采用':v.ok?'备选':'拦下'}</span></h4>${v.idea?`<p style="margin-bottom:6px">思路：${esc(v.idea)}</p>`:''}
+     <ol>${v.lines.map(l=>`<li>${esc(l.en)}<br><small>${esc(l.zh)}</small></li>`).join('')}</ol>
+     <ul class="ck">${v.checks.map(c=>`<li><span class="${c.ok?'ok-ic':'bad-ic'}">${c.ok?'✓':'✕'}</span> ${esc(c.name)}：${esc(c.msg)}</li>`).join('')}</ul></div>`).join('')}</div>
+   <p>事实库：${X.facts.map(f=>f.id+' '+esc(f.text)).join('；')}</p>
    <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
   $('modal').hidden=false;
 }
-$('steps').addEventListener('click',e=>{const li=e.target.closest('li.link.done');if(!li)return;li.dataset.step==='选题'?openTopic():openScript()});
+$('steps').addEventListener('click',e=>{const li=e.target.closest('li.link.done');if(!li||state.running)return;li.dataset.step==='选题'?openTopic():openScript()});
 $('modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.id==='closeM')$('modal').hidden=true});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('modal').hidden=true});
+
+/* ---------- 本地工作台：输入选题现场生成 ---------- */
+if(STUDIO){
+  $('askPanel').hidden=false;$('gen').textContent='回放上一次运行';
+  if(isInput)$('askTopic').value=R.title;
+  fetch('/api/keys').then(r=>r.json()).then(k=>{
+    const miss=[!k.deepseek&&'DeepSeek',!k.minimax&&'MiniMax'].filter(Boolean);
+    if(miss.length)$('askHint').innerHTML+=` <b>还没填 ${miss.join('、')} 的 key（在 .env 里填）${k.deepseek?'，没有 MiniMax 时用系统语音配音':''}。</b>`;
+    if(!k.deepseek)$('askGo').disabled=true;
+  }).catch(()=>{});
+  $('askForm').addEventListener('submit',async e=>{
+    e.preventDefault();if(state.running)return;state.running=true;setPlaying(false);
+    $('askGo').disabled=true;$('askGo').textContent='生成中…';['gen','play','draftBtn'].forEach(id=>$(id).disabled=true);
+    $('ph').hidden=false;$('ph').innerHTML='<div><b>正在生成</b>左边会一步步显示真实进度</div>';
+    Object.values(vids).forEach(v=>v.classList.remove('on'));$('sub').hidden=true;$('huazi').hidden=true;
+    const body={topic:$('askTopic').value.trim(),market:$('askMarket').value,platform:$('askPlatform').value};
+    try{
+      const r=await fetch('/api/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(!r.ok)throw new Error((await r.json()).error||r.status);
+      for(;;){
+        await new Promise(r=>setTimeout(r,700));
+        const s=await (await fetch('/api/status')).json();
+        renderSteps(s.log.length,s.running?s.log.length:-1,[...s.log,...(s.running?[{step:'下一步',msg:''}]:[])]);
+        if(!s.running){if(s.error)throw new Error(s.error);location.replace('/#done-1');location.reload();return}
+      }
+    }catch(err){state.running=false;$('askGo').disabled=false;$('askGo').textContent='生成粗剪';$('ph').innerHTML=`<div><b>生成失败</b><span class="err">${esc(err.message)}</span></div>`}
+  });
+}
+
 renderSteps(0,-1);
-// #done-<秒>-<第几句>：直接显示生成后的状态（截图、演示用）
+// #done-<秒>：直接显示生成后的状态（截图、演示用）；#topic / #script 打开对应弹窗
 const hm=location.hash.match(/^#done(?:-([\d.]+))?/);
 if(location.hash==='#topic'||location.hash==='#script'){renderSteps(R.log.length,-1);location.hash==='#topic'?openTopic():openScript();}
-if(hm){const t=parseFloat(hm[1]||'1');renderSteps(R.log.length,-1);state.gen=true;state.t=t;const sg=segAt(t);state.seg=sg.i;state.shot=shotAt(sg,t);$('ph').hidden=true;$('sub').hidden=false;['play','draftBtn'].forEach(id=>$(id).disabled=false);$('gen').textContent='重新回放';renderAll();}
-let rt;addEventListener('resize',()=>{if(!state.gen)return;clearTimeout(rt);rt=setTimeout(renderTimeline,120)});
+if(hm)showDone(parseFloat(hm[1]||'1'));
+else if(STUDIO&&R.mode==='live')showDone(1);
 </script>
 </body>
 </html>

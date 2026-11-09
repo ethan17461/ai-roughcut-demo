@@ -33,7 +33,7 @@
     },
     "cover": null,
     "create_time": 0,
-    "duration": 19570000,
+    "duration": 23790000,
     "extra_info": null,
     "fps": 30,
     "free_render_index_mode_on": false,
@@ -75,14 +75,14 @@
                 "category_name": "local",
                 "check_flag": 3,
                 "copyright_limit_type": "none",
-                "duration": 3648000,
+                "duration": 4232000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "777d40d6c6cf481f8c2a2e1a81e2414c",
-                "local_material_id": "777d40d6c6cf481f8c2a2e1a81e2414c",
-                "music_id": "777d40d6c6cf481f8c2a2e1a81e2414c",
+                "id": "23454e4c1ec34dbb9ff616bd19a0d525",
+                "local_material_id": "23454e4c1ec34dbb9ff616bd19a0d525",
+                "music_id": "23454e4c1ec34dbb9ff616bd19a0d525",
                 "name": "line1.wav",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line1.wav",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/line1.wav",
                 "source_platform": 0,
                 "type": "extract_music",
                 "wave_points": []
@@ -93,14 +93,14 @@
                 "category_name": "local",
                 "check_flag": 3,
                 "copyright_limit_type": "none",
-                "duration": 2981000,
+                "duration": 4963000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "eb047d20ed834bafa4d855092fba8299",
-                "local_material_id": "eb047d20ed834bafa4d855092fba8299",
-                "music_id": "eb047d20ed834bafa4d855092fba8299",
+                "id": "3b1683fc68fd45caaaf652de8870b4a1",
+                "local_material_id": "3b1683fc68fd45caaaf652de8870b4a1",
+                "music_id": "3b1683fc68fd45caaaf652de8870b4a1",
                 "name": "line2.wav",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line2.wav",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/line2.wav",
                 "source_platform": 0,
                 "type": "extract_music",
                 "wave_points": []
@@ -111,14 +111,14 @@
                 "category_name": "local",
                 "check_flag": 3,
                 "copyright_limit_type": "none",
-                "duration": 3102000,
+                "duration": 4180000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "73c5425971aa42c6ba60406a3f7e159a",
-                "local_material_id": "73c5425971aa42c6ba60406a3f7e159a",
-                "music_id": "73c5425971aa42c6ba60406a3f7e159a",
+                "id": "706485f14bdc4f51af023251ebb866ac",
+                "local_material_id": "706485f14bdc4f51af023251ebb866ac",
+                "music_id": "706485f14bdc4f51af023251ebb866ac",
                 "name": "line3.wav",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line3.wav",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/line3.wav",
                 "source_platform": 0,
                 "type": "extract_music",
                 "wave_points": []
@@ -129,14 +129,14 @@
                 "category_name": "local",
                 "check_flag": 3,
                 "copyright_limit_type": "none",
-                "duration": 3590000,
+                "duration": 4362000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "a6978bd632ae4abba186b9c66695dc7a",
-                "local_material_id": "a6978bd632ae4abba186b9c66695dc7a",
-                "music_id": "a6978bd632ae4abba186b9c66695dc7a",
+                "id": "e0bcc60f8eef424f9e0c072d9cdedab8",
+                "local_material_id": "e0bcc60f8eef424f9e0c072d9cdedab8",
+                "music_id": "e0bcc60f8eef424f9e0c072d9cdedab8",
                 "name": "line4.wav",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line4.wav",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/line4.wav",
                 "source_platform": 0,
                 "type": "extract_music",
                 "wave_points": []
@@ -147,14 +147,14 @@
                 "category_name": "local",
                 "check_flag": 3,
                 "copyright_limit_type": "none",
-                "duration": 5047000,
+                "duration": 4859000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "7b75012e8f9544448ace945c1d801651",
-                "local_material_id": "7b75012e8f9544448ace945c1d801651",
-                "music_id": "7b75012e8f9544448ace945c1d801651",
+                "id": "87aacaca7237459b8b3b1c77bf95a928",
+                "local_material_id": "87aacaca7237459b8b3b1c77bf95a928",
+                "music_id": "87aacaca7237459b8b3b1c77bf95a928",
                 "name": "line5.wav",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line5.wav",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/line5.wav",
                 "source_platform": 0,
                 "type": "extract_music",
                 "wave_points": []
@@ -191,91 +191,105 @@
         "speeds": [
             {
                 "curve_speed": null,
-                "id": "7552262e7a4f454ba5504d715f83beb2",
+                "id": "cd3bbf07dd5f4f38a23dda165ab63aaa",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "77f0bf4a4252486b99d08ba9091c1e6b",
+                "id": "8a1c56fcaf434764950c0bfedf465661",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "941012c494214cdb9093643aaccad55f",
+                "id": "3bf35e7d964b46fc8c10b2e412fc9744",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "2e44c3b36f8b462296150b8dcac0b3a5",
+                "id": "3f5285b974f64c80815fa1d14098106d",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "d420e963a5e14379b14fe316c848ddba",
+                "id": "5c11ecc751f04f6bbc66e8f1516a2233",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "febd9a2316d04d1a91738ae5dbd997c8",
+                "id": "25f7126ede5c46ef9b35c52e172b66ee",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "94f5b8326ba84f09936f55697a046cdf",
+                "id": "a0d54a3454f840a5865ce00b5f5283ff",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "53f79972ecfa452d97ac06f4badc065e",
+                "id": "e6ff5697ed814596bf0770ff5eec4fe6",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "989e4c5d5e3e4179a5f66fe59d62b516",
+                "id": "2f4fbd4db5494d2aad2566c210463384",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "0182827b92684b54a3cdd5d3c58cfbe7",
+                "id": "fd699b636be84de4900bec36209efb8f",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "b906030e505d4cbab33327abe284e884",
+                "id": "2ccf384fcd2c4ae3b575f3da137c3483",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "af942ecdfe69409f9dad408d6d4d1c17",
+                "id": "9c22183c7c3543e69542a67cefd5a0e1",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "91c21db343924d7885bad931e2eff7c1",
+                "id": "4ec72ed9bdd240b5accdd9ab08902006",
+                "mode": 0,
+                "speed": 1.0,
+                "type": "speed"
+            },
+            {
+                "curve_speed": null,
+                "id": "ab507b51430447f69085cf0d7e8eb0a9",
+                "mode": 0,
+                "speed": 1.0,
+                "type": "speed"
+            },
+            {
+                "curve_speed": null,
+                "id": "6b319dcb4ea0425986badacf2e37d915",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
@@ -286,8 +300,8 @@
         "text_templates": [],
         "texts": [
             {
-                "id": "7dd1266a87e340c8aeb8c58359eaf245",
-                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 70], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Most people don't know you can sleep your\\nway from London to Scotland.\"}",
+                "id": "58a142acc6354196851ab1fe1d44806d",
+                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 59], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"The Matterhorn is one of the most iconic\\npeaks in the Alps.\"}",
                 "typesetting": 0,
                 "alignment": 1,
                 "letter_spacing": 0.0,
@@ -300,8 +314,8 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "cf5f726b4f4547dd9aae9ce757454684",
-                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1.0, 0.84, 0.18]}}}, \"range\": [0, 33], \"size\": 11.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.11000000000000001}]}], \"text\": \"LONDON → SCOTLAND\\nWHILE YOU SLEEP\"}",
+                "id": "2941a80bbbb94c3f95398e03bf7454e1",
+                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1.0, 0.84, 0.18]}}}, \"range\": [0, 18], \"size\": 11.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.11000000000000001}]}], \"text\": \"ICONIC ALPINE PEAK\"}",
                 "typesetting": 0,
                 "alignment": 1,
                 "letter_spacing": 0.0,
@@ -314,8 +328,8 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "fcc57bf15523431fabdbb337f9087991",
-                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 58], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"The Highlander sleeper leaves London\\nEuston every evening.\"}",
+                "id": "a0a6a3a3c14b417ab126a9b826b16fea",
+                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 69], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Trains in Switzerland offer panoramic\\nwindows with views of the Alps.\"}",
                 "typesetting": 0,
                 "alignment": 1,
                 "letter_spacing": 0.0,
@@ -328,8 +342,8 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "036b6f13ef2e46b08aa94267afd93d72",
-                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 58], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"You fall asleep in the city and wake up\\nto Highland lochs.\"}",
+                "id": "0dd0706ea6534e5293a05b9a6fc1862a",
+                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 56], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Imagine gliding past snow-capped peaks\\nand lush valleys.\"}",
                 "typesetting": 0,
                 "alignment": 1,
                 "letter_spacing": 0.0,
@@ -342,8 +356,8 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "13b712edea554824ac1b672628adbad6",
-                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 56], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Book the two legs separately and you can\\nsave up to 30%.\"}",
+                "id": "c4ada01d5d1341d7a53486c15ade591f",
+                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 55], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Split ticketing can save you up to 30% on\\ntrain travel.\"}",
                 "typesetting": 0,
                 "alignment": 1,
                 "letter_spacing": 0.0,
@@ -356,7 +370,7 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "f36a365c03d74c4695384cb44ee31071",
+                "id": "4a9dd5988958412a8fc905d485632e75",
                 "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1.0, 0.84, 0.18]}}}, \"range\": [0, 14], \"size\": 11.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.11000000000000001}]}], \"text\": \"SAVE UP TO 30%\"}",
                 "typesetting": 0,
                 "alignment": 1,
@@ -370,8 +384,8 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "0bfb6af68acb41158c1c68711306626b",
-                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 57], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Open the app, search code UK20, and get\\nan extra 20% off.\"}",
+                "id": "2bddb737165a4f7daff0675f4eba1e6a",
+                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 60], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Search UK20 in the app for an extra 20%\\noff your first trip.\"}",
                 "typesetting": 0,
                 "alignment": 1,
                 "letter_spacing": 0.0,
@@ -384,8 +398,8 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "fb67f42c46e84029b8cda10319d56a45",
-                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1.0, 0.84, 0.18]}}}, \"range\": [0, 12], \"size\": 11.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.11000000000000001}]}], \"text\": \"SEARCH: UK20\"}",
+                "id": "94743cc38bad425fbb7bfb3ef3f7cad4",
+                "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1.0, 0.84, 0.18]}}}, \"range\": [0, 4], \"size\": 11.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.11000000000000001}]}], \"text\": \"UK20\"}",
                 "typesetting": 0,
                 "alignment": 1,
                 "letter_spacing": 0.0,
@@ -420,14 +434,14 @@
                 },
                 "crop_ratio": "free",
                 "crop_scale": 1.0,
-                "duration": 11678000,
+                "duration": 11967000,
                 "height": 960,
-                "id": "fe1622ae7bda4d8886eca8d40ed0d0cc",
+                "id": "dc71367a11434bf7a224fd7992173ad3",
                 "local_material_id": "",
-                "material_id": "fe1622ae7bda4d8886eca8d40ed0d0cc",
-                "material_name": "m06.mp4",
+                "material_id": "dc71367a11434bf7a224fd7992173ad3",
+                "material_name": "m40.mp4",
                 "media_path": "",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m06.mp4",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m40.mp4",
                 "type": "video",
                 "width": 540
             },
@@ -448,14 +462,14 @@
                 },
                 "crop_ratio": "free",
                 "crop_scale": 1.0,
-                "duration": 3500000,
+                "duration": 6667000,
                 "height": 960,
-                "id": "97ca8fcb082946bdb295d33db017aae3",
+                "id": "b33256980ffb44dc8fa85b5ff731f00f",
                 "local_material_id": "",
-                "material_id": "97ca8fcb082946bdb295d33db017aae3",
-                "material_name": "m04.mp4",
+                "material_id": "b33256980ffb44dc8fa85b5ff731f00f",
+                "material_name": "m42.mp4",
                 "media_path": "",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m04.mp4",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m42.mp4",
                 "type": "video",
                 "width": 540
             },
@@ -476,14 +490,14 @@
                 },
                 "crop_ratio": "free",
                 "crop_scale": 1.0,
-                "duration": 12467000,
+                "duration": 12000000,
                 "height": 960,
-                "id": "d14e3dfd84154f24828136e53fe6fe6f",
+                "id": "8c3a193cac7a4ac1beadbc8cf3656634",
                 "local_material_id": "",
-                "material_id": "d14e3dfd84154f24828136e53fe6fe6f",
-                "material_name": "m02.mp4",
+                "material_id": "8c3a193cac7a4ac1beadbc8cf3656634",
+                "material_name": "m41.mp4",
                 "media_path": "",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m02.mp4",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m41.mp4",
                 "type": "video",
                 "width": 540
             },
@@ -506,12 +520,12 @@
                 "crop_scale": 1.0,
                 "duration": 8892000,
                 "height": 960,
-                "id": "1f88ca6dc7a6438d8e92f866c0865dce",
+                "id": "a1e5d133a49f49de8bd448fc778edc18",
                 "local_material_id": "",
-                "material_id": "1f88ca6dc7a6438d8e92f866c0865dce",
+                "material_id": "a1e5d133a49f49de8bd448fc778edc18",
                 "material_name": "m16.mp4",
                 "media_path": "",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m16.mp4",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m16.mp4",
                 "type": "video",
                 "width": 540
             },
@@ -532,14 +546,70 @@
                 },
                 "crop_ratio": "free",
                 "crop_scale": 1.0,
-                "duration": 18000000,
+                "duration": 7234000,
                 "height": 960,
-                "id": "a8aaa1db69d24afb865f0fb26d8e92ea",
+                "id": "c7ceb8c1ff4d4d95ae0c588e21869a9d",
                 "local_material_id": "",
-                "material_id": "a8aaa1db69d24afb865f0fb26d8e92ea",
-                "material_name": "m10.mp4",
+                "material_id": "c7ceb8c1ff4d4d95ae0c588e21869a9d",
+                "material_name": "m43.mp4",
                 "media_path": "",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m10.mp4",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m43.mp4",
+                "type": "video",
+                "width": 540
+            },
+            {
+                "audio_fade": null,
+                "category_id": "",
+                "category_name": "local",
+                "check_flag": 63487,
+                "crop": {
+                    "upper_left_x": 0.0,
+                    "upper_left_y": 0.0,
+                    "upper_right_x": 1.0,
+                    "upper_right_y": 0.0,
+                    "lower_left_x": 0.0,
+                    "lower_left_y": 1.0,
+                    "lower_right_x": 1.0,
+                    "lower_right_y": 1.0
+                },
+                "crop_ratio": "free",
+                "crop_scale": 1.0,
+                "duration": 12000000,
+                "height": 960,
+                "id": "bab549de03514634a69b68edd0e64142",
+                "local_material_id": "",
+                "material_id": "bab549de03514634a69b68edd0e64142",
+                "material_name": "m41.mp4",
+                "media_path": "",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m41.mp4",
+                "type": "video",
+                "width": 540
+            },
+            {
+                "audio_fade": null,
+                "category_id": "",
+                "category_name": "local",
+                "check_flag": 63487,
+                "crop": {
+                    "upper_left_x": 0.0,
+                    "upper_left_y": 0.0,
+                    "upper_right_x": 1.0,
+                    "upper_right_y": 0.0,
+                    "lower_left_x": 0.0,
+                    "lower_left_y": 1.0,
+                    "lower_right_x": 1.0,
+                    "lower_right_y": 1.0
+                },
+                "crop_ratio": "free",
+                "crop_scale": 1.0,
+                "duration": 8634000,
+                "height": 960,
+                "id": "b8d0f08aa24149fb86e536eab90baff4",
+                "local_material_id": "",
+                "material_id": "b8d0f08aa24149fb86e536eab90baff4",
+                "material_name": "m52.mp4",
+                "media_path": "",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m52.mp4",
                 "type": "video",
                 "width": 540
             },
@@ -562,12 +632,12 @@
                 "crop_scale": 1.0,
                 "duration": 10160000,
                 "height": 960,
-                "id": "413cb6cdce27455ea9a2792ab41a4821",
+                "id": "1f22193fc63d424399a18437acfa65b9",
                 "local_material_id": "",
-                "material_id": "413cb6cdce27455ea9a2792ab41a4821",
+                "material_id": "1f22193fc63d424399a18437acfa65b9",
                 "material_name": "m13.mp4",
                 "media_path": "",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m13.mp4",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m13.mp4",
                 "type": "video",
                 "width": 540
             },
@@ -590,12 +660,12 @@
                 "crop_scale": 1.0,
                 "duration": 30948000,
                 "height": 960,
-                "id": "981a42d05d8944799f6f7b6149420b6c",
+                "id": "9df657ca704e4b48a4b8cab44907aa02",
                 "local_material_id": "",
-                "material_id": "981a42d05d8944799f6f7b6149420b6c",
+                "material_id": "9df657ca704e4b48a4b8cab44907aa02",
                 "material_name": "m05.mp4",
                 "media_path": "",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m05.mp4",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m05.mp4",
                 "type": "video",
                 "width": 540
             },
@@ -616,14 +686,14 @@
                 },
                 "crop_ratio": "free",
                 "crop_scale": 1.0,
-                "duration": 5292000,
+                "duration": 8634000,
                 "height": 960,
-                "id": "527ac5a2fcbf40dfbb81cb128d7b4d5a",
+                "id": "124c8e3a6b49400d91f7a4ab155423e6",
                 "local_material_id": "",
-                "material_id": "527ac5a2fcbf40dfbb81cb128d7b4d5a",
-                "material_name": "m14.mp4",
+                "material_id": "124c8e3a6b49400d91f7a4ab155423e6",
+                "material_name": "m52.mp4",
                 "media_path": "",
-                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m14.mp4",
+                "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_坐火车穿越瑞士阿尔卑斯窗_1109-0407/materials/m52.mp4",
                 "type": "video",
                 "width": 540
             }
@@ -644,7 +714,7 @@
         {
             "attribute": 0,
             "flag": 0,
-            "id": "84ed31cda32f4cfbb27c39a81fbee390",
+            "id": "56a369276f2b4b35988545cb5e6dc07b",
             "is_default_name": false,
             "name": "画面",
             "segments": [
@@ -661,22 +731,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "efe4d5a185fa43ca952f293c810315ff",
-                    "material_id": "fe1622ae7bda4d8886eca8d40ed0d0cc",
+                    "id": "888fdcae36954e95bec82d2a3c9de540",
+                    "material_id": "dc71367a11434bf7a224fd7992173ad3",
                     "target_timerange": {
                         "start": 0,
-                        "duration": 1900000
+                        "duration": 2190000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 500000,
-                        "duration": 1900000
+                        "duration": 2190000
                     },
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "7552262e7a4f454ba5504d715f83beb2"
+                        "cd3bbf07dd5f4f38a23dda165ab63aaa"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -719,22 +789,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "04b388e547464e29b501e273a60bb034",
-                    "material_id": "97ca8fcb082946bdb295d33db017aae3",
+                    "id": "d54129ba16984f459bfbc02a5dd254f4",
+                    "material_id": "b33256980ffb44dc8fa85b5ff731f00f",
                     "target_timerange": {
-                        "start": 1900000,
-                        "duration": 1900000
+                        "start": 2190000,
+                        "duration": 2190000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 500000,
-                        "duration": 1900000
+                        "duration": 2190000
                     },
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "77f0bf4a4252486b99d08ba9091c1e6b"
+                        "8a1c56fcaf434764950c0bfedf465661"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -777,22 +847,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "cdb2c22159b545b4a16de4fe9b157d44",
-                    "material_id": "d14e3dfd84154f24828136e53fe6fe6f",
+                    "id": "adaf87cfa211463591499d4697dc22a5",
+                    "material_id": "8c3a193cac7a4ac1beadbc8cf3656634",
                     "target_timerange": {
-                        "start": 3800000,
-                        "duration": 3130000
+                        "start": 4380000,
+                        "duration": 2555000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 500000,
-                        "duration": 3130000
+                        "duration": 2555000
                     },
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "941012c494214cdb9093643aaccad55f"
+                        "3bf35e7d964b46fc8c10b2e412fc9744"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -835,22 +905,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "d23b6fbaec0a4d9084eee410e2ebd8fe",
-                    "material_id": "1f88ca6dc7a6438d8e92f866c0865dce",
+                    "id": "f7fe4b8e5dc340a791f9eceacfa2af8c",
+                    "material_id": "a1e5d133a49f49de8bd448fc778edc18",
                     "target_timerange": {
-                        "start": 6930000,
-                        "duration": 1625000
+                        "start": 6935000,
+                        "duration": 2555000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 500000,
-                        "duration": 1625000
+                        "duration": 2555000
                     },
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "2e44c3b36f8b462296150b8dcac0b3a5"
+                        "3f5285b974f64c80815fa1d14098106d"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -893,22 +963,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "0a5a94955e6a4099925cff050d0b40f3",
-                    "material_id": "a8aaa1db69d24afb865f0fb26d8e92ea",
+                    "id": "8e7f91913b004aefaef5f7bfbb72f33d",
+                    "material_id": "c7ceb8c1ff4d4d95ae0c588e21869a9d",
                     "target_timerange": {
-                        "start": 8555000,
-                        "duration": 1625000
+                        "start": 9490000,
+                        "duration": 2165000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 500000,
-                        "duration": 1625000
+                        "duration": 2165000
                     },
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "d420e963a5e14379b14fe316c848ddba"
+                        "5c11ecc751f04f6bbc66e8f1516a2233"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -951,22 +1021,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "44f03d834a0c40de94a552de26b3e2c8",
-                    "material_id": "413cb6cdce27455ea9a2792ab41a4821",
+                    "id": "2392a9f762f44773bd97ee5412488439",
+                    "material_id": "bab549de03514634a69b68edd0e64142",
                     "target_timerange": {
-                        "start": 10180000,
-                        "duration": 3740000
+                        "start": 11655000,
+                        "duration": 2165000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 500000,
-                        "duration": 3740000
+                        "duration": 2165000
                     },
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "febd9a2316d04d1a91738ae5dbd997c8"
+                        "25f7126ede5c46ef9b35c52e172b66ee"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1009,22 +1079,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "918750fb7bc842bd936ff3ab6735fb26",
-                    "material_id": "981a42d05d8944799f6f7b6149420b6c",
+                    "id": "d99ce346750e4add9d32622646df3cb9",
+                    "material_id": "b8d0f08aa24149fb86e536eab90baff4",
                     "target_timerange": {
-                        "start": 13920000,
-                        "duration": 2825000
+                        "start": 13820000,
+                        "duration": 2255000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 500000,
-                        "duration": 2825000
+                        "duration": 2255000
                     },
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "94f5b8326ba84f09936f55697a046cdf"
+                        "a0d54a3454f840a5865ce00b5f5283ff"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1067,22 +1137,138 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "51e698da544041619961607a219772dd",
-                    "material_id": "527ac5a2fcbf40dfbb81cb128d7b4d5a",
+                    "id": "d9418545c8e945d5899e711ac3b27f2e",
+                    "material_id": "1f22193fc63d424399a18437acfa65b9",
                     "target_timerange": {
-                        "start": 16745000,
-                        "duration": 2825000
+                        "start": 16075000,
+                        "duration": 2255000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 500000,
-                        "duration": 2825000
+                        "duration": 2255000
                     },
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "53f79972ecfa452d97ac06f4badc065e"
+                        "e6ff5697ed814596bf0770ff5eec4fe6"
+                    ],
+                    "is_tone_modify": false,
+                    "clip": {
+                        "alpha": 1.0,
+                        "flip": {
+                            "horizontal": false,
+                            "vertical": false
+                        },
+                        "rotation": 0.0,
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0
+                        },
+                        "transform": {
+                            "x": 0.0,
+                            "y": 0.0
+                        }
+                    },
+                    "uniform_scale": {
+                        "on": true,
+                        "value": 1.0
+                    },
+                    "hdr_settings": {
+                        "intensity": 1.0,
+                        "mode": 1,
+                        "nits": 1000
+                    },
+                    "render_index": 0
+                },
+                {
+                    "enable_adjust": true,
+                    "enable_color_correct_adjust": false,
+                    "enable_color_curves": true,
+                    "enable_color_match_adjust": false,
+                    "enable_color_wheels": true,
+                    "enable_lut": true,
+                    "enable_smart_color_adjust": false,
+                    "last_nonzero_volume": 1.0,
+                    "reverse": false,
+                    "track_attribute": 0,
+                    "track_render_index": 0,
+                    "visible": true,
+                    "id": "5b8ccadf82fd42a9bd21fd034d768554",
+                    "material_id": "9df657ca704e4b48a4b8cab44907aa02",
+                    "target_timerange": {
+                        "start": 18330000,
+                        "duration": 2730000
+                    },
+                    "common_keyframes": [],
+                    "keyframe_refs": [],
+                    "source_timerange": {
+                        "start": 500000,
+                        "duration": 2730000
+                    },
+                    "speed": 1.0,
+                    "volume": 0.0,
+                    "extra_material_refs": [
+                        "2f4fbd4db5494d2aad2566c210463384"
+                    ],
+                    "is_tone_modify": false,
+                    "clip": {
+                        "alpha": 1.0,
+                        "flip": {
+                            "horizontal": false,
+                            "vertical": false
+                        },
+                        "rotation": 0.0,
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0
+                        },
+                        "transform": {
+                            "x": 0.0,
+                            "y": 0.0
+                        }
+                    },
+                    "uniform_scale": {
+                        "on": true,
+                        "value": 1.0
+                    },
+                    "hdr_settings": {
+                        "intensity": 1.0,
+                        "mode": 1,
+                        "nits": 1000
+                    },
+                    "render_index": 0
+                },
+                {
+                    "enable_adjust": true,
+                    "enable_color_correct_adjust": false,
+                    "enable_color_curves": true,
+                    "enable_color_match_adjust": false,
+                    "enable_color_wheels": true,
+                    "enable_lut": true,
+                    "enable_smart_color_adjust": false,
+                    "last_nonzero_volume": 1.0,
+                    "reverse": false,
+                    "track_attribute": 0,
+                    "track_render_index": 0,
+                    "visible": true,
+                    "id": "0bd9f888a8ca490f923ae1a9693b8259",
+                    "material_id": "124c8e3a6b49400d91f7a4ab155423e6",
+                    "target_timerange": {
+                        "start": 21060000,
+                        "duration": 2730000
+                    },
+                    "common_keyframes": [],
+                    "keyframe_refs": [],
+                    "source_timerange": {
+                        "start": 500000,
+                        "duration": 2730000
+                    },
+                    "speed": 1.0,
+                    "volume": 0.0,
+                    "extra_material_refs": [
+                        "fd699b636be84de4900bec36209efb8f"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1118,7 +1304,7 @@
         {
             "attribute": 0,
             "flag": 0,
-            "id": "a87b17ef083d433cb61ec3ff450c278d",
+            "id": "862dd3df839345ed875b1eb72c3e8d48",
             "is_default_name": false,
             "name": "配音",
             "segments": [
@@ -1135,22 +1321,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "3e73607928a849829640bf2e148010f9",
-                    "material_id": "777d40d6c6cf481f8c2a2e1a81e2414c",
+                    "id": "c9069155fbef4f45b00f6aa08da2e6d7",
+                    "material_id": "23454e4c1ec34dbb9ff616bd19a0d525",
                     "target_timerange": {
                         "start": 0,
-                        "duration": 3648000
+                        "duration": 4232000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 0,
-                        "duration": 3648000
+                        "duration": 4232000
                     },
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "989e4c5d5e3e4179a5f66fe59d62b516"
+                        "2ccf384fcd2c4ae3b575f3da137c3483"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1170,22 +1356,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "55a7e0517c994d21a36fdcf7fce6418d",
-                    "material_id": "eb047d20ed834bafa4d855092fba8299",
+                    "id": "0ba098632271443b85f847c0e7c22ec3",
+                    "material_id": "3b1683fc68fd45caaaf652de8870b4a1",
                     "target_timerange": {
-                        "start": 3800000,
-                        "duration": 2981000
+                        "start": 4380000,
+                        "duration": 4963000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 0,
-                        "duration": 2981000
+                        "duration": 4963000
                     },
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "0182827b92684b54a3cdd5d3c58cfbe7"
+                        "9c22183c7c3543e69542a67cefd5a0e1"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1205,22 +1391,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "48e00d087f1d4c9d92f858449da2d034",
-                    "material_id": "73c5425971aa42c6ba60406a3f7e159a",
+                    "id": "d9d12a494f3d4788b2d465474aa1375a",
+                    "material_id": "706485f14bdc4f51af023251ebb866ac",
                     "target_timerange": {
-                        "start": 6930000,
-                        "duration": 3102000
+                        "start": 9490000,
+                        "duration": 4180000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 0,
-                        "duration": 3102000
+                        "duration": 4180000
                     },
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "b906030e505d4cbab33327abe284e884"
+                        "4ec72ed9bdd240b5accdd9ab08902006"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1240,22 +1426,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "db2e3babc80c42f18fa759165065bc1e",
-                    "material_id": "a6978bd632ae4abba186b9c66695dc7a",
+                    "id": "59a469caf178406faf0d3dddc36b9edb",
+                    "material_id": "e0bcc60f8eef424f9e0c072d9cdedab8",
                     "target_timerange": {
-                        "start": 10180000,
-                        "duration": 3590000
+                        "start": 13820000,
+                        "duration": 4362000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 0,
-                        "duration": 3590000
+                        "duration": 4362000
                     },
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "af942ecdfe69409f9dad408d6d4d1c17"
+                        "ab507b51430447f69085cf0d7e8eb0a9"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1275,22 +1461,22 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "9e6fce244a764a008405a693275719d7",
-                    "material_id": "7b75012e8f9544448ace945c1d801651",
+                    "id": "2925b111ee314a3bbf1d016f5c334a1e",
+                    "material_id": "87aacaca7237459b8b3b1c77bf95a928",
                     "target_timerange": {
-                        "start": 13920000,
-                        "duration": 5047000
+                        "start": 18330000,
+                        "duration": 4859000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
                     "source_timerange": {
                         "start": 0,
-                        "duration": 5047000
+                        "duration": 4859000
                     },
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "91c21db343924d7885bad931e2eff7c1"
+                        "6b319dcb4ea0425986badacf2e37d915"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1303,7 +1489,7 @@
         {
             "attribute": 0,
             "flag": 0,
-            "id": "882062ae1f334c0994d0abe8037e3faa",
+            "id": "6b7c800bbbdb47848900e8e1d3764021",
             "is_default_name": false,
             "name": "字幕",
             "segments": [
@@ -1320,11 +1506,11 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "cf25c7d05a5e4ee3bda8146a24a1fb1d",
-                    "material_id": "7dd1266a87e340c8aeb8c58359eaf245",
+                    "id": "55eb2f33a74d497b838ea27f68360bf0",
+                    "material_id": "58a142acc6354196851ab1fe1d44806d",
                     "target_timerange": {
                         "start": 0,
-                        "duration": 3800000
+                        "duration": 4380000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
@@ -1332,7 +1518,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "ec87c84356df444b94dcbaabc4503879"
+                        "22e0c6d4e70341c99588d7eff29198fc"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1370,11 +1556,11 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "de292f6792de4e2b9f748a4258ad959c",
-                    "material_id": "fcc57bf15523431fabdbb337f9087991",
+                    "id": "bb4736d8fc09411ba0d5047dd5ddc779",
+                    "material_id": "a0a6a3a3c14b417ab126a9b826b16fea",
                     "target_timerange": {
-                        "start": 3800000,
-                        "duration": 3130000
+                        "start": 4380000,
+                        "duration": 5110000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
@@ -1382,7 +1568,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "9e94c765ca6b430aab3f44d812b77cfb"
+                        "b9d08e43b4164d91ad4a7f5a89337c57"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1420,11 +1606,11 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "15046480b8fb46089f6359af332b8a0a",
-                    "material_id": "036b6f13ef2e46b08aa94267afd93d72",
+                    "id": "3ffbb52b70ae467ba38315455643227b",
+                    "material_id": "0dd0706ea6534e5293a05b9a6fc1862a",
                     "target_timerange": {
-                        "start": 6930000,
-                        "duration": 3250000
+                        "start": 9490000,
+                        "duration": 4330000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
@@ -1432,7 +1618,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "e5ad2087b5a349a4b948f24db249baf0"
+                        "8248eefaf5e748fa878eed2893747c85"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1470,11 +1656,11 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "ac965db55ecf4880bbceca7f417406ab",
-                    "material_id": "13b712edea554824ac1b672628adbad6",
+                    "id": "d947c1a176d64e5e875849a69b368165",
+                    "material_id": "c4ada01d5d1341d7a53486c15ade591f",
                     "target_timerange": {
-                        "start": 10180000,
-                        "duration": 3740000
+                        "start": 13820000,
+                        "duration": 4510000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
@@ -1482,7 +1668,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "ab13ed057e714241b11496f0997c38d3"
+                        "1e4d4dd39ee845d08b6209a5c614ce17"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1520,11 +1706,11 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "b878d26341bf48278dcb9ba4533a6474",
-                    "material_id": "0bfb6af68acb41158c1c68711306626b",
+                    "id": "4c0de5625f444dd38eca5549b3516491",
+                    "material_id": "2bddb737165a4f7daff0675f4eba1e6a",
                     "target_timerange": {
-                        "start": 13920000,
-                        "duration": 5650000
+                        "start": 18330000,
+                        "duration": 5460000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
@@ -1532,7 +1718,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "8e637ba059c2463a85da1127d0034eb9"
+                        "95ad1e7ee4f748059afe20f7a89b7c59"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1563,7 +1749,7 @@
         {
             "attribute": 0,
             "flag": 0,
-            "id": "7161337f964c42bf99133825bf7f7709",
+            "id": "5d758533cafb4c6d9c8a86debf310166",
             "is_default_name": false,
             "name": "花字",
             "segments": [
@@ -1580,8 +1766,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "85fac84d50f8435c9229d603344b5598",
-                    "material_id": "cf5f726b4f4547dd9aae9ce757454684",
+                    "id": "2465817d8a8e4501a764f5599fedbeb5",
+                    "material_id": "2941a80bbbb94c3f95398e03bf7454e1",
                     "target_timerange": {
                         "start": 0,
                         "duration": 2800000
@@ -1592,7 +1778,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "b10c9813cbb4494cbce6b5c0078be233"
+                        "f058e6806855460a9b8eaa880144cfa8"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1630,10 +1816,10 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "5a31fdfbc5f64f7395dd2e94332b0a16",
-                    "material_id": "f36a365c03d74c4695384cb44ee31071",
+                    "id": "1b2a3b9b02834e2fb277f36775814aff",
+                    "material_id": "4a9dd5988958412a8fc905d485632e75",
                     "target_timerange": {
-                        "start": 10480000,
+                        "start": 14120000,
                         "duration": 2600000
                     },
                     "common_keyframes": [],
@@ -1642,7 +1828,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "b53dfac6381244659103aaecbe383463"
+                        "ff75ab11bb07491a889637e88850616c"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1680,11 +1866,11 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "18d195cca4b4407ba7e3712a96385612",
-                    "material_id": "fb67f42c46e84029b8cda10319d56a45",
+                    "id": "57ae8bd0ce9740cdab739e09e3c252a0",
+                    "material_id": "94743cc38bad425fbb7bfb3ef3f7cad4",
                     "target_timerange": {
-                        "start": 14120000,
-                        "duration": 5450000
+                        "start": 18530000,
+                        "duration": 5260000
                     },
                     "common_keyframes": [],
                     "keyframe_refs": [],
@@ -1692,7 +1878,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "55c7f8934d194fbd84e48ccaa2c02465"
+                        "b21e8dfdb871459b87bce68cdea48717"
                     ],
                     "is_tone_modify": false,
                     "clip": {
