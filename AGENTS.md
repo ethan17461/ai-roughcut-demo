@@ -4,49 +4,54 @@
 
 ## 项目是什么
 
-AI 产品经理课程的模拟项目：给一家做出海火车票短视频引流的业务方，演示"AI 粗剪 + 人工精修"（需求池里的 P0）。
+AI 产品经理课程的模拟项目：给一家做出海火车票短视频引流的业务方，做"AI 粗剪 + 人工精修"（需求池里的 P0）。
 
-页面演示的流程：选国家、平台、剪辑 Skill → 点「生成粗剪」→ 依次跑 7 步（读 Skill、生成配音、分段、素材召回、检索国家/平台规则、编排剪映轨道、自动评分）→ 出现剪映式多轨时间线和预览视频 → 可以换镜头、锁定、换一批、导出剪映草稿 JSON。
+这个仓库里是一条**真的能跑的最小流水线**，加一个展示结果的网页：
 
-**这是演示 Demo，不接任何真实服务**：流程是定时动画，评分是页面里的公式，候选镜头里只有每句的首选是真实视频，其他是色块示意。
+选题 → 写脚本（AI 初稿 + 规则审核）→ 读 Skill → 配音 → 分段 → 素材召回 → 国家/平台规则检查 → 生成剪映草稿 → 自动评分
+
+## 哪些是真的，哪些是简化的
+
+| 环节 | 现在怎么做 | 真实落地换成 |
+|---|---|---|
+| 选题 | 按公式给选题池打分；历史爆款率是**示例数据** | 接 BI 的真实播放数据 |
+| 写脚本 | 3 版初稿由 Claude 按 `data/script_prompt.md` 生成后存档；流水线按规则和事实库审核并选一版 | 脚本 Agent 实时调用大模型生成 |
+| 配音 | macOS 系统语音 `say`（Daniel 英式男声），真实音频 | ElevenLabs 等配音接口 |
+| 素材库 | 16 段 Pexels 实拍，标签由人工看画面标注 | 多模态模型自动打标 |
+| 素材召回 | 关键词匹配（`LEXICON`）+ 地点冲突排除 | 向量检索 |
+| 规则检查 | `data/rules.json` 里 6 条英国 × TikTok 规则 | 合规专员维护的规则库，RAG 检索 |
+| 剪映草稿 | 用开源库 pyJianYingDraft 生成**真的剪映草稿**，剪映能直接打开 | 同左 |
+| 评分 | 100 分评分标准的自动可算部分；画面节奏等需人工复核 | 加多模态模型抽帧打分 |
 
 ## 文件
 
-- `index.html`：全部代码都在这一个文件里（HTML + CSS + 原生 JavaScript，没有框架、没有构建步骤）
-- `clips/s1.mp4` ~ `clips/s5.mp4`：5 段竖屏实拍，来自 Pexels（免费可商用），对应脚本的 5 句
-- `.nojekyll`：让 GitHub Pages 直接发布静态文件
+- `pipeline.py`：流水线主程序
+- `build_web.py`：把流水线输出整理成网页（生成 `index.html`、`audio/`、`draft/`）
+- `data/`：`topics.json` 选题池、`script_prompt.md` 脚本提示词、`script_candidates.json` 3 版脚本初稿、`facts.json` 事实库、`skill.json` 剪辑规则、`rules.json` 国家/平台规则、`library.json` 素材标签、`script.json` 国家和平台
+- `web/template.html`：网页模板（深色剪辑台风格，颜色都用 `:root` 里的 CSS 变量）
+- `clips/m01.mp4` ~ `m16.mp4`：素材库；`thumbs/`：缩略图
+- `index.html`、`audio/`、`draft/`：构建产物，发布到 GitHub Pages
 
-## index.html 里的结构
+## 怎么跑（需要 macOS，因为配音用了系统自带的 say 和 afconvert）
 
-在 `<script>` 里按顺序：
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python pipeline.py        # 默认把剪映草稿写进本机剪映草稿目录
+python3 build_web.py                # 重新生成网页
+```
 
-1. `SENTS`：5 句脚本。每句有英文、中文、时长 `dur`、3 个候选镜头 `cands`。候选字段：`match` 匹配度、`q` 清晰度、`file` 真实视频路径（只有首选有）、`warn` 风险（"地点不符" / "含人脸"）
-2. `STICKERS`：花字/贴纸，挂在某一句上，`off` 是相对这句开头的秒数
-3. `RULES`：国家/平台规则检查
-4. `score()`：100 分评分。权重：语义匹配 30、配音对齐 15、结构和开头 15、剪辑规则还原 15、画面质量 10、合规 15。选了"地点不符"的镜头，语义匹配记 0；每个"含人脸"扣合规 8 分
-5. `band()`：分档。<70 退回重做；70–79 粗剪合格交人工精修；80–89 精修后可发布；90+ 有爆款潜力
-6. `STEPS` / `renderSteps()`：左侧 7 步流程
-7. `renderScore / renderRules / renderInspect / renderTimeline / renderMonitor`：各区域渲染
-8. 播放：`tick()` 用 requestAnimationFrame 推进全局时间 `state.t`，按当前句子切换显示对应的 `<video>`
-9. `draft()`：生成剪映草稿结构的 JSON（示意结构，真实对接需按剪映版本适配字段）
+- 剪映草稿默认写到 `~/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1`，用到的视频和配音会复制进草稿的 `materials/` 文件夹。没装剪映时用 `--draft-root <任意文件夹>`。
+- 打开剪映专业版，在草稿列表里点开就能看到四条轨道：画面、配音、字幕、花字。
+- 网页里加 `#topic`、`#script`、`#done-<秒>` 可以直接打开选题卡、脚本审核或生成后的某一时刻（截图用）。
 
 ## 约定
 
-- 界面文字用简体中文；保持深色编辑器风格，颜色都用 `:root` 里的 CSS 变量
-- 不要引入框架或构建工具，保持单文件、双击就能打开
-- 新增视频放进 `clips/`，单个文件尽量 < 10MB（GitHub 单文件上限 100MB，Pages 加载会变慢）
-- 只用可商用素材，并在页面底部的素材来源里注明出处
-- 改完在浏览器里点一遍「生成粗剪」，确认视频能播、评分能算、导出弹窗能开能关
-
-## 本地预览
-
-直接用浏览器打开 `index.html` 即可。若视频加载异常，在项目目录运行：
-
-```bash
-python3 -m http.server 8000
-```
-
-然后打开 http://localhost:8000
+- 界面文字用简体中文；视频里的字幕和花字用英文（目标观众在英国）
+- 不要引入前端框架或构建工具；网页保持单文件
+- 新增素材放进 `clips/` 并在 `data/library.json` 补标签；只用可商用素材，网页底部注明出处
+- 脚本里的事实必须能在 `data/facts.json` 找到出处
+- 改完先跑 `pipeline.py` 和 `build_web.py`，再在浏览器里点一遍「生成粗剪」，确认视频、配音、评分、弹窗都正常
 
 ## 发布
 

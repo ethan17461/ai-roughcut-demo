@@ -4,430 +4,1509 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AI 粗剪工作台</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
-/* Layout: editing workbench — settings + pipeline left, 9:16 monitor center, score + clip inspector right, multi-track timeline across the bottom. Deliberately dark-only, like the editors it mimics. */
+/* Layout: editing workbench — settings + pipeline left, 9:16 monitor center, score + inspector right, multi-track timeline across the bottom. Dark-only by design, like the editors it mimics. */
 :root{
-  --bg:#10131a; --panel:#171b24; --panel-2:#1e2330; --line:#2a3142; --fg:#e8eaf0; --muted:#949bad; --dim:#6b7285;
+  --bg:#0f1218; --panel:#161a22; --panel-2:#1d222c; --panel-3:#232a36; --line:#2a3140; --fg:#e9ebf1; --muted:#9aa1b2; --dim:#687084;
   --accent:#f3c04d; --accent-ink:#1b1505;
   --trk-v:#3ea8a1; --trk-a:#8a7df3; --trk-t:#c7b78c; --trk-s:#e97c62;
   --good:#5cc78f; --warn:#f0a03c; --bad:#ef5f5f;
   --font-ui:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
   --font-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-  --r:8px;
-  color-scheme:dark;
+  --r:10px; color-scheme:dark;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
-img,video{max-width:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.5;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px}
 button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--muted)}
 .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
-.wrap{max-width:1360px;margin:0 auto;display:grid;gap:12px}
-
+.wrap{max-width:1380px;margin:0 auto;display:grid;gap:14px}
 .top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-.top h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.02em}
-.tag-demo{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:500;vertical-align:middle}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-.btn{border:1px solid var(--line);background:var(--panel-2);padding:7px 14px;border-radius:var(--r);font-size:13px}
+.top h1{margin:0;font-size:21px;font-weight:700;letter-spacing:.02em}
+.top p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.pill{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:500;vertical-align:middle;background:rgba(92,199,143,.14);color:var(--good)}
+.btn{border:1px solid var(--line);background:var(--panel-2);padding:8px 15px;border-radius:8px;font-size:13px}
 .btn:hover{border-color:var(--dim)}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
-
-.grid{display:grid;grid-template-columns:270px minmax(0,1fr) 340px;gap:12px;align-items:start}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0}
+.grid{display:grid;grid-template-columns:280px minmax(0,1fr) 360px;gap:14px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
 .panel h2{margin:0 0 10px;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.08em}
-.field{display:grid;gap:4px;margin-bottom:10px}
-.field label{font-size:12px;color:var(--muted)}
-select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:7px 8px;font:inherit;font-size:13px}
-
-.steps{list-style:none;margin:12px 0 0;padding:0;display:grid}
-.steps li{display:grid;grid-template-columns:18px 1fr;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px;margin-bottom:14px}
+.kv dt{color:var(--dim)} .kv dd{margin:0}
+.steps{list-style:none;margin:14px 0 0;padding:0}
+.steps li{display:grid;grid-template-columns:18px 1fr auto;gap:8px;padding:7px 0;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
 .steps li:first-child{border-top:0}
 .steps li.done,.steps li.run{color:var(--fg)}
+.steps .v{display:block;color:var(--muted);font-size:12px}
+.steps li.link{cursor:pointer}
+.steps li.link.done .k{text-decoration:underline;text-decoration-color:var(--dim);text-underline-offset:3px}
+.steps li.link.done:hover .k{color:var(--accent)}
+.vt{display:grid;gap:10px}
+.var{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--panel-2)}
+.var.ok{border-color:rgba(92,199,143,.55)}
+.var h4{margin:0 0 6px;font-size:13px;display:flex;gap:8px;align-items:center}
+.var ol{margin:0;padding-left:18px;font-size:12.5px}
+.var ol li{margin:2px 0}
+.var ol small{color:var(--muted)}
+.ck{list-style:none;margin:8px 0 0;padding:0;font-size:12px;display:grid;gap:3px;color:var(--muted)}
+.steps .ms{font-size:11px;color:var(--dim);padding-top:2px}
 .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--dim);margin-top:3px}
 .steps li.done .dot{background:var(--good);border-color:var(--good)}
 .steps li.run .dot{border-color:var(--accent);border-top-color:transparent;animation:spin .8s linear infinite}
-.steps .v{color:var(--muted);font-size:12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .monitor{display:grid;justify-items:center;gap:10px}
-.screen{position:relative;width:min(100%,270px);aspect-ratio:9/16;max-width:100%;border-radius:10px;overflow:hidden;background:#05070a;border:1px solid var(--line)}
-.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .15s}
+.screen{position:relative;width:min(100%,290px);aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:#05070a;border:1px solid var(--line)}
+.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
 .screen video.on{opacity:1}
-.ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;color:var(--muted);font-size:13px}
-.ph b{display:block;color:var(--fg);font-size:15px;margin-bottom:4px}
-.alt{position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,255,255,.75);font-size:12px}
-.huazi{position:absolute;left:10px;right:10px;top:20%;text-align:center;font-weight:700;font-size:18px;color:#fff6d8;
-  text-shadow:0 2px 0 #b5302a,0 0 10px rgba(0,0,0,.6);line-height:1.3}
-.sub{position:absolute;left:10px;right:10px;bottom:11%;text-align:center}
-.sub .en{font-size:13px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,0 0 6px #000;line-height:1.35}
-.sub .zh{font-size:11px;color:#eee;text-shadow:0 0 3px #000,0 0 3px #000;margin-top:2px}
-.transport{display:flex;align-items:center;gap:10px}
-.play{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--panel-2);display:grid;place-items:center}
+.ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:22px;color:var(--muted);font-size:13px}
+.ph b{display:block;color:var(--fg);font-size:15px;margin-bottom:6px}
+.huazi{position:absolute;left:12px;right:12px;top:19%;text-align:center;font-weight:800;font-size:20px;color:#ffd62e;letter-spacing:.02em;
+  text-shadow:0 0 2px #000,0 0 2px #000,0 2px 0 #000,0 0 12px rgba(0,0,0,.5);line-height:1.2;white-space:pre-line}
+.sub{position:absolute;left:14px;right:14px;bottom:12%;text-align:center;font-weight:700;font-size:13px;color:#fff;text-wrap:balance;
+  text-shadow:0 0 2px #000,0 0 3px #000,0 1px 0 #000;line-height:1.35}
+.transport{display:flex;align-items:center;gap:12px}
+.play{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel-2);display:grid;place-items:center}
 .play svg{width:14px;height:14px;fill:var(--fg)}
 .tc{color:var(--muted);font-size:13px}
-.note{font-size:11.5px;color:var(--dim);text-align:center;max-width:300px}
-
-.empty{color:var(--muted);font-size:13px;padding:8px 0}
+.zh{max-width:320px;text-align:center;color:var(--muted);font-size:12.5px;min-height:20px}
+.note{font-size:11.5px;color:var(--dim);text-align:center;max-width:330px}
+.empty{color:var(--muted);font-size:13px;margin:6px 0}
 .score-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.score-num{font-size:40px;font-weight:700;line-height:1}
+.score-num{font-size:42px;font-weight:700;line-height:1}
 .band{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
-.band.ok{background:rgba(92,199,143,.15);color:var(--good)}
-.band.mid{background:rgba(243,192,77,.15);color:var(--accent)}
-.band.bad{background:rgba(239,95,95,.15);color:var(--bad)}
-.dims{display:grid;gap:8px;margin-top:12px}
-.dim{display:grid;gap:3px}
+.band.ok{background:rgba(92,199,143,.15);color:var(--good)} .band.mid{background:rgba(243,192,77,.15);color:var(--accent)} .band.bad{background:rgba(239,95,95,.15);color:var(--bad)}
+.dims{display:grid;gap:9px;margin-top:12px}
 .dim .t{display:flex;justify-content:space-between;font-size:12.5px}
-.bar{height:5px;border-radius:3px;background:var(--panel-2);overflow:hidden}
+.bar{height:5px;border-radius:3px;background:var(--panel-3);overflow:hidden;margin:3px 0}
 .bar i{display:block;height:100%;background:var(--good);transition:width .3s}
 .bar i.w{background:var(--warn)} .bar i.b{background:var(--bad)}
 .dim .why{font-size:11.5px;color:var(--muted)}
-.sep{border:0;border-top:1px solid var(--line);margin:14px 0}
+.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
+.seg-head{display:flex;justify-content:space-between;gap:8px;align-items:start}
 .seg-title{font-size:13px;font-weight:500}
-.seg-zh{font-size:12px;color:var(--muted);margin-bottom:6px}
-.lockbtn{font-size:12px;padding:3px 10px;white-space:nowrap}
+.seg-en{font-size:12.5px;margin-top:2px}
+.seg-zh{font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 2px}
+.chip{font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.chip.hit{border-color:rgba(62,168,161,.6);color:#8fd7d1}
+.chip.bad{border-color:rgba(239,95,95,.55);color:var(--bad)}
+.chip.warn{border-color:rgba(240,160,60,.55);color:var(--warn)}
+.gap{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(240,160,60,.1);border:1px solid rgba(240,160,60,.35);color:#f5c27e;font-size:12px}
+.shot-tabs{display:flex;gap:6px;margin-top:10px}
+.shot-tabs button{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2)}
+.shot-tabs button.on{border-color:var(--accent);color:var(--accent)}
 .cands{display:grid;gap:8px;margin-top:8px}
-.cand{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2)}
-.cand.sel{border-color:var(--trk-v)}
-.thumb{width:44px;aspect-ratio:9/16;border-radius:4px;object-fit:cover;background:#000}
+.cand{display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2)}
+.cand.sel{border-color:var(--trk-v)} .cand.x{opacity:.8}
+.cand img{width:46px;aspect-ratio:9/16;object-fit:cover;border-radius:4px;background:#000}
 .cand .nm{font-size:12.5px;font-weight:500}
 .cand .meta{font-size:11px;color:var(--muted)}
-.chip{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:999px;border:1px solid rgba(239,95,95,.5);color:var(--bad);margin-top:2px}
-.match{font-size:12px;text-align:right}
-.cand button{font-size:11.5px;padding:3px 8px;margin-top:4px;border-radius:5px;border:1px solid var(--line);background:var(--panel)}
-.rules{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.cand .pct{font-size:13px;text-align:right}
+.cand button{font-size:11.5px;padding:3px 9px;margin-top:4px;border-radius:6px;border:1px solid var(--line);background:var(--panel)}
+.rules{list-style:none;margin:0;padding:0;display:grid;gap:7px}
 .rules li{display:grid;grid-template-columns:16px 1fr;gap:6px;font-size:12px;color:var(--muted)}
 .rules b{color:var(--fg);font-weight:500}
 .ok-ic{color:var(--good)} .bad-ic{color:var(--bad)}
-
 .tl-panel{padding:0;overflow:hidden}
-.tl-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.tl-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
 .tl-bar h2{margin:0}
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
 .tl-scroll{overflow-x:auto}
-.tl{position:relative;min-width:760px;padding:6px 14px 12px}
-.tl-row{display:grid;grid-template-columns:72px 1fr;align-items:center;min-height:44px}
+.tl{position:relative;min-width:780px;padding:6px 16px 14px}
+.tl-row{display:grid;grid-template-columns:72px 1fr;align-items:center;min-height:46px}
 .tl-row .nm{font-size:12px;color:var(--muted)}
-.lane{position:relative;height:36px;border-radius:4px;background:rgba(255,255,255,.025)}
+.lane{position:relative;height:38px;border-radius:5px;background:rgba(255,255,255,.025)}
 .ruler{height:22px;background:none;cursor:pointer}
-.ruler span{position:absolute;top:2px;font-size:10.5px;color:var(--dim);transform:translateX(-50%)}
-.clip{position:absolute;top:2px;bottom:2px;border-radius:5px;padding:3px 7px;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;border:1px solid rgba(0,0,0,.35);text-align:left;line-height:1.35}
-.clip.v{background:var(--trk-v);color:#062523}
+.ruler span{position:absolute;top:3px;font-size:10.5px;color:var(--dim);transform:translateX(-50%)}
+.clip{position:absolute;top:2px;bottom:2px;border-radius:6px;padding:3px 7px;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;border:1px solid rgba(0,0,0,.35);text-align:left;line-height:1.35}
+.clip.v{background:var(--trk-v);color:#062523;display:flex;gap:6px;align-items:center;padding:2px}
+.clip.v img{height:100%;aspect-ratio:9/16;object-fit:cover;border-radius:4px;flex:none}
+.clip.v span{overflow:hidden;text-overflow:ellipsis}
 .clip.v.active{outline:2px solid var(--accent);outline-offset:1px}
 .clip.v.flag{background:var(--bad);color:#2a0606}
+.clip.v.long{box-shadow:inset 0 -3px 0 var(--warn)}
 .clip.a{background:color-mix(in srgb,var(--trk-a) 28%,var(--panel-2));border-color:var(--trk-a);color:#d9d4ff}
 .clip.t{background:var(--trk-t);color:#241f12}
 .clip.s{background:var(--trk-s);color:#2b0d06}
 .clip small{display:block;opacity:.8;font-size:10px}
-.playhead{position:absolute;top:6px;bottom:8px;width:2px;background:var(--accent);pointer-events:none;z-index:3}
-.tl-empty{padding:18px 14px;color:var(--muted);font-size:13px}
-
-.credit{font-size:11.5px;color:var(--dim)}
-.credit a{color:var(--muted)}
-
-.modal{position:fixed;inset:0;background:rgba(5,7,10,.7);display:grid;place-items:center;padding:16px;z-index:20}
-.modal-card{width:min(760px,100%);max-height:86vh;display:grid;grid-template-rows:auto 1fr auto;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
-.modal-card h3{margin:0;font-size:16px}
-.modal-card p{margin:0;color:var(--muted);font-size:12.5px}
-.modal pre{margin:0;overflow:auto;background:#0b0d12;border:1px solid var(--line);border-radius:6px;padding:12px;font-size:11.5px;line-height:1.5;font-family:var(--font-mono);color:#cfd5e2}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
-.copied{color:var(--good);font-size:12px}
-
-@media (max-width:1100px){.grid{grid-template-columns:260px minmax(0,1fr)} .inspector{grid-column:1 / -1}}
-@media (max-width:720px){.grid{grid-template-columns:minmax(0,1fr)}}
+.playhead{position:absolute;top:6px;bottom:10px;width:2px;background:var(--accent);pointer-events:none;z-index:3}
+.tl-empty{padding:20px 16px;color:var(--muted);font-size:13px}
+.foot{font-size:12px;color:var(--dim);display:grid;gap:4px}
+.modal{position:fixed;inset:0;background:rgba(5,7,10,.72);display:grid;place-items:center;padding:16px;z-index:20}
+.modal-card{width:min(720px,100%);max-height:86vh;overflow:auto;display:grid;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+.modal-card h3{margin:0;font-size:17px}
+.modal-card p{margin:0;color:var(--muted);font-size:13px}
+.modal-card table{border-collapse:collapse;width:100%;font-size:12.5px}
+.modal-card td,.modal-card th{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+.modal-card th{color:var(--muted);font-weight:500}
+.path{font-family:var(--font-mono);font-size:12px;background:#0b0d12;border:1px solid var(--line);border-radius:6px;padding:8px 10px;word-break:break-all;color:#cfd5e2}
+@media (max-width:1150px){.grid{grid-template-columns:270px minmax(0,1fr)} .inspector{grid-column:1 / -1}}
+@media (max-width:740px){.grid{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-
 <div class="wrap">
   <header class="top">
-    <h1>AI 粗剪工作台 <span class="tag-demo">Demo</span></h1>
-    <div class="actions">
-      <button class="btn" id="regen" disabled>换一批未锁定镜头</button>
-      <button class="btn primary" id="export" disabled>导出剪映草稿</button>
+    <div>
+      <h1>AI 粗剪工作台 <span class="pill">真实流水线结果</span></h1>
+      <p>选题 → 写脚本 → 配音 → 素材召回 → 国家和平台规则 → 剪映草稿 → 自动评分 → 人工精修</p>
     </div>
+    <button class="btn" id="draftBtn" disabled>查看生成的剪映草稿</button>
   </header>
 
   <div class="grid">
     <section class="panel" aria-labelledby="in-h">
-      <h2 id="in-h">设置</h2>
-      <div class="field"><label for="country">目标国家</label>
-        <select id="country"><option>英国</option><option>日本</option><option>韩国</option><option>泰国</option></select></div>
-      <div class="field"><label for="platform">发布平台</label>
-        <select id="platform"><option>TikTok</option><option>Instagram</option><option>YouTube Shorts</option></select></div>
-      <div class="field"><label for="skill">剪辑 Skill（从优秀实践蒸馏）</label>
-        <select id="skill"><option>冷知识路线类 v0.3</option><option>优惠券钩子类 v0.2</option></select></div>
+      <h2 id="in-h">本次任务</h2>
+      <dl class="kv" id="kv"></dl>
       <button class="btn primary" id="gen" style="width:100%">生成粗剪</button>
       <ol class="steps" id="steps" aria-live="polite"></ol>
     </section>
 
     <section class="panel monitor" aria-label="预览">
       <div class="screen" id="screen">
-        <div class="ph" id="ph"><div><b>还没有粗剪</b>点「生成粗剪」，AI 跑完流程后这里出视频</div></div>
-        <div class="alt" id="alt" hidden></div>
+        <div class="ph" id="ph"><div><b>还没有粗剪</b>点「生成粗剪」，回放流水线的真实运行过程，跑完后这里出片</div></div>
         <div class="huazi" id="huazi" hidden></div>
-        <div class="sub" id="sub" hidden><div class="en" id="subEn"></div><div class="zh" id="subZh"></div></div>
+        <div class="sub" id="sub" hidden></div>
       </div>
       <div class="transport">
         <button class="play" id="play" aria-label="播放" disabled><svg viewBox="0 0 16 16" id="playIc"><path d="M4 2l10 6-10 6z"/></svg></button>
         <span class="tc mono" id="tc">00:00.0 / 00:00.0</span>
       </div>
-      <p class="note">画面为真实素材；配音在 Demo 里用字幕示意。</p>
+      <div class="zh" id="zh"></div>
+      <p class="note">画面是素材库里的真实镜头，配音是系统语音合成的真实音频（英式男声）。网页里换镜头只影响预览和评分，正式修改在剪映里做。</p>
     </section>
 
     <section class="panel inspector" aria-labelledby="sc-h">
       <h2 id="sc-h">粗剪评分（满分 100）</h2>
-      <div id="scoreBox"><p class="empty">生成后自动打分。</p></div>
+      <div id="scoreBox"><p class="empty">生成后显示评分。</p></div>
       <hr class="sep">
       <h2>当前片段</h2>
-      <div id="inspect"><p class="empty">点时间线上的视频片段，可替换或锁定镜头。</p></div>
+      <div id="inspect"><p class="empty">点时间线上的画面片段，查看召回的候选镜头。</p></div>
       <hr class="sep">
       <h2>国家 / 平台规则（RAG）</h2>
-      <ul class="rules" id="rules"><li><span></span><span>生成后显示命中的规则。</span></li></ul>
+      <ul class="rules" id="rules"><li><span></span><span>生成后显示规则检查结果。</span></li></ul>
     </section>
   </div>
 
   <section class="panel tl-panel" aria-labelledby="tl-h">
     <div class="tl-bar">
-      <h2 id="tl-h">时间线（剪映式多轨，可继续精修）</h2>
-      <div class="legend"><span style="--c:var(--trk-v)">视频</span><span style="--c:var(--trk-a)">配音</span><span style="--c:var(--trk-t)">字幕</span><span style="--c:var(--trk-s)">花字 / 贴纸</span></div>
+      <h2 id="tl-h">时间线（和剪映草稿的轨道一致）</h2>
+      <div class="legend"><span style="--c:var(--trk-v)">画面</span><span style="--c:var(--trk-a)">配音</span><span style="--c:var(--trk-t)">字幕</span><span style="--c:var(--trk-s)">花字</span></div>
     </div>
-    <div class="tl-scroll"><div class="tl" id="tl"><div class="tl-empty">生成后在这里出现视频、配音、字幕、花字四条轨道。</div></div></div>
+    <div class="tl-scroll"><div class="tl" id="tl"><div class="tl-empty">生成后在这里出现画面、配音、字幕、花字四条轨道。</div></div></div>
   </section>
 
-  <p class="credit">视频素材来自 Pexels（免费可商用）：
-    <a href="https://www.pexels.com/video/train-arriving-at-station-at-night-14536989/" target="_blank" rel="noopener">夜间列车进站</a> ·
-    <a href="https://www.pexels.com/video/a-train-is-parked-at-a-station-at-night-27549041/" target="_blank" rel="noopener">夜间站台</a> ·
-    <a href="https://www.pexels.com/video/scenic-train-journey-through-lush-green-mountains-33054658/" target="_blank" rel="noopener">穿过山谷</a> ·
-    <a href="https://www.pexels.com/video/legs-of-person-laying-on-couchette-on-train-10430975/" target="_blank" rel="noopener">卧铺</a> ·
-    <a href="https://www.pexels.com/video/using-smartphone-display-for-mobile-applications-40326823/" target="_blank" rel="noopener">手机 App</a></p>
+  <div class="foot" id="foot"></div>
 </div>
 
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-h">
-  <div class="modal-card">
-    <div>
-      <h3 id="m-h">剪映草稿（draft_content.json 示意）</h3>
-      <p>按剪映草稿的轨道、片段、素材结构组织。真实对接时按剪映版本适配字段，放进草稿目录后在剪映里打开继续精修。</p>
-    </div>
-    <pre id="json"></pre>
-    <div class="modal-actions"><span class="copied" id="copied" hidden>已复制</span><button class="btn" id="copy">复制 JSON</button><button class="btn primary" id="close">关闭</button></div>
-  </div>
+  <div class="modal-card" id="modalCard"></div>
 </div>
 
 <script>
-/* ---------- data (real clips are the AI's first pick; others are illustrative candidates) ---------- */
-const SENTS=[
- {id:'s1',role:'开头 · 冷知识',en:"Most people don't know you can sleep your way from London to Scotland.",zh:'很多人不知道，从伦敦睡一觉就能到苏格兰。',dur:4.2,
-  cands:[{id:'A1',title:'夜间列车进站',src:'实拍',file:'clips/s1.mp4',q:4,match:.82},
-         {id:'A2',title:'伦敦塔桥夜景航拍',src:'网络素材',q:4,match:.71,hue:222},
-         {id:'A3',title:'伦敦→苏格兰路线动画',src:'素材库',q:3,match:.74,hue:160}]},
- {id:'s2',role:'铺垫 · 路线',en:'The sleeper train leaves London Euston just before midnight.',zh:'卧铺列车午夜前从伦敦尤斯顿站出发。',dur:3.6,
-  cands:[{id:'B1',title:'夜间站台停靠列车',src:'实拍',file:'clips/s2.mp4',q:4,match:.85},
-         {id:'B2',title:'国王十字站大厅',src:'网络素材',q:4,match:.58,hue:28,warn:'地点不符',note:'脚本说的是尤斯顿站，不能拿别的车站凑'},
-         {id:'B3',title:'列车车门关闭特写',src:'素材库',q:3,match:.76,hue:200}]},
- {id:'s3',role:'画面 · 情绪',en:'You fall asleep in the city and wake up to Highland lochs.',zh:'在城市睡着，醒来窗外是高地湖泊。',dur:4.0,
-  cands:[{id:'C1',title:'列车穿过绿色山谷',src:'实拍',file:'clips/s3.mp4',q:4,match:.80,why:'画面是山谷，脚本写的是湖泊'},
-         {id:'C2',title:'瑞士雪山湖泊',src:'网络素材',q:5,match:.66,hue:205,warn:'地点不符',note:'画面是瑞士，不是苏格兰'},
-         {id:'C3',title:'卧铺包厢窗外天亮',src:'素材库',q:3,match:.78,hue:190}]},
- {id:'s4',role:'利益点 · 省钱',en:'Book the two legs separately and you can save up to 30%.',zh:'分两段买票，最多能省 30%。',dur:3.9,
-  cands:[{id:'D1',title:'卧铺铺位',src:'实拍',file:'clips/s4.mp4',q:4,match:.78,why:'画面没有体现"分段买票省钱"'},
-         {id:'D2',title:'分段购票价格对比 屏录',src:'素材库',q:3,match:.79,hue:45,kind:'屏录'},
-         {id:'D3',title:'乘客数钱 人脸特写',src:'网络素材',q:4,match:.72,hue:338,warn:'含人脸',note:'欧洲隐私合规：不出现可识别人脸'}]},
- {id:'s5',role:'结尾 · 搜码钩子',en:'Open the app, search code UK20, and get an extra 20% off.',zh:'打开 App 搜 UK20，再减 20%。',dur:4.5,
-  cands:[{id:'E1',title:'手机 App 操作',src:'实拍',file:'clips/s5.mp4',q:4,match:.86},
-         {id:'E2',title:'手机领券 手部特写',src:'素材库',q:3,match:.83,hue:82},
-         {id:'E3',title:'车票特价海报',src:'网络素材',q:2,match:.61,hue:0}]}
-];
-const STICKERS=[{seg:'s1',text:'伦敦 → 苏格兰\n睡一觉就到',off:0,len:3},{seg:'s4',text:'最多省 30%',off:.5,len:2.8},{seg:'s5',text:'搜 UK20 再减 20%',off:.4,len:3.8}];
-const RULES=[
- {k:'利益点不放前 3 秒',v:'平台会判成营销视频限流',check:()=>pick(SENTS[0]).kind!=='屏录'},
- {k:'不出现可识别人脸、儿童',v:'欧洲隐私合规',check:()=>!SENTS.some(s=>pick(s).warn==='含人脸')},
- {k:'画面地点和脚本一致',v:'找不到对的素材就标缺口，不拿别处凑',check:()=>!SENTS.some(s=>pick(s).warn==='地点不符')},
- {k:'价格写"最多 / 起"',v:'英国广告规范：字幕用 up to',check:()=>true}
-];
-
-/* ---------- state ---------- */
-const state={gen:false,busy:false,sel:{},locked:new Set(),active:'s1',t:0,playing:false};
+const R = {
+  "topic": {
+    "note": "示例数据：历史爆款率为模拟值，真实落地时从 BI 的播放数据算出；营销节点来自营销部门的年度 roadmap。",
+    "month": "11 月",
+    "nodes": [
+      {
+        "name": "入冬 · 夜车出行",
+        "weight": 1.0
+      },
+      {
+        "name": "黑五促销",
+        "weight": 0.8
+      }
+    ],
+    "pool": [
+      {
+        "id": "T1",
+        "title": "伦敦到苏格兰，睡一觉就到（卧铺冷知识）",
+        "genre": [
+          "冷知识",
+          "路线推荐"
+        ],
+        "node": "入冬 · 夜车出行",
+        "benefit_fit": 0.9,
+        "hit": 1.0,
+        "node_w": 1.0,
+        "score": 0.98
+      },
+      {
+        "id": "T3",
+        "title": "伦敦出发的 3 条一日游火车路线",
+        "genre": [
+          "路线推荐"
+        ],
+        "node": "入冬 · 夜车出行",
+        "benefit_fit": 0.6,
+        "hit": 0.77,
+        "node_w": 1.0,
+        "score": 0.807
+      },
+      {
+        "id": "T4",
+        "title": "黑五英国火车票限时优惠",
+        "genre": [
+          "热点",
+          "优惠券"
+        ],
+        "node": "黑五促销",
+        "benefit_fit": 1.0,
+        "hit": 0.56,
+        "node_w": 0.8,
+        "score": 0.722
+      },
+      {
+        "id": "T2",
+        "title": "英国火车票分段买更便宜",
+        "genre": [
+          "优惠券"
+        ],
+        "node": "黑五促销",
+        "benefit_fit": 1.0,
+        "hit": 0.34,
+        "node_w": 0.8,
+        "score": 0.609
+      }
+    ],
+    "chosen": "T1"
+  },
+  "scripts": {
+    "generated_by": "Claude Opus 5.5（按 data/script_prompt.md 生成，2026-11-09 存档）",
+    "variants": [
+      {
+        "id": "A",
+        "lines": [
+          {
+            "en": "Most people don't know you can sleep your way from London to Scotland.",
+            "zh": "很多人不知道，从伦敦睡一觉就能到苏格兰。",
+            "role": "开头 · 冷知识",
+            "on_screen": "LONDON → SCOTLAND\nWHILE YOU SLEEP"
+          },
+          {
+            "en": "The Highlander sleeper leaves London Euston every evening.",
+            "zh": "Highlander 卧铺列车每天晚上从伦敦尤斯顿站出发。",
+            "role": "铺垫 · 路线"
+          },
+          {
+            "en": "You fall asleep in the city and wake up to Highland lochs.",
+            "zh": "在城市睡着，醒来窗外是高地湖泊。",
+            "role": "画面 · 情绪"
+          },
+          {
+            "en": "Book the two legs separately and you can save up to 30%.",
+            "zh": "分两段买票，最多能省 30%。",
+            "role": "利益点 · 省钱",
+            "on_screen": "SAVE UP TO 30%"
+          },
+          {
+            "en": "Open the app, search code UK20, and get an extra 20% off.",
+            "zh": "打开 App 搜 UK20，再减 20%。",
+            "role": "结尾 · 搜码钩子",
+            "on_screen": "SEARCH: UK20"
+          }
+        ],
+        "checks": [
+          {
+            "name": "开头不放利益点（R1）",
+            "ok": true,
+            "msg": "第 1 句没有价格或优惠"
+          },
+          {
+            "name": "每句不超过 14 个词",
+            "ok": true,
+            "msg": "都在 14 个词以内"
+          },
+          {
+            "name": "价格写 up to / extra（R4）",
+            "ok": true,
+            "msg": "价格表述合规"
+          },
+          {
+            "name": "事实核查（对照事实库）",
+            "ok": true,
+            "msg": "所用事实都能在事实库找到出处"
+          }
+        ],
+        "ok": true
+      },
+      {
+        "id": "B",
+        "lines": [
+          {
+            "en": "Here's a train secret most tourists never hear about.",
+            "zh": "这是大多数游客都不知道的火车冷知识。",
+            "role": "开头 · 冷知识",
+            "on_screen": "UK TRAIN SECRET"
+          },
+          {
+            "en": "The sleeper train leaves London Euston just before midnight.",
+            "zh": "卧铺列车午夜前从伦敦尤斯顿站出发。",
+            "role": "铺垫 · 路线"
+          },
+          {
+            "en": "By breakfast, you're looking out at Highland mountains.",
+            "zh": "到早餐时间，窗外已经是高地山景。",
+            "role": "画面 · 情绪"
+          },
+          {
+            "en": "Split your ticket in two and save up to 30%.",
+            "zh": "把票分成两段买，最多省 30%。",
+            "role": "利益点 · 省钱",
+            "on_screen": "SAVE UP TO 30%"
+          },
+          {
+            "en": "Search UK20 in the app for an extra 20% off.",
+            "zh": "在 App 搜 UK20，再减 20%。",
+            "role": "结尾 · 搜码钩子",
+            "on_screen": "SEARCH: UK20"
+          }
+        ],
+        "checks": [
+          {
+            "name": "开头不放利益点（R1）",
+            "ok": true,
+            "msg": "第 1 句没有价格或优惠"
+          },
+          {
+            "name": "每句不超过 14 个词",
+            "ok": true,
+            "msg": "都在 14 个词以内"
+          },
+          {
+            "name": "价格写 up to / extra（R4）",
+            "ok": true,
+            "msg": "价格表述合规"
+          },
+          {
+            "name": "事实核查（对照事实库）",
+            "ok": false,
+            "msg": "事实冲突：午夜前发车的是去爱丁堡、格拉斯哥的 Lowlander；去高地的 Highlander 晚上 8–9 点就发车（F2）"
+          }
+        ],
+        "ok": false
+      },
+      {
+        "id": "C",
+        "lines": [
+          {
+            "en": "Get 20% off the London to Scotland sleeper with code UK20.",
+            "zh": "用优惠码 UK20，伦敦到苏格兰卧铺立减 20%。",
+            "role": "开头 · 冷知识",
+            "on_screen": "20% OFF"
+          },
+          {
+            "en": "It leaves London Euston every evening and runs overnight.",
+            "zh": "它每天晚上从伦敦尤斯顿站出发，连夜行驶。",
+            "role": "铺垫 · 路线"
+          },
+          {
+            "en": "Wake up to lochs and mountains outside your window.",
+            "zh": "醒来时窗外是湖泊和山。",
+            "role": "画面 · 情绪"
+          },
+          {
+            "en": "Splitting the journey can save you up to 30%.",
+            "zh": "分段出行最多能省 30%。",
+            "role": "利益点 · 省钱",
+            "on_screen": "SAVE UP TO 30%"
+          },
+          {
+            "en": "Open the app and search UK20 before it's gone.",
+            "zh": "趁还有，打开 App 搜 UK20。",
+            "role": "结尾 · 搜码钩子",
+            "on_screen": "SEARCH: UK20"
+          }
+        ],
+        "checks": [
+          {
+            "name": "开头不放利益点（R1）",
+            "ok": false,
+            "msg": "第 1 句出现利益点：Get 20% off the London to Scotland sleeper with code UK20."
+          },
+          {
+            "name": "每句不超过 14 个词",
+            "ok": true,
+            "msg": "都在 14 个词以内"
+          },
+          {
+            "name": "价格写 up to / extra（R4）",
+            "ok": false,
+            "msg": "有价格没写 up to"
+          },
+          {
+            "name": "事实核查（对照事实库）",
+            "ok": true,
+            "msg": "所用事实都能在事实库找到出处"
+          }
+        ],
+        "ok": false
+      }
+    ],
+    "chosen": "A",
+    "rejected": [
+      "B 版：事实冲突：午夜前发车的是去爱丁堡、格拉斯哥的 Lowlander；去高地的 Highlander 晚上 8–9 点就发车（F2）",
+      "C 版：第 1 句出现利益点：Get 20% off the London to Scotland sleeper with code UK20."
+    ],
+    "facts": [
+      {
+        "id": "F1",
+        "text": "Caledonian Sleeper 每晚从伦敦尤斯顿站开往苏格兰。",
+        "source": "https://www.ontheluce.com/the-caledonian-sleeper/"
+      },
+      {
+        "id": "F2",
+        "text": "去高地（Inverness / Fort William / Aberdeen）的 Highlander 晚上约 20:30–21:15 发车；午夜前约 23:45 发车的是去爱丁堡、格拉斯哥的 Lowlander。",
+        "source": "https://railtravelstation.com/caledonian-sleeper-1s25-london-euston-inverness/"
+      },
+      {
+        "id": "F3",
+        "text": "分段买票（A–B + B–C）可能比直达票便宜，最高优惠幅度由产品团队提供（示例：up to 30%，待确认）。",
+        "source": "业务访谈：A 到 C 的价格会比 A 到 B 加 B 到 C 贵"
+      },
+      {
+        "id": "F4",
+        "text": "新客搜码 UK20 额外 20% 优惠（示例券，上限由产品团队设定）。",
+        "source": "业务访谈：优惠券提到上限 4 欧、20%"
+      }
+    ]
+  },
+  "title": "伦敦 → 苏格兰卧铺冷知识",
+  "country": "英国",
+  "platform": "TikTok",
+  "skill": {
+    "name": "冷知识路线类 v0.3",
+    "from": "从业务方 12 个爆款剪映工程里提炼的剪辑规则（Demo 中为人工整理的示例规则）",
+    "voice": {
+      "engine": "macOS 系统语音（Demo）/ ElevenLabs（落地）",
+      "voice": "Daniel（英式男声）",
+      "rate_wpm": 175
+    },
+    "gap_between_lines_s": 0.15,
+    "tail_s": 0.6,
+    "max_shot_s": 3.2,
+    "clip_skip_head_s": 0.5,
+    "subtitle": {
+      "size": 7.0,
+      "color": [
+        1,
+        1,
+        1
+      ],
+      "bold": true,
+      "border_width": 45,
+      "y": -0.62,
+      "max_chars_per_line": 42
+    },
+    "huazi": {
+      "size": 11.0,
+      "color": [
+        1.0,
+        0.84,
+        0.18
+      ],
+      "bold": true,
+      "border_width": 55,
+      "y": 0.4
+    },
+    "opening_huazi_max_s": 2.8,
+    "benefit_sticker_offset_s": 0.3,
+    "benefit_sticker_len_s": 2.6,
+    "cta_min_s": 1.5
+  },
+  "total_s": 19.57,
+  "segments": [
+    {
+      "i": 0,
+      "en": "Most people don't know you can sleep your way from London to Scotland.",
+      "zh": "很多人不知道，从伦敦睡一觉就能到苏格兰。",
+      "role": "开头 · 冷知识",
+      "start": 0.0,
+      "dur": 3.8,
+      "voice_s": 3.65,
+      "audio": "output/tts/line1",
+      "need": [
+        "sleeper",
+        "london"
+      ],
+      "places": [
+        "伦敦",
+        "苏格兰"
+      ],
+      "candidates": [
+        {
+          "id": "m06",
+          "title": "伦敦夜景（泰晤士河）",
+          "coverage": 0.5,
+          "matched": [
+            "london"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 11.68
+        },
+        {
+          "id": "m07",
+          "title": "伦敦塔桥夜景",
+          "coverage": 0.5,
+          "matched": [
+            "london"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 12.5
+        },
+        {
+          "id": "m04",
+          "title": "卧铺铺位（车厢内）",
+          "coverage": 0.5,
+          "matched": [
+            "sleeper"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 3.5
+        }
+      ],
+      "shots": [
+        {
+          "clip": "m06",
+          "title": "伦敦夜景（泰晤士河）",
+          "start": 0.0,
+          "dur": 1.9,
+          "src_in": 0.5,
+          "coverage": 0.5,
+          "quality": 4,
+          "issues": [],
+          "excluded": null
+        },
+        {
+          "clip": "m04",
+          "title": "卧铺铺位（车厢内）",
+          "start": 1.9,
+          "dur": 1.9,
+          "src_in": 0.5,
+          "coverage": 0.5,
+          "quality": 4,
+          "issues": [],
+          "excluded": null
+        }
+      ],
+      "stickers": [
+        {
+          "kind": "开头花字",
+          "text": "LONDON → SCOTLAND\nWHILE YOU SLEEP",
+          "start": 0.0,
+          "dur": 2.8
+        }
+      ],
+      "gap": null,
+      "subtitle": "Most people don't know you can sleep your\nway from London to Scotland."
+    },
+    {
+      "i": 1,
+      "en": "The Highlander sleeper leaves London Euston every evening.",
+      "zh": "Highlander 卧铺列车每天晚上从伦敦尤斯顿站出发。",
+      "role": "铺垫 · 路线",
+      "start": 3.8,
+      "dur": 3.13,
+      "voice_s": 2.98,
+      "audio": "output/tts/line2",
+      "need": [
+        "sleeper",
+        "train",
+        "depart",
+        "station",
+        "london",
+        "night"
+      ],
+      "places": [
+        "伦敦"
+      ],
+      "candidates": [
+        {
+          "id": "m02",
+          "title": "夜间站台停靠列车",
+          "coverage": 0.67,
+          "matched": [
+            "train",
+            "depart",
+            "station",
+            "night"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 12.47
+        },
+        {
+          "id": "m01",
+          "title": "夜间列车进站",
+          "coverage": 0.5,
+          "matched": [
+            "train",
+            "station",
+            "night"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 11.47
+        },
+        {
+          "id": "m06",
+          "title": "伦敦夜景（泰晤士河）",
+          "coverage": 0.33,
+          "matched": [
+            "london",
+            "night"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 1,
+          "clip_s": 11.68
+        },
+        {
+          "id": "m08",
+          "title": "克鲁火车站站台（英格兰）",
+          "coverage": 0.33,
+          "matched": [
+            "train",
+            "station"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": "地点不符：画面是克鲁，脚本说的是伦敦",
+          "loc_hit": 0,
+          "clip_s": 11.0
+        }
+      ],
+      "shots": [
+        {
+          "clip": "m02",
+          "title": "夜间站台停靠列车",
+          "start": 3.8,
+          "dur": 3.13,
+          "src_in": 0.5,
+          "coverage": 0.67,
+          "quality": 4,
+          "issues": [],
+          "excluded": null
+        }
+      ],
+      "stickers": [],
+      "gap": null,
+      "subtitle": "The Highlander sleeper leaves London\nEuston every evening."
+    },
+    {
+      "i": 2,
+      "en": "You fall asleep in the city and wake up to Highland lochs.",
+      "zh": "在城市睡着，醒来窗外是高地湖泊。",
+      "role": "画面 · 情绪",
+      "start": 6.93,
+      "dur": 3.25,
+      "voice_s": 3.1,
+      "audio": "output/tts/line3",
+      "need": [
+        "sleeper",
+        "city",
+        "morning",
+        "window",
+        "mountain",
+        "lake"
+      ],
+      "places": [
+        "苏格兰"
+      ],
+      "candidates": [
+        {
+          "id": "m16",
+          "title": "卧铺包厢窗景（清晨）",
+          "coverage": 0.5,
+          "matched": [
+            "sleeper",
+            "morning",
+            "window"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 8.89
+        },
+        {
+          "id": "m10",
+          "title": "山丘与湖泊（阴天）",
+          "coverage": 0.33,
+          "matched": [
+            "mountain",
+            "lake"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 18.0
+        },
+        {
+          "id": "m11",
+          "title": "阴天山湖",
+          "coverage": 0.33,
+          "matched": [
+            "mountain",
+            "lake"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 10.7
+        },
+        {
+          "id": "m12",
+          "title": "阿尔卑斯雪山湖",
+          "coverage": 0.33,
+          "matched": [
+            "mountain",
+            "lake"
+          ],
+          "quality": 5,
+          "issues": [],
+          "excluded": "地点不符：画面是阿尔卑斯，脚本说的是苏格兰",
+          "loc_hit": 0,
+          "clip_s": 9.19
+        }
+      ],
+      "shots": [
+        {
+          "clip": "m16",
+          "title": "卧铺包厢窗景（清晨）",
+          "start": 6.93,
+          "dur": 1.625,
+          "src_in": 0.5,
+          "coverage": 0.5,
+          "quality": 4,
+          "issues": [],
+          "excluded": null
+        },
+        {
+          "clip": "m10",
+          "title": "山丘与湖泊（阴天）",
+          "start": 8.555,
+          "dur": 1.625,
+          "src_in": 0.5,
+          "coverage": 0.33,
+          "quality": 4,
+          "issues": [],
+          "excluded": null
+        }
+      ],
+      "stickers": [],
+      "gap": null,
+      "subtitle": "You fall asleep in the city and wake up\nto Highland lochs."
+    },
+    {
+      "i": 3,
+      "en": "Book the two legs separately and you can save up to 30%.",
+      "zh": "分两段买票，最多能省 30%。",
+      "role": "利益点 · 省钱",
+      "start": 10.18,
+      "dur": 3.74,
+      "voice_s": 3.59,
+      "audio": "output/tts/line4",
+      "need": [
+        "ticket"
+      ],
+      "places": [],
+      "candidates": [
+        {
+          "id": "m13",
+          "title": "售票机出票口",
+          "coverage": 1.0,
+          "matched": [
+            "ticket"
+          ],
+          "quality": 3,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 10.16
+        }
+      ],
+      "shots": [
+        {
+          "clip": "m13",
+          "title": "售票机出票口",
+          "start": 10.18,
+          "dur": 3.74,
+          "src_in": 0.5,
+          "coverage": 1.0,
+          "quality": 3,
+          "issues": [],
+          "excluded": null
+        }
+      ],
+      "stickers": [
+        {
+          "kind": "利益点贴纸",
+          "text": "SAVE UP TO 30%",
+          "start": 10.48,
+          "dur": 2.6
+        }
+      ],
+      "gap": "素材缺口：和「ticket」相关的镜头只有 1 个，这句只能用单镜头 3.7 秒",
+      "subtitle": "Book the two legs separately and you can\nsave up to 30%."
+    },
+    {
+      "i": 4,
+      "en": "Open the app, search code UK20, and get an extra 20% off.",
+      "zh": "打开 App 搜 UK20，再减 20%。",
+      "role": "结尾 · 搜码钩子",
+      "start": 13.92,
+      "dur": 5.65,
+      "voice_s": 5.05,
+      "audio": "output/tts/line5",
+      "need": [
+        "app",
+        "phone"
+      ],
+      "places": [],
+      "candidates": [
+        {
+          "id": "m05",
+          "title": "手机上打开 App",
+          "coverage": 1.0,
+          "matched": [
+            "app",
+            "phone"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 30.95
+        },
+        {
+          "id": "m14",
+          "title": "火车上用手机",
+          "coverage": 0.5,
+          "matched": [
+            "phone"
+          ],
+          "quality": 4,
+          "issues": [],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 5.29
+        },
+        {
+          "id": "m15",
+          "title": "手持手机（背面）",
+          "coverage": 0.5,
+          "matched": [
+            "phone"
+          ],
+          "quality": 4,
+          "issues": [
+            "brand"
+          ],
+          "excluded": null,
+          "loc_hit": 0,
+          "clip_s": 12.1
+        }
+      ],
+      "shots": [
+        {
+          "clip": "m05",
+          "title": "手机上打开 App",
+          "start": 13.92,
+          "dur": 2.825,
+          "src_in": 0.5,
+          "coverage": 1.0,
+          "quality": 4,
+          "issues": [],
+          "excluded": null
+        },
+        {
+          "clip": "m14",
+          "title": "火车上用手机",
+          "start": 16.745,
+          "dur": 2.825,
+          "src_in": 0.5,
+          "coverage": 0.5,
+          "quality": 4,
+          "issues": [],
+          "excluded": null
+        }
+      ],
+      "stickers": [
+        {
+          "kind": "结尾钩子",
+          "text": "SEARCH: UK20",
+          "start": 14.12,
+          "dur": 5.45
+        }
+      ],
+      "gap": null,
+      "subtitle": "Open the app, search code UK20, and get\nan extra 20% off."
+    }
+  ],
+  "rules": [
+    {
+      "id": "R1",
+      "name": "利益点不放前 3 秒",
+      "why": "平台会判成营销视频限流",
+      "ok": true,
+      "msg": "前 3 秒没有价格或优惠信息"
+    },
+    {
+      "id": "R2",
+      "name": "不出现可识别人脸、儿童",
+      "why": "欧洲隐私合规",
+      "ok": true,
+      "msg": "所选镜头里没有可识别人脸（人工标注）"
+    },
+    {
+      "id": "R3",
+      "name": "不出现第三方品牌标识",
+      "why": "避免商标和广告纠纷",
+      "ok": true,
+      "msg": "没有第三方品牌标识"
+    },
+    {
+      "id": "R4",
+      "name": "价格写\"up to / from\"",
+      "why": "英国广告规范，不写绝对优惠",
+      "ok": true,
+      "msg": "价格都写了 up to / extra"
+    },
+    {
+      "id": "R5",
+      "name": "英文字幕每行不超过 42 字符",
+      "why": "移动端可读性",
+      "ok": true,
+      "msg": "字幕已按 42 字符自动断行"
+    },
+    {
+      "id": "R6",
+      "name": "画面地点和脚本一致",
+      "why": "找不到对的素材就标缺口，不拿别处画面凑",
+      "ok": true,
+      "msg": "已排除 2 个地点不符的镜头，所用镜头地点都和脚本一致"
+    }
+  ],
+  "score": {
+    "dims": [
+      {
+        "n": "脚本和画面语义匹配",
+        "max": 30,
+        "v": 18.8,
+        "why": "8 个镜头平均覆盖所在句子 62% 的关键词"
+      },
+      {
+        "n": "配音和画面对齐",
+        "max": 15,
+        "v": 10,
+        "why": "切点都对齐句子边界；句内画面节奏需人工复核，自动最多给 10 分"
+      },
+      {
+        "n": "结构和开头",
+        "max": 15,
+        "v": 13,
+        "why": "开头 3.8 秒，建议压到 3.5 秒内；利益点在后半段"
+      },
+      {
+        "n": "剪辑规则还原",
+        "max": 15,
+        "v": 12,
+        "why": "Skill 规则命中 4/5；有镜头超过 3.2 秒（素材缺口）"
+      },
+      {
+        "n": "画面质量",
+        "max": 10,
+        "v": 7.8,
+        "why": "所用镜头平均清晰度 3.9 / 5（540p 竖屏素材）"
+      },
+      {
+        "n": "合规",
+        "max": 15,
+        "v": 15,
+        "why": "所选镜头里没有可识别人脸（人工标注）；没有第三方品牌标识；价格都写了 up to / extra"
+      }
+    ],
+    "total": 77,
+    "band": "70–79：粗剪合格，交人工精修"
+  },
+  "log": [
+    {
+      "step": "选题",
+      "msg": "4 个候选选题，按 历史爆款率×0.5 + 营销节点×0.3 + 利益点可植入×0.2 打分，选中 T1「伦敦到苏格兰，睡一觉就到（卧铺冷知识）」（0.98）",
+      "ms": 0
+    },
+    {
+      "step": "写脚本",
+      "msg": "脚本 Agent 出 3 版初稿，审核拦下 2 版，采用 A 版",
+      "ms": 0
+    },
+    {
+      "step": "读取 Skill",
+      "msg": "冷知识路线类 v0.3：单镜头 ≤ 3.2 秒、字幕/花字样式、利益点和结尾钩子规则",
+      "ms": 0
+    },
+    {
+      "step": "读取素材库",
+      "msg": "16 段实拍，已打标签（地点、场景、清晰度、风险）",
+      "ms": 120
+    },
+    {
+      "step": "生成配音",
+      "msg": "5 句，共 18.4 秒（Daniel（英式男声））",
+      "ms": 2421
+    },
+    {
+      "step": "按语义和气口分段",
+      "msg": "5 段，总时长 19.57 秒",
+      "ms": 2421
+    },
+    {
+      "step": "本地素材库召回",
+      "msg": "每句按关键词召回 3 个候选；排除地点不符 2 个；8 个镜头",
+      "ms": 2421
+    },
+    {
+      "step": "检索国家 / 平台规则",
+      "msg": "英国 × TikTok，命中 6 条，通过 6 条",
+      "ms": 2421
+    },
+    {
+      "step": "编排剪映轨道",
+      "msg": "已生成剪映草稿「AI粗剪_伦敦苏格兰卧铺_v1」：画面 8 段、配音 5 段、字幕 5 段、花字 3 个",
+      "ms": 2479
+    },
+    {
+      "step": "自动评分",
+      "msg": "77 分 · 70–79：粗剪合格，交人工精修",
+      "ms": 2479
+    }
+  ],
+  "draft": {
+    "name": "AI粗剪_伦敦苏格兰卧铺_v1",
+    "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1",
+    "shots": 8,
+    "stickers": 3
+  },
+  "clips": {
+    "m01": {
+      "title": "夜间列车进站",
+      "file": "clips/m01.mp4",
+      "tags": [
+        "train",
+        "night",
+        "station"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/train-arriving-at-station-at-night-14536989/",
+      "clip_s": 11.47
+    },
+    "m02": {
+      "title": "夜间站台停靠列车",
+      "file": "clips/m02.mp4",
+      "tags": [
+        "train",
+        "night",
+        "station",
+        "depart"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/a-train-is-parked-at-a-station-at-night-27549041/",
+      "clip_s": 12.47
+    },
+    "m03": {
+      "title": "列车穿过绿色山谷",
+      "file": "clips/m03.mp4",
+      "tags": [
+        "train",
+        "mountain",
+        "journey"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenic-train-journey-through-lush-green-mountains-33054658/",
+      "clip_s": 8.6
+    },
+    "m04": {
+      "title": "卧铺铺位（车厢内）",
+      "file": "clips/m04.mp4",
+      "tags": [
+        "sleeper",
+        "cabin",
+        "train"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/legs-of-person-laying-on-couchette-on-train-10430975/",
+      "clip_s": 3.5
+    },
+    "m05": {
+      "title": "手机上打开 App",
+      "file": "clips/m05.mp4",
+      "tags": [
+        "phone",
+        "app"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/using-smartphone-display-for-mobile-applications-40326823/",
+      "clip_s": 30.95
+    },
+    "m06": {
+      "title": "伦敦夜景（泰晤士河）",
+      "file": "clips/m06.mp4",
+      "tags": [
+        "london",
+        "night",
+        "city"
+      ],
+      "location": "伦敦",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/stunning-nighttime-view-of-london-skyline-32215140/",
+      "clip_s": 11.68
+    },
+    "m07": {
+      "title": "伦敦塔桥夜景",
+      "file": "clips/m07.mp4",
+      "tags": [
+        "london",
+        "night",
+        "city"
+      ],
+      "location": "伦敦",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/nightview-of-tower-bridge-in-london-35991478/",
+      "clip_s": 12.5
+    },
+    "m08": {
+      "title": "克鲁火车站站台（英格兰）",
+      "file": "clips/m08.mp4",
+      "tags": [
+        "station",
+        "train",
+        "platform"
+      ],
+      "location": "克鲁",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/modern-crewe-railway-station-platform-view-31273250/",
+      "clip_s": 11.0
+    },
+    "m09": {
+      "title": "白天车站站台",
+      "file": "clips/m09.mp4",
+      "tags": [
+        "station",
+        "platform"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/modern-train-station-platform-with-arrival-38885403/",
+      "clip_s": 8.67
+    },
+    "m10": {
+      "title": "山丘与湖泊（阴天）",
+      "file": "clips/m10.mp4",
+      "tags": [
+        "lake",
+        "mountain"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/scenery-with-hills-and-lake-12521200/",
+      "clip_s": 18.0
+    },
+    "m11": {
+      "title": "阴天山湖",
+      "file": "clips/m11.mp4",
+      "tags": [
+        "lake",
+        "mountain"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/tranquil-mountain-lake-scene-with-overcast-sky-35426666/",
+      "clip_s": 10.7
+    },
+    "m12": {
+      "title": "阿尔卑斯雪山湖",
+      "file": "clips/m12.mp4",
+      "tags": [
+        "lake",
+        "mountain"
+      ],
+      "location": "阿尔卑斯",
+      "quality": 5,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/serene-alpine-lake-with-majestic-mountains-38087912/",
+      "clip_s": 9.19
+    },
+    "m13": {
+      "title": "售票机出票口",
+      "file": "clips/m13.mp4",
+      "tags": [
+        "ticket",
+        "station"
+      ],
+      "location": "未知",
+      "quality": 3,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/a-person-getting-a-ticket-from-the-machine-7252267/",
+      "clip_s": 10.16
+    },
+    "m14": {
+      "title": "火车上用手机",
+      "file": "clips/m14.mp4",
+      "tags": [
+        "phone",
+        "train",
+        "window"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/person-using-smartphone-on-train-33117489/",
+      "clip_s": 5.29
+    },
+    "m15": {
+      "title": "手持手机（背面）",
+      "file": "clips/m15.mp4",
+      "tags": [
+        "phone"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [
+        "brand"
+      ],
+      "pexels": "https://www.pexels.com/video/hand-holding-phone-with-icons-on-screen-11698130/",
+      "clip_s": 12.1
+    },
+    "m16": {
+      "title": "卧铺包厢窗景（清晨）",
+      "file": "clips/m16.mp4",
+      "tags": [
+        "sleeper",
+        "cabin",
+        "window",
+        "morning",
+        "train"
+      ],
+      "location": "未知",
+      "quality": 4,
+      "issues": [],
+      "pexels": "https://www.pexels.com/video/tranquil-train-cabin-view-with-passenger-38302461/",
+      "clip_s": 8.89
+    }
+  }
+};
 const $=id=>document.getElementById(id);
-const pick=s=>s.cands.find(c=>c.id===state.sel[s.id]);
-const TOTAL=SENTS.reduce((a,s)=>a+s.dur,0);
-const starts={};(()=>{let t=0;SENTS.forEach(s=>{starts[s.id]=t;t+=s.dur})})();
+const S=R.segments;
 const fmt=t=>{const m=Math.floor(t/60),s=t-m*60;return String(m).padStart(2,'0')+':'+s.toFixed(1).padStart(4,'0')};
-const grad=h=>`linear-gradient(160deg,hsl(${h} 45% 34%),hsl(${(h+40)%360} 40% 16%))`;
-const segAt=t=>{for(const s of SENTS){if(t<starts[s.id]+s.dur)return s}return SENTS[SENTS.length-1]};
-const stkRange=k=>[starts[k.seg]+k.off,k.len];
-SENTS.forEach(s=>state.sel[s.id]=s.cands[0].id);
+const thumb=id=>`thumbs/${id}.jpg`;
+const state={gen:false,t:0,playing:false,seg:0,shot:0};
+// shots are editable in the page (preview + score only)
+S.forEach(seg=>seg.shots.forEach(sh=>{sh.orig=sh.clip}));
 
-/* one <video> per real clip, preloaded */
+/* ---------- static info ---------- */
+$('kv').innerHTML=`<dt>国家 / 平台</dt><dd>${R.country} · ${R.platform}</dd><dt>剪辑 Skill</dt><dd>${R.skill.name}</dd><dt>配音</dt><dd>${R.skill.voice.voice}</dd><dt>选题</dt><dd>${R.topic.chosen} · ${R.title}</dd><dt>脚本</dt><dd>AI 初稿 ${R.scripts.variants.length} 版 → 采用 ${R.scripts.chosen} 版</dd>`;
+const used=[...new Set(S.flatMap(s=>s.candidates.map(c=>c.id)))];
+$('foot').innerHTML=`<div>素材：Pexels 免费可商用实拍，共 ${Object.keys(R.clips).length} 段（${Object.entries(R.clips).map(([id,c])=>`<a href="${c.pexels}" target="_blank" rel="noopener">${id}</a>`).join(' ')}）。</div><div>说明：素材标签为人工看画面标注，召回用关键词匹配；真实落地时换成多模态模型自动打标和向量检索。剪映草稿由开源工具 pyJianYingDraft 生成。</div>`;
+
+/* ---------- video / audio elements ---------- */
 const vids={};
-SENTS.forEach(s=>s.cands.filter(c=>c.file).forEach(c=>{
-  const v=document.createElement('video');v.src=c.file;v.muted=true;v.playsInline=true;v.preload='auto';v.setAttribute('aria-hidden','true');
-  $('screen').insertBefore(v,$('alt'));vids[c.id]=v;
-}));
+function vid(id){ if(!vids[id]){ const v=document.createElement('video'); v.src=R.clips[id].file.replace('library/','clips/'); v.muted=true; v.playsInline=true; v.preload='auto'; $('screen').insertBefore(v,$('huazi')); vids[id]=v; } return vids[id]; }
+const auds=S.map(seg=>{const a=new Audio(seg.audio.replace('output/tts/','audio/')+'.m4a'); a.preload='auto'; return a;});
+S.forEach(seg=>seg.shots.forEach(sh=>vid(sh.clip)));
 
-/* ---------- scoring ---------- */
+/* ---------- scoring (same rubric as pipeline.py) ---------- */
+function candOf(seg,id){return seg.candidates.find(c=>c.id===id)}
 function score(){
-  const picks=SENTS.map(pick);
-  const avg=picks.reduce((a,p)=>a+p.match,0)/picks.length;
-  const wrong=picks.filter(p=>p.warn==='地点不符');
-  const faces=picks.filter(p=>p.warn==='含人脸').length;
-  const avgQ=picks.reduce((a,p)=>a+p.q,0)/picks.length;
-  const weak=picks.map((p,i)=>({p,i})).filter(x=>x.p.why);
-  const sem=wrong.length?0:Math.max(0,Math.min(30,30*(avg-.6)/.4));
-  const dims=[
-   {n:'脚本和画面语义匹配',max:30,v:sem,why:wrong.length?`「${wrong[0].title}」地点和脚本不符，本项记 0 分`:`平均匹配度 ${(avg*100).toFixed(0)}%`+(weak.length?`；${weak.map(x=>`第 ${x.i+1} 句${x.p.why}`).join('；')}`:'')},
-   {n:'配音和画面对齐',max:15,v:10,why:'按气口自动切点；第 3 句转场略早 0.3 秒'},
-   {n:'结构和开头',max:15,v:picks[0].kind==='屏录'?6:13,why:picks[0].kind==='屏录'?'开头是屏录，像营销视频':'冷知识开头，利益点在后半段；开头 4.2 秒，建议压到 3 秒内'},
-   {n:'剪辑规则还原',max:15,v:10,why:'花字、字幕样式按 Skill 还原；贴纸入场动效未还原'},
-   {n:'画面质量',max:10,v:10*avgQ/5,why:`素材平均清晰度 ${avgQ.toFixed(1)} / 5（540p 竖屏）`},
-   {n:'合规',max:15,v:Math.max(0,15-8*faces),why:faces?`${faces} 个片段含可识别人脸`:'未命中人脸、国旗、竞品标识'}
-  ];
-  return {dims,total:Math.round(dims.reduce((a,d)=>a+d.v,0))};
+  const dims=R.score.dims.map(d=>({...d}));
+  const shots=S.flatMap(seg=>seg.shots.map(sh=>({sh,seg,c:candOf(seg,sh.clip)})));
+  const wrong=shots.filter(x=>x.c.excluded);
+  const avg=shots.reduce((a,x)=>a+x.c.coverage,0)/shots.length;
+  dims[0].v=wrong.length?0:Math.round(300*avg)/10;
+  dims[0].why=wrong.length?`「${wrong[0].c.title}」${wrong[0].c.excluded}，本项记 0 分`:`${shots.length} 个镜头平均覆盖所在句子 ${Math.round(avg*100)}% 的关键词`;
+  const q=shots.reduce((a,x)=>a+x.c.quality,0)/shots.length;
+  dims[4].v=Math.round(100*q/5)/10; dims[4].why=`所用镜头平均清晰度 ${q.toFixed(1)} / 5（540p 竖屏素材）`;
+  const brand=shots.filter(x=>x.c.issues.includes('brand')).length;
+  dims[5].v=15-(brand?3:0);
+  dims[5].why=`所选镜头里没有可识别人脸（人工标注）；${brand?brand+' 个镜头露出手机品牌标识':'没有第三方品牌标识'}；价格都写了 up to / extra`;
+  const total=Math.round(dims.reduce((a,d)=>a+d.v,0));
+  return {dims,total,brand,wrong:wrong.length};
 }
 const band=t=>t<70?['bad','低于 70：退回重做']:t<80?['mid','70–79：粗剪合格，交人工精修']:t<90?['ok','80–89：精修后可发布']:['ok','90+：有爆款潜力'];
 
-/* ---------- pipeline ---------- */
-const STEPS=[
- ['读取剪辑 Skill',()=>`${$('skill').value}（12 个爆款工程）`],
- ['生成配音',()=>`${SENTS.length} 句 · ${TOTAL.toFixed(1)} 秒 · 英式女声`],
- ['按语义和气口分段',()=>`${SENTS.length} 段`],
- ['本地素材库语义召回',()=>'1,284 条素材，每句召回 3 个候选；排除地点不符 2 个'],
- ['检索国家 / 平台规则',()=>`${$('country').value} × ${$('platform').value}，命中 ${RULES.length} 条`],
- ['编排剪映轨道',()=>`视频 ${SENTS.length} · 配音 ${SENTS.length} · 字幕 ${SENTS.length} · 花字 ${STICKERS.length}`],
- ['自动评分',()=>{const s=score();return `${s.total} 分 · ${band(s.total)[1]}`}]
-];
-function renderSteps(done,run){
-  $('steps').innerHTML=STEPS.map(([k,v],i)=>`<li class="${i<done?'done':i===run?'run':''}"><span class="dot" aria-hidden="true"></span><span>${k}<br><span class="v">${i<done?v():i===run?'处理中…':'等待'}</span></span></li>`).join('');
-}
-
 /* ---------- render ---------- */
+function renderSteps(done,run){
+  $('steps').innerHTML=R.log.map((l,i)=>`<li data-step="${l.step}" class="${i<done?'done':i===run?'run':''} ${l.step==='选题'||l.step==='写脚本'?'link':''}"><span class="dot" aria-hidden="true"></span><span><span class="k">${l.step}</span><span class="v">${i<done?l.msg:i===run?'处理中…':'等待'}</span></span><span class="ms mono">${i<done?l.ms+' ms':''}</span></li>`).join('');
+}
 function renderScore(){
   const {dims,total}=score();const [cls,txt]=band(total);
-  $('scoreBox').innerHTML=`<div class="score-head"><span class="score-num mono">${total}</span><span class="band ${cls}">${txt}</span></div>
-   <div class="dims">${dims.map(d=>{const r=d.v/d.max;const c=r<.4?'b':r<.75?'w':'';
-     return `<div class="dim"><div class="t"><span>${d.n}</span><span class="mono">${(Math.round(d.v*10)/10)} / ${d.max}</span></div><div class="bar"><i class="${c}" style="width:${r*100}%"></i></div><div class="why">${d.why}</div></div>`}).join('')}</div>`;
+  $('scoreBox').innerHTML=`<div class="score-head"><span class="score-num mono">${total}</span><span class="band ${cls}">${txt}</span></div><div class="dims">${dims.map(d=>{const r=d.v/d.max;const c=r<.4?'b':r<.75?'w':'';return `<div class="dim"><div class="t"><span>${d.n}</span><span class="mono">${d.v} / ${d.max}</span></div><div class="bar"><i class="${c}" style="width:${r*100}%"></i></div><div class="why">${d.why}</div></div>`}).join('')}</div>`;
 }
 function renderRules(){
-  $('rules').innerHTML=RULES.map(r=>{const ok=r.check();return `<li><span class="${ok?'ok-ic':'bad-ic'}">${ok?'✓':'✕'}</span><span><b>${r.k}</b> · ${r.v}</span></li>`}).join('');
+  const sc=score();
+  $('rules').innerHTML=R.rules.map(r=>{let ok=r.ok,msg=r.msg;
+    if(r.id==='R3'){ok=!sc.brand;msg=ok?'没有第三方品牌标识':`${sc.brand} 个镜头露出手机品牌标识`}
+    if(r.id==='R6'&&sc.wrong){ok=false;msg='有镜头地点和脚本不符'}
+    return `<li><span class="${ok?'ok-ic':'bad-ic'}">${ok?'✓':'✕'}</span><span><b>${r.name}</b> · ${msg}</span></li>`}).join('');
 }
 function renderInspect(){
-  const s=SENTS.find(x=>x.id===state.active);const lk=state.locked.has(s.id);
-  $('inspect').innerHTML=`<div style="display:flex;justify-content:space-between;gap:8px;align-items:start">
-     <div><div class="seg-title">第 ${SENTS.indexOf(s)+1} 句 · ${s.role}</div><div class="seg-zh">${s.zh}</div></div>
-     <button class="btn lockbtn" data-lock="${s.id}">${lk?'已锁定 · 解锁':'锁定'}</button></div>
-   <div class="cands">${s.cands.map(c=>{const sel=state.sel[s.id]===c.id;
-     const th=c.file?`<video class="thumb" src="${c.file}#t=1" muted playsinline preload="metadata"></video>`:`<div class="thumb" style="background:${grad(c.hue)}"></div>`;
-     return `<div class="cand ${sel?'sel':''}">${th}<div><div class="nm">${c.title}</div><div class="meta">${c.src} · 清晰度 ${c.q}/5</div>${c.warn?`<span class="chip">${c.warn}</span><div class="meta" style="color:var(--bad)">${c.note}</div>`:''}</div>
-       <div class="match"><span class="mono">${Math.round(c.match*100)}%</span><br>${sel?'<span class="meta">使用中</span>':`<button data-use="${s.id}:${c.id}">${c.warn?'仍要替换':'替换'}</button>`}</div></div>`}).join('')}</div>`;
+  const seg=S[state.seg]; const sh=seg.shots[state.shot]||seg.shots[0];
+  const cur=candOf(seg,sh.clip);
+  $('inspect').innerHTML=`<div class="seg-head"><div><div class="seg-title">第 ${seg.i+1} 句 · ${seg.role}</div><div class="seg-en">${seg.en}</div><div class="seg-zh">${seg.zh}</div></div></div>
+   <div class="chips">${seg.need.map(k=>`<span class="chip ${cur.matched.includes(k)?'hit':''}">${k}</span>`).join('')}${seg.places.map(p=>`<span class="chip">地点：${p}</span>`).join('')}</div>
+   ${seg.gap?`<div class="gap">${seg.gap}</div>`:''}
+   ${seg.shots.length>1?`<div class="shot-tabs">${seg.shots.map((x,i)=>`<button data-shot="${i}" class="${i===state.shot?'on':''}">镜头 ${i+1}</button>`).join('')}</div>`:''}
+   <div class="cands">${seg.candidates.map(c=>{const sel=c.id===sh.clip;const flags=(c.excluded?`<span class="chip bad">${c.excluded}</span>`:'')+(c.issues.includes('brand')?'<span class="chip warn">品牌露出</span>':'');
+     return `<div class="cand ${sel?'sel':''} ${c.excluded?'x':''}"><img src="${thumb(c.id)}" alt=""><div><div class="nm">${c.id} · ${c.title}</div><div class="meta">命中：${c.matched.join('、')||'无'} · 清晰度 ${c.quality}/5 · ${c.clip_s} 秒</div>${flags?`<div class="chips">${flags}</div>`:''}</div><div class="pct"><span class="mono">${Math.round(c.coverage*100)}%</span><br>${sel?'<span class="meta">使用中</span>':`<button data-use="${c.id}">${c.excluded?'仍要替换':'替换'}</button>`}</div></div>`}).join('')}</div>`;
 }
 let pps=40;
 function renderTimeline(){
-  const tl=$('tl');const laneW=Math.max(tl.clientWidth-28-72,660);pps=laneW/TOTAL;const x=t=>t*pps;
-  let ruler='';for(let t=0;t<=Math.floor(TOTAL);t+=2)ruler+=`<span class="mono" style="left:${x(t)}px">${fmt(t).slice(1)}</span>`;
+  const tl=$('tl');const laneW=Math.max(tl.clientWidth-32-72,680);pps=laneW/R.total_s;const x=t=>t*pps;
+  let ruler='';for(let t=0;t<=Math.floor(R.total_s);t+=2)ruler+=`<span class="mono" style="left:${x(t)}px">${fmt(t).slice(1)}</span>`;
   const row=(nm,inner,cls='')=>`<div class="tl-row"><span class="nm">${nm}</span><div class="lane ${cls}">${inner}</div></div>`;
-  const box=(cls,st,len,html,extra='')=>`<div class="clip ${cls}" ${extra} style="left:${x(st)}px;width:${x(len)-2}px">${html}</div>`;
-  tl.innerHTML=
-   row('','<div id="ruler" style="position:absolute;inset:0">'+ruler+'</div>','ruler')+
-   row('视频',SENTS.map(s=>{const c=pick(s);return `<button class="clip v ${state.active===s.id?'active':''} ${c.warn?'flag':''}" data-seg="${s.id}" style="left:${x(starts[s.id])}px;width:${x(s.dur)-2}px">${c.title}${state.locked.has(s.id)?' 🔒':''}<small>${Math.round(c.match*100)}% · ${c.src}</small></button>`}).join(''))+
-   row('配音',SENTS.map((s,i)=>box('a',starts[s.id],s.dur,`配音 ${i+1}`)).join(''))+
-   row('字幕',SENTS.map(s=>box('t',starts[s.id],s.dur,s.en,`title="${s.en.replace(/"/g,'&quot;')}"`)).join(''))+
-   row('花字/贴纸',STICKERS.map(k=>{const [st,len]=stkRange(k);return box('s',st,len,k.text.replace('\n',' '))}).join(''))+
-   '<div class="playhead" id="ph"></div>';
+  const box=(cls,st,len,html)=>`<div class="clip ${cls}" style="left:${x(st)}px;width:${Math.max(4,x(len)-2)}px">${html}</div>`;
+  const vids=S.flatMap(seg=>seg.shots.map((sh,j)=>{const c=candOf(seg,sh.clip);const act=state.seg===seg.i&&state.shot===j;
+    return `<button class="clip v ${act?'active':''} ${c.excluded?'flag':''} ${sh.dur>R.skill.max_shot_s+.05?'long':''}" data-seg="${seg.i}" data-shot="${j}" style="left:${x(sh.start)}px;width:${x(sh.dur)-2}px" title="${c.title}"><img src="${thumb(sh.clip)}" alt=""><span>${sh.clip} ${c.title}<small>${Math.round(c.coverage*100)}%</small></span></button>`}));
+  tl.innerHTML=row('',`<div id="ruler" style="position:absolute;inset:0">${ruler}</div>`,'ruler')+
+    row('画面',vids.join(''))+
+    row('配音',S.map(seg=>box('a',seg.start,seg.voice_s,`配音 ${seg.i+1} · ${seg.voice_s}s`)).join(''))+
+    row('字幕',S.map(seg=>box('t',seg.start,seg.dur,seg.subtitle.replace('\n',' '))).join(''))+
+    row('花字',S.flatMap(seg=>seg.stickers.map(st=>box('s',st.start,st.dur,st.text.replace('\n',' ')))).join(''))+
+    '<div class="playhead" id="ph2"></div>';
   placeHead();
 }
-function placeHead(){const ph=$('ph');if(ph)ph.style.left=(14+72+state.t*pps)+'px'}
+function placeHead(){const p=$('ph2');if(p)p.style.left=(16+72+state.t*pps)+'px'}
+function segAt(t){for(const s of S){if(t<s.start+s.dur)return s}return S[S.length-1]}
+function shotAt(seg,t){for(let j=0;j<seg.shots.length;j++){const sh=seg.shots[j];if(t<sh.start+sh.dur)return j}return seg.shots.length-1}
 function renderMonitor(){
-  const s=segAt(state.t);const c=pick(s);
-  Object.entries(vids).forEach(([id,v])=>{const on=c.id===id;v.classList.toggle('on',on);
-    if(on){const want=state.t-starts[s.id];if(Math.abs(v.currentTime-want)>.35)v.currentTime=want;
-      if(state.playing&&v.paused)v.play().catch(()=>{});if(!state.playing&&!v.paused)v.pause()}
-    else if(!v.paused)v.pause()});
-  $('alt').hidden=!!c.file;if(!c.file){$('alt').style.background=grad(c.hue);$('alt').textContent=`候选镜头：${c.title}（示意）`}
-  $('subEn').textContent=s.en;$('subZh').textContent=s.zh;
-  const k=STICKERS.find(k=>{const [st,len]=stkRange(k);return state.t>=st&&state.t<st+len});
-  $('huazi').hidden=!k;if(k)$('huazi').innerHTML=k.text.replace('\n','<br>');
-  $('tc').textContent=fmt(state.t)+' / '+fmt(TOTAL);placeHead();
+  const seg=segAt(state.t), j=shotAt(seg,state.t), sh=seg.shots[j];
+  Object.entries(vids).forEach(([id,v])=>{const on=id===sh.clip;v.classList.toggle('on',on);
+    if(on){const want=sh.src_in+(state.t-sh.start);if(Math.abs(v.currentTime-want)>.3)v.currentTime=want;if(state.playing&&v.paused)v.play().catch(()=>{});if(!state.playing&&!v.paused)v.pause()}else if(!v.paused)v.pause()});
+  S.forEach((s,i)=>{const a=auds[i];const inside=state.t>=s.start&&state.t<s.start+s.voice_s;
+    if(inside&&state.playing){const want=state.t-s.start;if(Math.abs(a.currentTime-want)>.25)a.currentTime=want;if(a.paused)a.play().catch(()=>{})}else if(!a.paused)a.pause()});
+  $('sub').textContent=seg.subtitle.replace('\n',' ');
+  const st=S.flatMap(s=>s.stickers).find(k=>state.t>=k.start&&state.t<k.start+k.dur);
+  $('huazi').hidden=!st; if(st)$('huazi').textContent=st.text;
+  $('zh').textContent='中文对照：'+seg.zh;
+  $('tc').textContent=fmt(state.t)+' / '+fmt(R.total_s);
+  if(state.playing&&(seg.i!==state.seg||j!==state.shot)){state.seg=seg.i;state.shot=j;renderInspect();renderTimeline()}
+  placeHead();
 }
 function renderAll(){renderScore();renderRules();renderInspect();renderTimeline();renderMonitor()}
 
 /* ---------- playback ---------- */
 let raf=0,last=0;
 function tick(ts){if(!state.playing)return;if(last)state.t+=(ts-last)/1000;last=ts;
-  if(state.t>=TOTAL){state.t=TOTAL-.01;setPlaying(false);renderMonitor();return}
-  const s=segAt(state.t);if(s.id!==state.active){state.active=s.id;renderInspect();renderTimeline()}
+  if(state.t>=R.total_s){state.t=R.total_s-.01;setPlaying(false);return}
   renderMonitor();raf=requestAnimationFrame(tick)}
 function setPlaying(p){state.playing=p;last=0;$('play').setAttribute('aria-label',p?'暂停':'播放');
   $('playIc').innerHTML=p?'<path d="M3 2h4v12H3zM9 2h4v12H9z"/>':'<path d="M4 2l10 6-10 6z"/>';
-  if(p){if(state.t>=TOTAL-.05)state.t=0;raf=requestAnimationFrame(tick)}else cancelAnimationFrame(raf);renderMonitor()}
+  if(p){if(state.t>=R.total_s-.05)state.t=0;raf=requestAnimationFrame(tick)}else cancelAnimationFrame(raf);renderMonitor()}
 
 /* ---------- interactions ---------- */
 document.addEventListener('click',e=>{
   if(!state.gen)return;
-  const seg=e.target.closest('[data-seg]');
-  if(seg){state.active=seg.dataset.seg;state.t=starts[state.active]+.05;renderInspect();renderTimeline();renderMonitor();return}
+  const c=e.target.closest('.clip.v');
+  if(c){state.seg=+c.dataset.seg;state.shot=+c.dataset.shot;const sh=S[state.seg].shots[state.shot];state.t=sh.start+.05;renderInspect();renderTimeline();renderMonitor();return}
+  const tab=e.target.closest('[data-shot]');
+  if(tab&&tab.closest('#inspect')){state.shot=+tab.dataset.shot;const sh=S[state.seg].shots[state.shot];state.t=sh.start+.05;renderInspect();renderTimeline();renderMonitor();return}
   const use=e.target.closest('[data-use]');
-  if(use){const [sid,cid]=use.dataset.use.split(':');state.sel[sid]=cid;renderAll();return}
-  const lk=e.target.closest('[data-lock]');
-  if(lk){const id=lk.dataset.lock;state.locked.has(id)?state.locked.delete(id):state.locked.add(id);renderInspect();renderTimeline();return}
-  if(e.target.closest('#ruler')){const r=$('ruler').getBoundingClientRect();state.t=Math.max(0,Math.min(TOTAL-.01,(e.clientX-r.left)/pps));state.active=segAt(state.t).id;renderInspect();renderTimeline();renderMonitor()}
+  if(use){const sh=S[state.seg].shots[state.shot];sh.clip=use.dataset.use;vid(sh.clip);sh.src_in=Math.min(R.skill.clip_skip_head_s,Math.max(0,R.clips[sh.clip].clip_s-sh.dur));renderAll();return}
+  if(e.target.closest('#ruler')){const r=$('ruler').getBoundingClientRect();state.t=Math.max(0,Math.min(R.total_s-.01,(e.clientX-r.left)/pps));const seg=segAt(state.t);state.seg=seg.i;state.shot=shotAt(seg,state.t);renderInspect();renderTimeline();renderMonitor()}
 });
 $('play').addEventListener('click',()=>setPlaying(!state.playing));
-$('regen').addEventListener('click',()=>{
-  SENTS.forEach(s=>{if(state.locked.has(s.id))return;const ok=s.cands.filter(c=>!c.warn);const i=ok.findIndex(c=>c.id===state.sel[s.id]);state.sel[s.id]=ok[(i+1)%ok.length].id});
-  renderAll();
-});
 $('gen').addEventListener('click',async()=>{
-  if(state.busy)return;state.busy=true;setPlaying(false);
-  ['gen','regen','export','play'].forEach(id=>$(id).disabled=true);$('gen').textContent='生成中…';
-  SENTS.forEach(s=>{if(!state.locked.has(s.id))state.sel[s.id]=s.cands[0].id});
+  if(state.busy)return;state.busy=true;setPlaying(false);['gen','play','draftBtn'].forEach(id=>$(id).disabled=true);$('gen').textContent='生成中…';
   const fast=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  for(let i=0;i<STEPS.length;i++){renderSteps(i,i);await new Promise(r=>setTimeout(r,fast?0:650))}
-  renderSteps(STEPS.length,-1);
-  state.gen=true;state.t=0;state.active='s1';$('ph').hidden=true;$('sub').hidden=false;
-  renderAll();
-  ['gen','regen','export','play'].forEach(id=>$(id).disabled=false);$('gen').textContent='重新生成';state.busy=false;
-  setPlaying(true);
+  for(let i=0;i<R.log.length;i++){renderSteps(i,i);await new Promise(r=>setTimeout(r,fast?0:560))}
+  renderSteps(R.log.length,-1);
+  state.gen=true;state.t=0;state.seg=0;state.shot=0;$('ph').hidden=true;$('sub').hidden=false;renderAll();
+  ['gen','play','draftBtn'].forEach(id=>$(id).disabled=false);$('gen').textContent='重新回放';state.busy=false;setPlaying(true);
 });
-
-/* ---------- export ---------- */
-function draft(){
-  const us=t=>Math.round(t*1e6);
-  return {
-    draft_name:'UK_sleeper_route_roughcut_v1',canvas_config:{width:1080,height:1920,ratio:'9:16'},duration:us(TOTAL),
-    meta:{skill:$('skill').value,country:$('country').value,platform:$('platform').value,score:score().total},
-    materials:{
-      videos:SENTS.map(s=>{const c=pick(s);return {id:'mat_'+c.id,path:c.file?c.file:`nas://素材库/${c.title}.mp4`}}),
-      audios:SENTS.map((s,i)=>({id:'tts_'+(i+1),path:`tts/line_${i+1}.mp3`,text:s.en})),
-      texts:SENTS.map((s,i)=>({id:'sub_'+(i+1),content:s.en,style:'skill:subtitle_bottom_white_outline'})),
-      stickers:STICKERS.map((k,i)=>({id:'stk_'+(i+1),content:k.text,style:'skill:huazi_red_shadow'}))
-    },
-    tracks:[
-      {type:'video',segments:SENTS.map(s=>({material_id:'mat_'+pick(s).id,target_timerange:{start:us(starts[s.id]),duration:us(s.dur)},locked:state.locked.has(s.id)}))},
-      {type:'audio',segments:SENTS.map((s,i)=>({material_id:'tts_'+(i+1),target_timerange:{start:us(starts[s.id]),duration:us(s.dur)}}))},
-      {type:'text',segments:SENTS.map((s,i)=>({material_id:'sub_'+(i+1),target_timerange:{start:us(starts[s.id]),duration:us(s.dur)}}))},
-      {type:'sticker',segments:STICKERS.map((k,i)=>{const [st,len]=stkRange(k);return {material_id:'stk_'+(i+1),target_timerange:{start:us(st),duration:us(len)}}})}
-    ]
-  };
+$('draftBtn').addEventListener('click',()=>{
+  const shots=S.flatMap(s=>s.shots);
+  $('modalCard').innerHTML=`<h3>已生成的剪映草稿</h3><p>流水线用开源工具 pyJianYingDraft 把轨道写成剪映草稿，打开剪映就能在草稿列表里看到，直接接着精修。</p>
+   <div><p style="margin-bottom:6px">草稿名称</p><div class="path">${R.draft.name}</div></div>
+   <div><p style="margin-bottom:6px">本机位置</p><div class="path">${R.draft.path}</div></div>
+   <table><tr><th>轨道</th><th>内容</th></tr>
+   <tr><td>画面</td><td>${shots.length} 段：${shots.map(s=>s.orig).join('、')}</td></tr>
+   <tr><td>配音</td><td>${S.length} 段（${R.skill.voice.voice}）</td></tr>
+   <tr><td>字幕</td><td>${S.length} 段，白字黑边，按 ${R.skill.subtitle.max_chars_per_line} 字符断行</td></tr>
+   <tr><td>花字</td><td>${S.flatMap(s=>s.stickers).map(s=>s.kind+'「'+s.text.replace('\n',' ')+'」').join('；')}</td></tr></table>
+   <p>草稿文件：<a href="draft/draft_content.json" target="_blank" rel="noopener">draft_content.json</a>（素材路径指向本机，换电脑需重新关联素材）。</p>
+   <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
+  $('modal').hidden=false;$('closeM').focus();
+});
+function openTopic(){
+  const T=R.topic;
+  $('modalCard').innerHTML=`<h3>选题卡 · ${T.month}</h3><p>${T.note}</p><p>营销节点：${T.nodes.map(n=>n.name+'（权重 '+n.weight+'）').join('、')}</p>
+   <table><tr><th>选题</th><th>题材</th><th>历史爆款率</th><th>节点</th><th>利益点可植入</th><th>得分</th></tr>
+   ${T.pool.map(t=>`<tr style="${t.id===T.chosen?'color:var(--accent)':''}"><td>${t.id} ${t.title}${t.id===T.chosen?'（选中）':''}</td><td>${t.genre.join('、')}</td><td class="mono">${t.hit}</td><td>${t.node}</td><td class="mono">${t.benefit_fit}</td><td class="mono">${t.score}</td></tr>`).join('')}</table>
+   <p>得分 = 历史爆款率（按题材，归一化）× 0.5 + 营销节点权重 × 0.3 + 利益点可植入度 × 0.2</p>
+   <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
+  $('modal').hidden=false;
 }
-$('export').addEventListener('click',()=>{$('json').textContent=JSON.stringify(draft(),null,2);$('copied').hidden=true;$('modal').hidden=false;$('close').focus()});
-$('close').addEventListener('click',()=>{$('modal').hidden=true});
-$('modal').addEventListener('click',e=>{if(e.target.id==='modal')$('modal').hidden=true});
+function openScript(){
+  const X=R.scripts;
+  $('modalCard').innerHTML=`<h3>脚本 Agent 初稿与审核</h3><p>生成：${X.generated_by}。三版都按"冷知识开头 → 路线 → 画面 → 利益点 → 搜码钩子"的结构写，再按规则和事实库逐条审核。</p>
+   <div class="vt">${X.variants.map(v=>`<div class="var ${v.ok?'ok':''}"><h4>${v.id} 版 <span class="band ${v.ok?'ok':'bad'}">${v.ok?'采用':'拦下'}</span></h4>
+     <ol>${v.lines.map(l=>`<li>${l.en}<br><small>${l.zh}</small></li>`).join('')}</ol>
+     <ul class="ck">${v.checks.map(c=>`<li><span class="${c.ok?'ok-ic':'bad-ic'}">${c.ok?'✓':'✕'}</span> ${c.name}：${c.msg}</li>`).join('')}</ul></div>`).join('')}</div>
+   <p>事实库：${X.facts.map(f=>f.id+' '+f.text).join('；')}</p>
+   <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
+  $('modal').hidden=false;
+}
+$('steps').addEventListener('click',e=>{const li=e.target.closest('li.link.done');if(!li)return;li.dataset.step==='选题'?openTopic():openScript()});
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.id==='closeM')$('modal').hidden=true});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('modal').hidden=true});
-$('copy').addEventListener('click',async()=>{
-  try{await navigator.clipboard.writeText($('json').textContent);$('copied').textContent='已复制';$('copied').hidden=false}
-  catch(err){const r=document.createRange();r.selectNodeContents($('json'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('copied').textContent='已选中，按 Ctrl/⌘+C 复制';$('copied').hidden=false}
-});
-
 renderSteps(0,-1);
+// #done-<秒>-<第几句>：直接显示生成后的状态（截图、演示用）
+const hm=location.hash.match(/^#done(?:-([\d.]+))?/);
+if(location.hash==='#topic'||location.hash==='#script'){renderSteps(R.log.length,-1);location.hash==='#topic'?openTopic():openScript();}
+if(hm){const t=parseFloat(hm[1]||'1');renderSteps(R.log.length,-1);state.gen=true;state.t=t;const sg=segAt(t);state.seg=sg.i;state.shot=shotAt(sg,t);$('ph').hidden=true;$('sub').hidden=false;['play','draftBtn'].forEach(id=>$(id).disabled=false);$('gen').textContent='重新回放';renderAll();}
 let rt;addEventListener('resize',()=>{if(!state.gen)return;clearTimeout(rt);rt=setTimeout(renderTimeline,120)});
 </script>
 </body>

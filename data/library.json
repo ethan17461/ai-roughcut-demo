@@ -1,0 +1,21 @@
+{
+  "source": "Pexels（免费可商用）。标签由人工看缩略图标注；真实落地时改为多模态模型自动打标。",
+  "clips": [
+    {"id":"m01","file":"clips/m01.mp4","title":"夜间列车进站","tags":["train","night","station"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/train-arriving-at-station-at-night-14536989/"},
+    {"id":"m02","file":"clips/m02.mp4","title":"夜间站台停靠列车","tags":["train","night","station","depart"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/a-train-is-parked-at-a-station-at-night-27549041/"},
+    {"id":"m03","file":"clips/m03.mp4","title":"列车穿过绿色山谷","tags":["train","mountain","journey"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/scenic-train-journey-through-lush-green-mountains-33054658/"},
+    {"id":"m04","file":"clips/m04.mp4","title":"卧铺铺位（车厢内）","tags":["sleeper","cabin","train"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/legs-of-person-laying-on-couchette-on-train-10430975/"},
+    {"id":"m05","file":"clips/m05.mp4","title":"手机上打开 App","tags":["phone","app"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/using-smartphone-display-for-mobile-applications-40326823/"},
+    {"id":"m06","file":"clips/m06.mp4","title":"伦敦夜景（泰晤士河）","tags":["london","night","city"],"location":"伦敦","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/stunning-nighttime-view-of-london-skyline-32215140/"},
+    {"id":"m07","file":"clips/m07.mp4","title":"伦敦塔桥夜景","tags":["london","night","city"],"location":"伦敦","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/nightview-of-tower-bridge-in-london-35991478/"},
+    {"id":"m08","file":"clips/m08.mp4","title":"克鲁火车站站台（英格兰）","tags":["station","train","platform"],"location":"克鲁","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/modern-crewe-railway-station-platform-view-31273250/"},
+    {"id":"m09","file":"clips/m09.mp4","title":"白天车站站台","tags":["station","platform"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/modern-train-station-platform-with-arrival-38885403/"},
+    {"id":"m10","file":"clips/m10.mp4","title":"山丘与湖泊（阴天）","tags":["lake","mountain"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/scenery-with-hills-and-lake-12521200/"},
+    {"id":"m11","file":"clips/m11.mp4","title":"阴天山湖","tags":["lake","mountain"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/tranquil-mountain-lake-scene-with-overcast-sky-35426666/"},
+    {"id":"m12","file":"clips/m12.mp4","title":"阿尔卑斯雪山湖","tags":["lake","mountain"],"location":"阿尔卑斯","quality":5,"issues":[],"pexels":"https://www.pexels.com/video/serene-alpine-lake-with-majestic-mountains-38087912/"},
+    {"id":"m13","file":"clips/m13.mp4","title":"售票机出票口","tags":["ticket","station"],"location":"未知","quality":3,"issues":[],"pexels":"https://www.pexels.com/video/a-person-getting-a-ticket-from-the-machine-7252267/"},
+    {"id":"m14","file":"clips/m14.mp4","title":"火车上用手机","tags":["phone","train","window"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/person-using-smartphone-on-train-33117489/"},
+    {"id":"m15","file":"clips/m15.mp4","title":"手持手机（背面）","tags":["phone"],"location":"未知","quality":4,"issues":["brand"],"pexels":"https://www.pexels.com/video/hand-holding-phone-with-icons-on-screen-11698130/"},
+    {"id":"m16","file":"clips/m16.mp4","title":"卧铺包厢窗景（清晨）","tags":["sleeper","cabin","window","morning","train"],"location":"未知","quality":4,"issues":[],"pexels":"https://www.pexels.com/video/tranquil-train-cabin-view-with-passenger-38302461/"}
+  ]
+}

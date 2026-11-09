@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI 粗剪工作台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* Layout: editing workbench — settings + pipeline left, 9:16 monitor center, score + inspector right, multi-track timeline across the bottom. Dark-only by design, like the editors it mimics. */
+:root{
+  --bg:#0f1218; --panel:#161a22; --panel-2:#1d222c; --panel-3:#232a36; --line:#2a3140; --fg:#e9ebf1; --muted:#9aa1b2; --dim:#687084;
+  --accent:#f3c04d; --accent-ink:#1b1505;
+  --trk-v:#3ea8a1; --trk-a:#8a7df3; --trk-t:#c7b78c; --trk-s:#e97c62;
+  --good:#5cc78f; --warn:#f0a03c; --bad:#ef5f5f;
+  --font-ui:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a{color:var(--muted)}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1380px;margin:0 auto;display:grid;gap:14px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.top h1{margin:0;font-size:21px;font-weight:700;letter-spacing:.02em}
+.top p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.pill{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:500;vertical-align:middle;background:rgba(92,199,143,.14);color:var(--good)}
+.btn{border:1px solid var(--line);background:var(--panel-2);padding:8px 15px;border-radius:8px;font-size:13px}
+.btn:hover{border-color:var(--dim)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:280px minmax(0,1fr) 360px;gap:14px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.panel h2{margin:0 0 10px;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.08em}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px;margin-bottom:14px}
+.kv dt{color:var(--dim)} .kv dd{margin:0}
+.steps{list-style:none;margin:14px 0 0;padding:0}
+.steps li{display:grid;grid-template-columns:18px 1fr auto;gap:8px;padding:7px 0;border-top:1px solid var(--line);font-size:13px;color:var(--dim)}
+.steps li:first-child{border-top:0}
+.steps li.done,.steps li.run{color:var(--fg)}
+.steps .v{display:block;color:var(--muted);font-size:12px}
+.steps li.link{cursor:pointer}
+.steps li.link.done .k{text-decoration:underline;text-decoration-color:var(--dim);text-underline-offset:3px}
+.steps li.link.done:hover .k{color:var(--accent)}
+.vt{display:grid;gap:10px}
+.var{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--panel-2)}
+.var.ok{border-color:rgba(92,199,143,.55)}
+.var h4{margin:0 0 6px;font-size:13px;display:flex;gap:8px;align-items:center}
+.var ol{margin:0;padding-left:18px;font-size:12.5px}
+.var ol li{margin:2px 0}
+.var ol small{color:var(--muted)}
+.ck{list-style:none;margin:8px 0 0;padding:0;font-size:12px;display:grid;gap:3px;color:var(--muted)}
+.steps .ms{font-size:11px;color:var(--dim);padding-top:2px}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--dim);margin-top:3px}
+.steps li.done .dot{background:var(--good);border-color:var(--good)}
+.steps li.run .dot{border-color:var(--accent);border-top-color:transparent;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.monitor{display:grid;justify-items:center;gap:10px}
+.screen{position:relative;width:min(100%,290px);aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:#05070a;border:1px solid var(--line)}
+.screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+.screen video.on{opacity:1}
+.ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:22px;color:var(--muted);font-size:13px}
+.ph b{display:block;color:var(--fg);font-size:15px;margin-bottom:6px}
+.huazi{position:absolute;left:12px;right:12px;top:19%;text-align:center;font-weight:800;font-size:20px;color:#ffd62e;letter-spacing:.02em;
+  text-shadow:0 0 2px #000,0 0 2px #000,0 2px 0 #000,0 0 12px rgba(0,0,0,.5);line-height:1.2;white-space:pre-line}
+.sub{position:absolute;left:14px;right:14px;bottom:12%;text-align:center;font-weight:700;font-size:13px;color:#fff;text-wrap:balance;
+  text-shadow:0 0 2px #000,0 0 3px #000,0 1px 0 #000;line-height:1.35}
+.transport{display:flex;align-items:center;gap:12px}
+.play{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel-2);display:grid;place-items:center}
+.play svg{width:14px;height:14px;fill:var(--fg)}
+.tc{color:var(--muted);font-size:13px}
+.zh{max-width:320px;text-align:center;color:var(--muted);font-size:12.5px;min-height:20px}
+.note{font-size:11.5px;color:var(--dim);text-align:center;max-width:330px}
+.empty{color:var(--muted);font-size:13px;margin:6px 0}
+.score-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.score-num{font-size:42px;font-weight:700;line-height:1}
+.band{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.band.ok{background:rgba(92,199,143,.15);color:var(--good)} .band.mid{background:rgba(243,192,77,.15);color:var(--accent)} .band.bad{background:rgba(239,95,95,.15);color:var(--bad)}
+.dims{display:grid;gap:9px;margin-top:12px}
+.dim .t{display:flex;justify-content:space-between;font-size:12.5px}
+.bar{height:5px;border-radius:3px;background:var(--panel-3);overflow:hidden;margin:3px 0}
+.bar i{display:block;height:100%;background:var(--good);transition:width .3s}
+.bar i.w{background:var(--warn)} .bar i.b{background:var(--bad)}
+.dim .why{font-size:11.5px;color:var(--muted)}
+.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
+.seg-head{display:flex;justify-content:space-between;gap:8px;align-items:start}
+.seg-title{font-size:13px;font-weight:500}
+.seg-en{font-size:12.5px;margin-top:2px}
+.seg-zh{font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 2px}
+.chip{font-size:11px;padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.chip.hit{border-color:rgba(62,168,161,.6);color:#8fd7d1}
+.chip.bad{border-color:rgba(239,95,95,.55);color:var(--bad)}
+.chip.warn{border-color:rgba(240,160,60,.55);color:var(--warn)}
+.gap{margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(240,160,60,.1);border:1px solid rgba(240,160,60,.35);color:#f5c27e;font-size:12px}
+.shot-tabs{display:flex;gap:6px;margin-top:10px}
+.shot-tabs button{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2)}
+.shot-tabs button.on{border-color:var(--accent);color:var(--accent)}
+.cands{display:grid;gap:8px;margin-top:8px}
+.cand{display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2)}
+.cand.sel{border-color:var(--trk-v)} .cand.x{opacity:.8}
+.cand img{width:46px;aspect-ratio:9/16;object-fit:cover;border-radius:4px;background:#000}
+.cand .nm{font-size:12.5px;font-weight:500}
+.cand .meta{font-size:11px;color:var(--muted)}
+.cand .pct{font-size:13px;text-align:right}
+.cand button{font-size:11.5px;padding:3px 9px;margin-top:4px;border-radius:6px;border:1px solid var(--line);background:var(--panel)}
+.rules{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.rules li{display:grid;grid-template-columns:16px 1fr;gap:6px;font-size:12px;color:var(--muted)}
+.rules b{color:var(--fg);font-weight:500}
+.ok-ic{color:var(--good)} .bad-ic{color:var(--bad)}
+.tl-panel{padding:0;overflow:hidden}
+.tl-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
+.tl-bar h2{margin:0}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+.tl-scroll{overflow-x:auto}
+.tl{position:relative;min-width:780px;padding:6px 16px 14px}
+.tl-row{display:grid;grid-template-columns:72px 1fr;align-items:center;min-height:46px}
+.tl-row .nm{font-size:12px;color:var(--muted)}
+.lane{position:relative;height:38px;border-radius:5px;background:rgba(255,255,255,.025)}
+.ruler{height:22px;background:none;cursor:pointer}
+.ruler span{position:absolute;top:3px;font-size:10.5px;color:var(--dim);transform:translateX(-50%)}
+.clip{position:absolute;top:2px;bottom:2px;border-radius:6px;padding:3px 7px;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;border:1px solid rgba(0,0,0,.35);text-align:left;line-height:1.35}
+.clip.v{background:var(--trk-v);color:#062523;display:flex;gap:6px;align-items:center;padding:2px}
+.clip.v img{height:100%;aspect-ratio:9/16;object-fit:cover;border-radius:4px;flex:none}
+.clip.v span{overflow:hidden;text-overflow:ellipsis}
+.clip.v.active{outline:2px solid var(--accent);outline-offset:1px}
+.clip.v.flag{background:var(--bad);color:#2a0606}
+.clip.v.long{box-shadow:inset 0 -3px 0 var(--warn)}
+.clip.a{background:color-mix(in srgb,var(--trk-a) 28%,var(--panel-2));border-color:var(--trk-a);color:#d9d4ff}
+.clip.t{background:var(--trk-t);color:#241f12}
+.clip.s{background:var(--trk-s);color:#2b0d06}
+.clip small{display:block;opacity:.8;font-size:10px}
+.playhead{position:absolute;top:6px;bottom:10px;width:2px;background:var(--accent);pointer-events:none;z-index:3}
+.tl-empty{padding:20px 16px;color:var(--muted);font-size:13px}
+.foot{font-size:12px;color:var(--dim);display:grid;gap:4px}
+.modal{position:fixed;inset:0;background:rgba(5,7,10,.72);display:grid;place-items:center;padding:16px;z-index:20}
+.modal-card{width:min(720px,100%);max-height:86vh;overflow:auto;display:grid;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+.modal-card h3{margin:0;font-size:17px}
+.modal-card p{margin:0;color:var(--muted);font-size:13px}
+.modal-card table{border-collapse:collapse;width:100%;font-size:12.5px}
+.modal-card td,.modal-card th{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+.modal-card th{color:var(--muted);font-weight:500}
+.path{font-family:var(--font-mono);font-size:12px;background:#0b0d12;border:1px solid var(--line);border-radius:6px;padding:8px 10px;word-break:break-all;color:#cfd5e2}
+@media (max-width:1150px){.grid{grid-template-columns:270px minmax(0,1fr)} .inspector{grid-column:1 / -1}}
+@media (max-width:740px){.grid{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>AI 粗剪工作台 <span class="pill">真实流水线结果</span></h1>
+      <p>选题 → 写脚本 → 配音 → 素材召回 → 国家和平台规则 → 剪映草稿 → 自动评分 → 人工精修</p>
+    </div>
+    <button class="btn" id="draftBtn" disabled>查看生成的剪映草稿</button>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="in-h">
+      <h2 id="in-h">本次任务</h2>
+      <dl class="kv" id="kv"></dl>
+      <button class="btn primary" id="gen" style="width:100%">生成粗剪</button>
+      <ol class="steps" id="steps" aria-live="polite"></ol>
+    </section>
+
+    <section class="panel monitor" aria-label="预览">
+      <div class="screen" id="screen">
+        <div class="ph" id="ph"><div><b>还没有粗剪</b>点「生成粗剪」，回放流水线的真实运行过程，跑完后这里出片</div></div>
+        <div class="huazi" id="huazi" hidden></div>
+        <div class="sub" id="sub" hidden></div>
+      </div>
+      <div class="transport">
+        <button class="play" id="play" aria-label="播放" disabled><svg viewBox="0 0 16 16" id="playIc"><path d="M4 2l10 6-10 6z"/></svg></button>
+        <span class="tc mono" id="tc">00:00.0 / 00:00.0</span>
+      </div>
+      <div class="zh" id="zh"></div>
+      <p class="note">画面是素材库里的真实镜头，配音是系统语音合成的真实音频（英式男声）。网页里换镜头只影响预览和评分，正式修改在剪映里做。</p>
+    </section>
+
+    <section class="panel inspector" aria-labelledby="sc-h">
+      <h2 id="sc-h">粗剪评分（满分 100）</h2>
+      <div id="scoreBox"><p class="empty">生成后显示评分。</p></div>
+      <hr class="sep">
+      <h2>当前片段</h2>
+      <div id="inspect"><p class="empty">点时间线上的画面片段，查看召回的候选镜头。</p></div>
+      <hr class="sep">
+      <h2>国家 / 平台规则（RAG）</h2>
+      <ul class="rules" id="rules"><li><span></span><span>生成后显示规则检查结果。</span></li></ul>
+    </section>
+  </div>
+
+  <section class="panel tl-panel" aria-labelledby="tl-h">
+    <div class="tl-bar">
+      <h2 id="tl-h">时间线（和剪映草稿的轨道一致）</h2>
+      <div class="legend"><span style="--c:var(--trk-v)">画面</span><span style="--c:var(--trk-a)">配音</span><span style="--c:var(--trk-t)">字幕</span><span style="--c:var(--trk-s)">花字</span></div>
+    </div>
+    <div class="tl-scroll"><div class="tl" id="tl"><div class="tl-empty">生成后在这里出现画面、配音、字幕、花字四条轨道。</div></div></div>
+  </section>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-h">
+  <div class="modal-card" id="modalCard"></div>
+</div>
+
+<script>
+const R = /*__RESULT__*/null;
+const $=id=>document.getElementById(id);
+const S=R.segments;
+const fmt=t=>{const m=Math.floor(t/60),s=t-m*60;return String(m).padStart(2,'0')+':'+s.toFixed(1).padStart(4,'0')};
+const thumb=id=>`thumbs/${id}.jpg`;
+const state={gen:false,t:0,playing:false,seg:0,shot:0};
+// shots are editable in the page (preview + score only)
+S.forEach(seg=>seg.shots.forEach(sh=>{sh.orig=sh.clip}));
+
+/* ---------- static info ---------- */
+$('kv').innerHTML=`<dt>国家 / 平台</dt><dd>${R.country} · ${R.platform}</dd><dt>剪辑 Skill</dt><dd>${R.skill.name}</dd><dt>配音</dt><dd>${R.skill.voice.voice}</dd><dt>选题</dt><dd>${R.topic.chosen} · ${R.title}</dd><dt>脚本</dt><dd>AI 初稿 ${R.scripts.variants.length} 版 → 采用 ${R.scripts.chosen} 版</dd>`;
+const used=[...new Set(S.flatMap(s=>s.candidates.map(c=>c.id)))];
+$('foot').innerHTML=`<div>素材：Pexels 免费可商用实拍，共 ${Object.keys(R.clips).length} 段（${Object.entries(R.clips).map(([id,c])=>`<a href="${c.pexels}" target="_blank" rel="noopener">${id}</a>`).join(' ')}）。</div><div>说明：素材标签为人工看画面标注，召回用关键词匹配；真实落地时换成多模态模型自动打标和向量检索。剪映草稿由开源工具 pyJianYingDraft 生成。</div>`;
+
+/* ---------- video / audio elements ---------- */
+const vids={};
+function vid(id){ if(!vids[id]){ const v=document.createElement('video'); v.src=R.clips[id].file.replace('library/','clips/'); v.muted=true; v.playsInline=true; v.preload='auto'; $('screen').insertBefore(v,$('huazi')); vids[id]=v; } return vids[id]; }
+const auds=S.map(seg=>{const a=new Audio(seg.audio.replace('output/tts/','audio/')+'.m4a'); a.preload='auto'; return a;});
+S.forEach(seg=>seg.shots.forEach(sh=>vid(sh.clip)));
+
+/* ---------- scoring (same rubric as pipeline.py) ---------- */
+function candOf(seg,id){return seg.candidates.find(c=>c.id===id)}
+function score(){
+  const dims=R.score.dims.map(d=>({...d}));
+  const shots=S.flatMap(seg=>seg.shots.map(sh=>({sh,seg,c:candOf(seg,sh.clip)})));
+  const wrong=shots.filter(x=>x.c.excluded);
+  const avg=shots.reduce((a,x)=>a+x.c.coverage,0)/shots.length;
+  dims[0].v=wrong.length?0:Math.round(300*avg)/10;
+  dims[0].why=wrong.length?`「${wrong[0].c.title}」${wrong[0].c.excluded}，本项记 0 分`:`${shots.length} 个镜头平均覆盖所在句子 ${Math.round(avg*100)}% 的关键词`;
+  const q=shots.reduce((a,x)=>a+x.c.quality,0)/shots.length;
+  dims[4].v=Math.round(100*q/5)/10; dims[4].why=`所用镜头平均清晰度 ${q.toFixed(1)} / 5（540p 竖屏素材）`;
+  const brand=shots.filter(x=>x.c.issues.includes('brand')).length;
+  dims[5].v=15-(brand?3:0);
+  dims[5].why=`所选镜头里没有可识别人脸（人工标注）；${brand?brand+' 个镜头露出手机品牌标识':'没有第三方品牌标识'}；价格都写了 up to / extra`;
+  const total=Math.round(dims.reduce((a,d)=>a+d.v,0));
+  return {dims,total,brand,wrong:wrong.length};
+}
+const band=t=>t<70?['bad','低于 70：退回重做']:t<80?['mid','70–79：粗剪合格，交人工精修']:t<90?['ok','80–89：精修后可发布']:['ok','90+：有爆款潜力'];
+
+/* ---------- render ---------- */
+function renderSteps(done,run){
+  $('steps').innerHTML=R.log.map((l,i)=>`<li data-step="${l.step}" class="${i<done?'done':i===run?'run':''} ${l.step==='选题'||l.step==='写脚本'?'link':''}"><span class="dot" aria-hidden="true"></span><span><span class="k">${l.step}</span><span class="v">${i<done?l.msg:i===run?'处理中…':'等待'}</span></span><span class="ms mono">${i<done?l.ms+' ms':''}</span></li>`).join('');
+}
+function renderScore(){
+  const {dims,total}=score();const [cls,txt]=band(total);
+  $('scoreBox').innerHTML=`<div class="score-head"><span class="score-num mono">${total}</span><span class="band ${cls}">${txt}</span></div><div class="dims">${dims.map(d=>{const r=d.v/d.max;const c=r<.4?'b':r<.75?'w':'';return `<div class="dim"><div class="t"><span>${d.n}</span><span class="mono">${d.v} / ${d.max}</span></div><div class="bar"><i class="${c}" style="width:${r*100}%"></i></div><div class="why">${d.why}</div></div>`}).join('')}</div>`;
+}
+function renderRules(){
+  const sc=score();
+  $('rules').innerHTML=R.rules.map(r=>{let ok=r.ok,msg=r.msg;
+    if(r.id==='R3'){ok=!sc.brand;msg=ok?'没有第三方品牌标识':`${sc.brand} 个镜头露出手机品牌标识`}
+    if(r.id==='R6'&&sc.wrong){ok=false;msg='有镜头地点和脚本不符'}
+    return `<li><span class="${ok?'ok-ic':'bad-ic'}">${ok?'✓':'✕'}</span><span><b>${r.name}</b> · ${msg}</span></li>`}).join('');
+}
+function renderInspect(){
+  const seg=S[state.seg]; const sh=seg.shots[state.shot]||seg.shots[0];
+  const cur=candOf(seg,sh.clip);
+  $('inspect').innerHTML=`<div class="seg-head"><div><div class="seg-title">第 ${seg.i+1} 句 · ${seg.role}</div><div class="seg-en">${seg.en}</div><div class="seg-zh">${seg.zh}</div></div></div>
+   <div class="chips">${seg.need.map(k=>`<span class="chip ${cur.matched.includes(k)?'hit':''}">${k}</span>`).join('')}${seg.places.map(p=>`<span class="chip">地点：${p}</span>`).join('')}</div>
+   ${seg.gap?`<div class="gap">${seg.gap}</div>`:''}
+   ${seg.shots.length>1?`<div class="shot-tabs">${seg.shots.map((x,i)=>`<button data-shot="${i}" class="${i===state.shot?'on':''}">镜头 ${i+1}</button>`).join('')}</div>`:''}
+   <div class="cands">${seg.candidates.map(c=>{const sel=c.id===sh.clip;const flags=(c.excluded?`<span class="chip bad">${c.excluded}</span>`:'')+(c.issues.includes('brand')?'<span class="chip warn">品牌露出</span>':'');
+     return `<div class="cand ${sel?'sel':''} ${c.excluded?'x':''}"><img src="${thumb(c.id)}" alt=""><div><div class="nm">${c.id} · ${c.title}</div><div class="meta">命中：${c.matched.join('、')||'无'} · 清晰度 ${c.quality}/5 · ${c.clip_s} 秒</div>${flags?`<div class="chips">${flags}</div>`:''}</div><div class="pct"><span class="mono">${Math.round(c.coverage*100)}%</span><br>${sel?'<span class="meta">使用中</span>':`<button data-use="${c.id}">${c.excluded?'仍要替换':'替换'}</button>`}</div></div>`}).join('')}</div>`;
+}
+let pps=40;
+function renderTimeline(){
+  const tl=$('tl');const laneW=Math.max(tl.clientWidth-32-72,680);pps=laneW/R.total_s;const x=t=>t*pps;
+  let ruler='';for(let t=0;t<=Math.floor(R.total_s);t+=2)ruler+=`<span class="mono" style="left:${x(t)}px">${fmt(t).slice(1)}</span>`;
+  const row=(nm,inner,cls='')=>`<div class="tl-row"><span class="nm">${nm}</span><div class="lane ${cls}">${inner}</div></div>`;
+  const box=(cls,st,len,html)=>`<div class="clip ${cls}" style="left:${x(st)}px;width:${Math.max(4,x(len)-2)}px">${html}</div>`;
+  const vids=S.flatMap(seg=>seg.shots.map((sh,j)=>{const c=candOf(seg,sh.clip);const act=state.seg===seg.i&&state.shot===j;
+    return `<button class="clip v ${act?'active':''} ${c.excluded?'flag':''} ${sh.dur>R.skill.max_shot_s+.05?'long':''}" data-seg="${seg.i}" data-shot="${j}" style="left:${x(sh.start)}px;width:${x(sh.dur)-2}px" title="${c.title}"><img src="${thumb(sh.clip)}" alt=""><span>${sh.clip} ${c.title}<small>${Math.round(c.coverage*100)}%</small></span></button>`}));
+  tl.innerHTML=row('',`<div id="ruler" style="position:absolute;inset:0">${ruler}</div>`,'ruler')+
+    row('画面',vids.join(''))+
+    row('配音',S.map(seg=>box('a',seg.start,seg.voice_s,`配音 ${seg.i+1} · ${seg.voice_s}s`)).join(''))+
+    row('字幕',S.map(seg=>box('t',seg.start,seg.dur,seg.subtitle.replace('\n',' '))).join(''))+
+    row('花字',S.flatMap(seg=>seg.stickers.map(st=>box('s',st.start,st.dur,st.text.replace('\n',' ')))).join(''))+
+    '<div class="playhead" id="ph2"></div>';
+  placeHead();
+}
+function placeHead(){const p=$('ph2');if(p)p.style.left=(16+72+state.t*pps)+'px'}
+function segAt(t){for(const s of S){if(t<s.start+s.dur)return s}return S[S.length-1]}
+function shotAt(seg,t){for(let j=0;j<seg.shots.length;j++){const sh=seg.shots[j];if(t<sh.start+sh.dur)return j}return seg.shots.length-1}
+function renderMonitor(){
+  const seg=segAt(state.t), j=shotAt(seg,state.t), sh=seg.shots[j];
+  Object.entries(vids).forEach(([id,v])=>{const on=id===sh.clip;v.classList.toggle('on',on);
+    if(on){const want=sh.src_in+(state.t-sh.start);if(Math.abs(v.currentTime-want)>.3)v.currentTime=want;if(state.playing&&v.paused)v.play().catch(()=>{});if(!state.playing&&!v.paused)v.pause()}else if(!v.paused)v.pause()});
+  S.forEach((s,i)=>{const a=auds[i];const inside=state.t>=s.start&&state.t<s.start+s.voice_s;
+    if(inside&&state.playing){const want=state.t-s.start;if(Math.abs(a.currentTime-want)>.25)a.currentTime=want;if(a.paused)a.play().catch(()=>{})}else if(!a.paused)a.pause()});
+  $('sub').textContent=seg.subtitle.replace('\n',' ');
+  const st=S.flatMap(s=>s.stickers).find(k=>state.t>=k.start&&state.t<k.start+k.dur);
+  $('huazi').hidden=!st; if(st)$('huazi').textContent=st.text;
+  $('zh').textContent='中文对照：'+seg.zh;
+  $('tc').textContent=fmt(state.t)+' / '+fmt(R.total_s);
+  if(state.playing&&(seg.i!==state.seg||j!==state.shot)){state.seg=seg.i;state.shot=j;renderInspect();renderTimeline()}
+  placeHead();
+}
+function renderAll(){renderScore();renderRules();renderInspect();renderTimeline();renderMonitor()}
+
+/* ---------- playback ---------- */
+let raf=0,last=0;
+function tick(ts){if(!state.playing)return;if(last)state.t+=(ts-last)/1000;last=ts;
+  if(state.t>=R.total_s){state.t=R.total_s-.01;setPlaying(false);return}
+  renderMonitor();raf=requestAnimationFrame(tick)}
+function setPlaying(p){state.playing=p;last=0;$('play').setAttribute('aria-label',p?'暂停':'播放');
+  $('playIc').innerHTML=p?'<path d="M3 2h4v12H3zM9 2h4v12H9z"/>':'<path d="M4 2l10 6-10 6z"/>';
+  if(p){if(state.t>=R.total_s-.05)state.t=0;raf=requestAnimationFrame(tick)}else cancelAnimationFrame(raf);renderMonitor()}
+
+/* ---------- interactions ---------- */
+document.addEventListener('click',e=>{
+  if(!state.gen)return;
+  const c=e.target.closest('.clip.v');
+  if(c){state.seg=+c.dataset.seg;state.shot=+c.dataset.shot;const sh=S[state.seg].shots[state.shot];state.t=sh.start+.05;renderInspect();renderTimeline();renderMonitor();return}
+  const tab=e.target.closest('[data-shot]');
+  if(tab&&tab.closest('#inspect')){state.shot=+tab.dataset.shot;const sh=S[state.seg].shots[state.shot];state.t=sh.start+.05;renderInspect();renderTimeline();renderMonitor();return}
+  const use=e.target.closest('[data-use]');
+  if(use){const sh=S[state.seg].shots[state.shot];sh.clip=use.dataset.use;vid(sh.clip);sh.src_in=Math.min(R.skill.clip_skip_head_s,Math.max(0,R.clips[sh.clip].clip_s-sh.dur));renderAll();return}
+  if(e.target.closest('#ruler')){const r=$('ruler').getBoundingClientRect();state.t=Math.max(0,Math.min(R.total_s-.01,(e.clientX-r.left)/pps));const seg=segAt(state.t);state.seg=seg.i;state.shot=shotAt(seg,state.t);renderInspect();renderTimeline();renderMonitor()}
+});
+$('play').addEventListener('click',()=>setPlaying(!state.playing));
+$('gen').addEventListener('click',async()=>{
+  if(state.busy)return;state.busy=true;setPlaying(false);['gen','play','draftBtn'].forEach(id=>$(id).disabled=true);$('gen').textContent='生成中…';
+  const fast=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for(let i=0;i<R.log.length;i++){renderSteps(i,i);await new Promise(r=>setTimeout(r,fast?0:560))}
+  renderSteps(R.log.length,-1);
+  state.gen=true;state.t=0;state.seg=0;state.shot=0;$('ph').hidden=true;$('sub').hidden=false;renderAll();
+  ['gen','play','draftBtn'].forEach(id=>$(id).disabled=false);$('gen').textContent='重新回放';state.busy=false;setPlaying(true);
+});
+$('draftBtn').addEventListener('click',()=>{
+  const shots=S.flatMap(s=>s.shots);
+  $('modalCard').innerHTML=`<h3>已生成的剪映草稿</h3><p>流水线用开源工具 pyJianYingDraft 把轨道写成剪映草稿，打开剪映就能在草稿列表里看到，直接接着精修。</p>
+   <div><p style="margin-bottom:6px">草稿名称</p><div class="path">${R.draft.name}</div></div>
+   <div><p style="margin-bottom:6px">本机位置</p><div class="path">${R.draft.path}</div></div>
+   <table><tr><th>轨道</th><th>内容</th></tr>
+   <tr><td>画面</td><td>${shots.length} 段：${shots.map(s=>s.orig).join('、')}</td></tr>
+   <tr><td>配音</td><td>${S.length} 段（${R.skill.voice.voice}）</td></tr>
+   <tr><td>字幕</td><td>${S.length} 段，白字黑边，按 ${R.skill.subtitle.max_chars_per_line} 字符断行</td></tr>
+   <tr><td>花字</td><td>${S.flatMap(s=>s.stickers).map(s=>s.kind+'「'+s.text.replace('\n',' ')+'」').join('；')}</td></tr></table>
+   <p>草稿文件：<a href="draft/draft_content.json" target="_blank" rel="noopener">draft_content.json</a>（素材路径指向本机，换电脑需重新关联素材）。</p>
+   <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
+  $('modal').hidden=false;$('closeM').focus();
+});
+function openTopic(){
+  const T=R.topic;
+  $('modalCard').innerHTML=`<h3>选题卡 · ${T.month}</h3><p>${T.note}</p><p>营销节点：${T.nodes.map(n=>n.name+'（权重 '+n.weight+'）').join('、')}</p>
+   <table><tr><th>选题</th><th>题材</th><th>历史爆款率</th><th>节点</th><th>利益点可植入</th><th>得分</th></tr>
+   ${T.pool.map(t=>`<tr style="${t.id===T.chosen?'color:var(--accent)':''}"><td>${t.id} ${t.title}${t.id===T.chosen?'（选中）':''}</td><td>${t.genre.join('、')}</td><td class="mono">${t.hit}</td><td>${t.node}</td><td class="mono">${t.benefit_fit}</td><td class="mono">${t.score}</td></tr>`).join('')}</table>
+   <p>得分 = 历史爆款率（按题材，归一化）× 0.5 + 营销节点权重 × 0.3 + 利益点可植入度 × 0.2</p>
+   <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
+  $('modal').hidden=false;
+}
+function openScript(){
+  const X=R.scripts;
+  $('modalCard').innerHTML=`<h3>脚本 Agent 初稿与审核</h3><p>生成：${X.generated_by}。三版都按"冷知识开头 → 路线 → 画面 → 利益点 → 搜码钩子"的结构写，再按规则和事实库逐条审核。</p>
+   <div class="vt">${X.variants.map(v=>`<div class="var ${v.ok?'ok':''}"><h4>${v.id} 版 <span class="band ${v.ok?'ok':'bad'}">${v.ok?'采用':'拦下'}</span></h4>
+     <ol>${v.lines.map(l=>`<li>${l.en}<br><small>${l.zh}</small></li>`).join('')}</ol>
+     <ul class="ck">${v.checks.map(c=>`<li><span class="${c.ok?'ok-ic':'bad-ic'}">${c.ok?'✓':'✕'}</span> ${c.name}：${c.msg}</li>`).join('')}</ul></div>`).join('')}</div>
+   <p>事实库：${X.facts.map(f=>f.id+' '+f.text).join('；')}</p>
+   <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
+  $('modal').hidden=false;
+}
+$('steps').addEventListener('click',e=>{const li=e.target.closest('li.link.done');if(!li)return;li.dataset.step==='选题'?openTopic():openScript()});
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.id==='closeM')$('modal').hidden=true});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('modal').hidden=true});
+renderSteps(0,-1);
+// #done-<秒>-<第几句>：直接显示生成后的状态（截图、演示用）
+const hm=location.hash.match(/^#done(?:-([\d.]+))?/);
+if(location.hash==='#topic'||location.hash==='#script'){renderSteps(R.log.length,-1);location.hash==='#topic'?openTopic():openScript();}
+if(hm){const t=parseFloat(hm[1]||'1');renderSteps(R.log.length,-1);state.gen=true;state.t=t;const sg=segAt(t);state.seg=sg.i;state.shot=shotAt(sg,t);$('ph').hidden=true;$('sub').hidden=false;['play','draftBtn'].forEach(id=>$(id).disabled=false);$('gen').textContent='重新回放';renderAll();}
+let rt;addEventListener('resize',()=>{if(!state.gen)return;clearTimeout(rt);rt=setTimeout(renderTimeline,120)});
+</script>
+</body>
+</html>
