@@ -324,7 +324,10 @@ def main():
                                           border=jy.TextBorder(width=hz["border_width"]),
                                           clip_settings=jy.ClipSettings(transform_y=hz["y"])), "花字")
     sf.save()
-    n_st = sum(len(seg["stickers"]) for seg in plan)
+    # 剪映 6.0 以后（含 Mac 版 11.x）读的是 draft_info.json；库默认写 draft_content.json（旧版/Windows 叫法），
+    # 留着旧名会被新版剪映当成"草稿内容已损坏"。明文写入即可，剪映第一次打开后会自己加密。
+    os.replace(os.path.join(draft_dir, "draft_content.json"), os.path.join(draft_dir, "draft_info.json"))
+    n_st =sum(len(seg["stickers"]) for seg in plan)
     log("编排剪映轨道", f"已生成剪映草稿「{DRAFT_NAME}」：画面 {len(shots)} 段、配音 {len(plan)} 段、字幕 {len(plan)} 段、花字 {n_st} 个", t0)
 
     dims, total = score(plan, lines, hits, skill)

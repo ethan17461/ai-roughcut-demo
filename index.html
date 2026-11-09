@@ -1066,47 +1066,47 @@ const R = {
     {
       "step": "写脚本",
       "msg": "脚本 Agent 出 3 版初稿，审核拦下 2 版，采用 A 版",
-      "ms": 0
+      "ms": 1
     },
     {
       "step": "读取 Skill",
       "msg": "冷知识路线类 v0.3：单镜头 ≤ 3.2 秒、字幕/花字样式、利益点和结尾钩子规则",
-      "ms": 0
+      "ms": 1
     },
     {
       "step": "读取素材库",
       "msg": "16 段实拍，已打标签（地点、场景、清晰度、风险）",
-      "ms": 120
+      "ms": 119
     },
     {
       "step": "生成配音",
       "msg": "5 句，共 18.4 秒（Daniel（英式男声））",
-      "ms": 2421
+      "ms": 2387
     },
     {
       "step": "按语义和气口分段",
       "msg": "5 段，总时长 19.57 秒",
-      "ms": 2421
+      "ms": 2387
     },
     {
       "step": "本地素材库召回",
       "msg": "每句按关键词召回 3 个候选；排除地点不符 2 个；8 个镜头",
-      "ms": 2421
+      "ms": 2387
     },
     {
       "step": "检索国家 / 平台规则",
       "msg": "英国 × TikTok，命中 6 条，通过 6 条",
-      "ms": 2421
+      "ms": 2388
     },
     {
       "step": "编排剪映轨道",
       "msg": "已生成剪映草稿「AI粗剪_伦敦苏格兰卧铺_v1」：画面 8 段、配音 5 段、字幕 5 段、花字 3 个",
-      "ms": 2479
+      "ms": 2445
     },
     {
       "step": "自动评分",
       "msg": "77 分 · 70–79：粗剪合格，交人工精修",
-      "ms": 2479
+      "ms": 2445
     }
   ],
   "draft": {
@@ -1476,7 +1476,7 @@ $('draftBtn').addEventListener('click',()=>{
    <tr><td>配音</td><td>${S.length} 段（${R.skill.voice.voice}）</td></tr>
    <tr><td>字幕</td><td>${S.length} 段，白字黑边，按 ${R.skill.subtitle.max_chars_per_line} 字符断行</td></tr>
    <tr><td>花字</td><td>${S.flatMap(s=>s.stickers).map(s=>s.kind+'「'+s.text.replace('\n',' ')+'」').join('；')}</td></tr></table>
-   <p>草稿文件：<a href="draft/draft_content.json" target="_blank" rel="noopener">draft_content.json</a>（素材路径指向本机，换电脑需重新关联素材）。</p>
+   <p>草稿文件：<a href="draft/draft_info.json" target="_blank" rel="noopener">draft_info.json</a>（素材路径指向本机，换电脑需重新关联素材）。</p>
    <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
   $('modal').hidden=false;$('closeM').focus();
 });

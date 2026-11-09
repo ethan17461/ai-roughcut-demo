@@ -41,7 +41,7 @@ python3 -m venv .venv
 python3 build_web.py                # 重新生成网页
 ```
 
-- 剪映草稿默认写到 `~/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1`，用到的视频和配音会复制进草稿的 `materials/` 文件夹。没装剪映时用 `--draft-root <任意文件夹>`。
+- 剪映草稿默认写到 `~/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1`，草稿文件名是 `draft_info.json`（剪映 6.0 以后和 Mac 版 11.x 只认这个名字，库默认写的 `draft_content.json` 会被当成损坏草稿，所以 `pipeline.py` 保存后会改名；明文写入，剪映第一次打开后会自己加密）。用到的视频和配音会复制进草稿的 `materials/` 文件夹。没装剪映时用 `--draft-root <任意文件夹>`。
 - 打开剪映专业版，在草稿列表里点开就能看到四条轨道：画面、配音、字幕、花字。
 - 网页里加 `#topic`、`#script`、`#done-<秒>` 可以直接打开选题卡、脚本审核或生成后的某一时刻（截图用）。
 

@@ -78,9 +78,9 @@
                 "duration": 3648000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "c53ff0033d034b6eb77bfc8aeb61d55d",
-                "local_material_id": "c53ff0033d034b6eb77bfc8aeb61d55d",
-                "music_id": "c53ff0033d034b6eb77bfc8aeb61d55d",
+                "id": "777d40d6c6cf481f8c2a2e1a81e2414c",
+                "local_material_id": "777d40d6c6cf481f8c2a2e1a81e2414c",
+                "music_id": "777d40d6c6cf481f8c2a2e1a81e2414c",
                 "name": "line1.wav",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line1.wav",
                 "source_platform": 0,
@@ -96,9 +96,9 @@
                 "duration": 2981000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "4ed5d0bd2c704aacb27de7565d794fb0",
-                "local_material_id": "4ed5d0bd2c704aacb27de7565d794fb0",
-                "music_id": "4ed5d0bd2c704aacb27de7565d794fb0",
+                "id": "eb047d20ed834bafa4d855092fba8299",
+                "local_material_id": "eb047d20ed834bafa4d855092fba8299",
+                "music_id": "eb047d20ed834bafa4d855092fba8299",
                 "name": "line2.wav",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line2.wav",
                 "source_platform": 0,
@@ -114,9 +114,9 @@
                 "duration": 3102000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "724c9cc7ec5e4f80a6d9d61dd04d0e30",
-                "local_material_id": "724c9cc7ec5e4f80a6d9d61dd04d0e30",
-                "music_id": "724c9cc7ec5e4f80a6d9d61dd04d0e30",
+                "id": "73c5425971aa42c6ba60406a3f7e159a",
+                "local_material_id": "73c5425971aa42c6ba60406a3f7e159a",
+                "music_id": "73c5425971aa42c6ba60406a3f7e159a",
                 "name": "line3.wav",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line3.wav",
                 "source_platform": 0,
@@ -132,9 +132,9 @@
                 "duration": 3590000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "052ee4fc3b074e4783ac339c795c694e",
-                "local_material_id": "052ee4fc3b074e4783ac339c795c694e",
-                "music_id": "052ee4fc3b074e4783ac339c795c694e",
+                "id": "a6978bd632ae4abba186b9c66695dc7a",
+                "local_material_id": "a6978bd632ae4abba186b9c66695dc7a",
+                "music_id": "a6978bd632ae4abba186b9c66695dc7a",
                 "name": "line4.wav",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line4.wav",
                 "source_platform": 0,
@@ -150,9 +150,9 @@
                 "duration": 5047000,
                 "effect_id": "",
                 "formula_id": "",
-                "id": "0cd90aa52e854331bcc94ab15495ae79",
-                "local_material_id": "0cd90aa52e854331bcc94ab15495ae79",
-                "music_id": "0cd90aa52e854331bcc94ab15495ae79",
+                "id": "7b75012e8f9544448ace945c1d801651",
+                "local_material_id": "7b75012e8f9544448ace945c1d801651",
+                "music_id": "7b75012e8f9544448ace945c1d801651",
                 "name": "line5.wav",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/line5.wav",
                 "source_platform": 0,
@@ -191,91 +191,91 @@
         "speeds": [
             {
                 "curve_speed": null,
-                "id": "8fc18bb61a404881b0cc950b2db5e2a0",
+                "id": "7552262e7a4f454ba5504d715f83beb2",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "145e7a2b0e0a475a98be90674d34b478",
+                "id": "77f0bf4a4252486b99d08ba9091c1e6b",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "eda0a823cbd64790b4a3325e1ed1fe65",
+                "id": "941012c494214cdb9093643aaccad55f",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "5eb5bf01e98f49d384058132d7345648",
+                "id": "2e44c3b36f8b462296150b8dcac0b3a5",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "af3cbfbc19024807846ee2c89289d7c5",
+                "id": "d420e963a5e14379b14fe316c848ddba",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "6e8b72bb85b5411ab20756c489146813",
+                "id": "febd9a2316d04d1a91738ae5dbd997c8",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "9585b8a85ef24778adf2971f69b70034",
+                "id": "94f5b8326ba84f09936f55697a046cdf",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "836996d903a04ff5bdb34c4e84ec763b",
+                "id": "53f79972ecfa452d97ac06f4badc065e",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "4b986f8454b7448aaf0aec9595371b69",
+                "id": "989e4c5d5e3e4179a5f66fe59d62b516",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "2acc9a91b36f433d982c924b8dd01f91",
+                "id": "0182827b92684b54a3cdd5d3c58cfbe7",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "f99d18942917476891c7f68b41f3ccac",
+                "id": "b906030e505d4cbab33327abe284e884",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "28e016605dc944a9b56f8813b29e2fdb",
+                "id": "af942ecdfe69409f9dad408d6d4d1c17",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
             },
             {
                 "curve_speed": null,
-                "id": "151202b6742b4a6394a3c638782cc7f2",
+                "id": "91c21db343924d7885bad931e2eff7c1",
                 "mode": 0,
                 "speed": 1.0,
                 "type": "speed"
@@ -286,7 +286,7 @@
         "text_templates": [],
         "texts": [
             {
-                "id": "b483c7b7a1ec47fe8b9967fed04338c7",
+                "id": "7dd1266a87e340c8aeb8c58359eaf245",
                 "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 70], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Most people don't know you can sleep your\\nway from London to Scotland.\"}",
                 "typesetting": 0,
                 "alignment": 1,
@@ -300,7 +300,7 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "6ede4abd7ca04a81af4b27797e406a46",
+                "id": "cf5f726b4f4547dd9aae9ce757454684",
                 "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1.0, 0.84, 0.18]}}}, \"range\": [0, 33], \"size\": 11.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.11000000000000001}]}], \"text\": \"LONDON → SCOTLAND\\nWHILE YOU SLEEP\"}",
                 "typesetting": 0,
                 "alignment": 1,
@@ -314,7 +314,7 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "d7e0c08e55c4406ca8ffc746a70b6a23",
+                "id": "fcc57bf15523431fabdbb337f9087991",
                 "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 58], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"The Highlander sleeper leaves London\\nEuston every evening.\"}",
                 "typesetting": 0,
                 "alignment": 1,
@@ -328,7 +328,7 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "d531a53985024a8b99cdbdbca4de76b2",
+                "id": "036b6f13ef2e46b08aa94267afd93d72",
                 "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 58], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"You fall asleep in the city and wake up\\nto Highland lochs.\"}",
                 "typesetting": 0,
                 "alignment": 1,
@@ -342,7 +342,7 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "e8e95bec9d17430ca99acbf42a0db142",
+                "id": "13b712edea554824ac1b672628adbad6",
                 "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 56], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Book the two legs separately and you can\\nsave up to 30%.\"}",
                 "typesetting": 0,
                 "alignment": 1,
@@ -356,7 +356,7 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "d223405aede349d6b51f9c5ac079062f",
+                "id": "f36a365c03d74c4695384cb44ee31071",
                 "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1.0, 0.84, 0.18]}}}, \"range\": [0, 14], \"size\": 11.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.11000000000000001}]}], \"text\": \"SAVE UP TO 30%\"}",
                 "typesetting": 0,
                 "alignment": 1,
@@ -370,7 +370,7 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "c4d84b1b91234f9387347e071fce28b8",
+                "id": "0bfb6af68acb41158c1c68711306626b",
                 "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1, 1, 1]}}}, \"range\": [0, 57], \"size\": 7.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.09000000000000001}]}], \"text\": \"Open the app, search code UK20, and get\\nan extra 20% off.\"}",
                 "typesetting": 0,
                 "alignment": 1,
@@ -384,7 +384,7 @@
                 "global_alpha": 1.0
             },
             {
-                "id": "84c4050aa4e2494ebe1e860a4b4e36d5",
+                "id": "fb67f42c46e84029b8cda10319d56a45",
                 "content": "{\"styles\": [{\"fill\": {\"alpha\": 1.0, \"content\": {\"render_type\": \"solid\", \"solid\": {\"alpha\": 1.0, \"color\": [1.0, 0.84, 0.18]}}}, \"range\": [0, 12], \"size\": 11.0, \"bold\": true, \"italic\": false, \"underline\": false, \"strokes\": [{\"content\": {\"solid\": {\"alpha\": 1.0, \"color\": [0.0, 0.0, 0.0]}}, \"width\": 0.11000000000000001}]}], \"text\": \"SEARCH: UK20\"}",
                 "typesetting": 0,
                 "alignment": 1,
@@ -422,9 +422,9 @@
                 "crop_scale": 1.0,
                 "duration": 11678000,
                 "height": 960,
-                "id": "c704618e5c174e5dadba2a4581ade5ce",
+                "id": "fe1622ae7bda4d8886eca8d40ed0d0cc",
                 "local_material_id": "",
-                "material_id": "c704618e5c174e5dadba2a4581ade5ce",
+                "material_id": "fe1622ae7bda4d8886eca8d40ed0d0cc",
                 "material_name": "m06.mp4",
                 "media_path": "",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m06.mp4",
@@ -450,9 +450,9 @@
                 "crop_scale": 1.0,
                 "duration": 3500000,
                 "height": 960,
-                "id": "95893ac33f6c401f902c84f18ee3a096",
+                "id": "97ca8fcb082946bdb295d33db017aae3",
                 "local_material_id": "",
-                "material_id": "95893ac33f6c401f902c84f18ee3a096",
+                "material_id": "97ca8fcb082946bdb295d33db017aae3",
                 "material_name": "m04.mp4",
                 "media_path": "",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m04.mp4",
@@ -478,9 +478,9 @@
                 "crop_scale": 1.0,
                 "duration": 12467000,
                 "height": 960,
-                "id": "150ebfc5b8e340ff94a5ab39cbb0ae74",
+                "id": "d14e3dfd84154f24828136e53fe6fe6f",
                 "local_material_id": "",
-                "material_id": "150ebfc5b8e340ff94a5ab39cbb0ae74",
+                "material_id": "d14e3dfd84154f24828136e53fe6fe6f",
                 "material_name": "m02.mp4",
                 "media_path": "",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m02.mp4",
@@ -506,9 +506,9 @@
                 "crop_scale": 1.0,
                 "duration": 8892000,
                 "height": 960,
-                "id": "0ca739f2d03f47669d8c5ce610813b27",
+                "id": "1f88ca6dc7a6438d8e92f866c0865dce",
                 "local_material_id": "",
-                "material_id": "0ca739f2d03f47669d8c5ce610813b27",
+                "material_id": "1f88ca6dc7a6438d8e92f866c0865dce",
                 "material_name": "m16.mp4",
                 "media_path": "",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m16.mp4",
@@ -534,9 +534,9 @@
                 "crop_scale": 1.0,
                 "duration": 18000000,
                 "height": 960,
-                "id": "a6cc44c8b92d4c259bb63036369bcc13",
+                "id": "a8aaa1db69d24afb865f0fb26d8e92ea",
                 "local_material_id": "",
-                "material_id": "a6cc44c8b92d4c259bb63036369bcc13",
+                "material_id": "a8aaa1db69d24afb865f0fb26d8e92ea",
                 "material_name": "m10.mp4",
                 "media_path": "",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m10.mp4",
@@ -562,9 +562,9 @@
                 "crop_scale": 1.0,
                 "duration": 10160000,
                 "height": 960,
-                "id": "589ba5cbb2cf4ce68e2e55080f003fdd",
+                "id": "413cb6cdce27455ea9a2792ab41a4821",
                 "local_material_id": "",
-                "material_id": "589ba5cbb2cf4ce68e2e55080f003fdd",
+                "material_id": "413cb6cdce27455ea9a2792ab41a4821",
                 "material_name": "m13.mp4",
                 "media_path": "",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m13.mp4",
@@ -590,9 +590,9 @@
                 "crop_scale": 1.0,
                 "duration": 30948000,
                 "height": 960,
-                "id": "7c699602a22f4c12b314f336eb101ef4",
+                "id": "981a42d05d8944799f6f7b6149420b6c",
                 "local_material_id": "",
-                "material_id": "7c699602a22f4c12b314f336eb101ef4",
+                "material_id": "981a42d05d8944799f6f7b6149420b6c",
                 "material_name": "m05.mp4",
                 "media_path": "",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m05.mp4",
@@ -618,9 +618,9 @@
                 "crop_scale": 1.0,
                 "duration": 5292000,
                 "height": 960,
-                "id": "e09cb4c8364649e58b3bc901697e331a",
+                "id": "527ac5a2fcbf40dfbb81cb128d7b4d5a",
                 "local_material_id": "",
-                "material_id": "e09cb4c8364649e58b3bc901697e331a",
+                "material_id": "527ac5a2fcbf40dfbb81cb128d7b4d5a",
                 "material_name": "m14.mp4",
                 "media_path": "",
                 "path": "/Users/ethan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft/AI粗剪_伦敦苏格兰卧铺_v1/materials/m14.mp4",
@@ -644,7 +644,7 @@
         {
             "attribute": 0,
             "flag": 0,
-            "id": "d76d42887eb444c9b83698aaed8be2d6",
+            "id": "84ed31cda32f4cfbb27c39a81fbee390",
             "is_default_name": false,
             "name": "画面",
             "segments": [
@@ -661,8 +661,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "7d0e4ed78e9e46dc90fb10cd49a3857f",
-                    "material_id": "c704618e5c174e5dadba2a4581ade5ce",
+                    "id": "efe4d5a185fa43ca952f293c810315ff",
+                    "material_id": "fe1622ae7bda4d8886eca8d40ed0d0cc",
                     "target_timerange": {
                         "start": 0,
                         "duration": 1900000
@@ -676,7 +676,7 @@
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "8fc18bb61a404881b0cc950b2db5e2a0"
+                        "7552262e7a4f454ba5504d715f83beb2"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -719,8 +719,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "0a7d542450714e7bb37bd60ac6b95c8b",
-                    "material_id": "95893ac33f6c401f902c84f18ee3a096",
+                    "id": "04b388e547464e29b501e273a60bb034",
+                    "material_id": "97ca8fcb082946bdb295d33db017aae3",
                     "target_timerange": {
                         "start": 1900000,
                         "duration": 1900000
@@ -734,7 +734,7 @@
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "145e7a2b0e0a475a98be90674d34b478"
+                        "77f0bf4a4252486b99d08ba9091c1e6b"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -777,8 +777,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "df1a10f49c1b421a8e64fe7548b17c0a",
-                    "material_id": "150ebfc5b8e340ff94a5ab39cbb0ae74",
+                    "id": "cdb2c22159b545b4a16de4fe9b157d44",
+                    "material_id": "d14e3dfd84154f24828136e53fe6fe6f",
                     "target_timerange": {
                         "start": 3800000,
                         "duration": 3130000
@@ -792,7 +792,7 @@
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "eda0a823cbd64790b4a3325e1ed1fe65"
+                        "941012c494214cdb9093643aaccad55f"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -835,8 +835,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "30fd0ebb397945409f4df655906be556",
-                    "material_id": "0ca739f2d03f47669d8c5ce610813b27",
+                    "id": "d23b6fbaec0a4d9084eee410e2ebd8fe",
+                    "material_id": "1f88ca6dc7a6438d8e92f866c0865dce",
                     "target_timerange": {
                         "start": 6930000,
                         "duration": 1625000
@@ -850,7 +850,7 @@
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "5eb5bf01e98f49d384058132d7345648"
+                        "2e44c3b36f8b462296150b8dcac0b3a5"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -893,8 +893,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "4c2b3e0d0ce0460d9d66a5c7d6587e79",
-                    "material_id": "a6cc44c8b92d4c259bb63036369bcc13",
+                    "id": "0a5a94955e6a4099925cff050d0b40f3",
+                    "material_id": "a8aaa1db69d24afb865f0fb26d8e92ea",
                     "target_timerange": {
                         "start": 8555000,
                         "duration": 1625000
@@ -908,7 +908,7 @@
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "af3cbfbc19024807846ee2c89289d7c5"
+                        "d420e963a5e14379b14fe316c848ddba"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -951,8 +951,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "0a9cb936ed614363b07e27897ef74e4e",
-                    "material_id": "589ba5cbb2cf4ce68e2e55080f003fdd",
+                    "id": "44f03d834a0c40de94a552de26b3e2c8",
+                    "material_id": "413cb6cdce27455ea9a2792ab41a4821",
                     "target_timerange": {
                         "start": 10180000,
                         "duration": 3740000
@@ -966,7 +966,7 @@
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "6e8b72bb85b5411ab20756c489146813"
+                        "febd9a2316d04d1a91738ae5dbd997c8"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1009,8 +1009,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "cd7b1898e64b44f894dd166621d3a171",
-                    "material_id": "7c699602a22f4c12b314f336eb101ef4",
+                    "id": "918750fb7bc842bd936ff3ab6735fb26",
+                    "material_id": "981a42d05d8944799f6f7b6149420b6c",
                     "target_timerange": {
                         "start": 13920000,
                         "duration": 2825000
@@ -1024,7 +1024,7 @@
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "9585b8a85ef24778adf2971f69b70034"
+                        "94f5b8326ba84f09936f55697a046cdf"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1067,8 +1067,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "25afe85d6bf444f2a9ebedd6fbbb08b8",
-                    "material_id": "e09cb4c8364649e58b3bc901697e331a",
+                    "id": "51e698da544041619961607a219772dd",
+                    "material_id": "527ac5a2fcbf40dfbb81cb128d7b4d5a",
                     "target_timerange": {
                         "start": 16745000,
                         "duration": 2825000
@@ -1082,7 +1082,7 @@
                     "speed": 1.0,
                     "volume": 0.0,
                     "extra_material_refs": [
-                        "836996d903a04ff5bdb34c4e84ec763b"
+                        "53f79972ecfa452d97ac06f4badc065e"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1118,7 +1118,7 @@
         {
             "attribute": 0,
             "flag": 0,
-            "id": "6b26fe3ca0c74395a75675cc1b2a41fd",
+            "id": "a87b17ef083d433cb61ec3ff450c278d",
             "is_default_name": false,
             "name": "配音",
             "segments": [
@@ -1135,8 +1135,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "417191f94bce48c2b812e66745676b16",
-                    "material_id": "c53ff0033d034b6eb77bfc8aeb61d55d",
+                    "id": "3e73607928a849829640bf2e148010f9",
+                    "material_id": "777d40d6c6cf481f8c2a2e1a81e2414c",
                     "target_timerange": {
                         "start": 0,
                         "duration": 3648000
@@ -1150,7 +1150,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "4b986f8454b7448aaf0aec9595371b69"
+                        "989e4c5d5e3e4179a5f66fe59d62b516"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1170,8 +1170,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "4ff8bad0dfd946ada0f0ddd34de1ce39",
-                    "material_id": "4ed5d0bd2c704aacb27de7565d794fb0",
+                    "id": "55a7e0517c994d21a36fdcf7fce6418d",
+                    "material_id": "eb047d20ed834bafa4d855092fba8299",
                     "target_timerange": {
                         "start": 3800000,
                         "duration": 2981000
@@ -1185,7 +1185,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "2acc9a91b36f433d982c924b8dd01f91"
+                        "0182827b92684b54a3cdd5d3c58cfbe7"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1205,8 +1205,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "93561a0f7e124588b7a0a22d94fd6838",
-                    "material_id": "724c9cc7ec5e4f80a6d9d61dd04d0e30",
+                    "id": "48e00d087f1d4c9d92f858449da2d034",
+                    "material_id": "73c5425971aa42c6ba60406a3f7e159a",
                     "target_timerange": {
                         "start": 6930000,
                         "duration": 3102000
@@ -1220,7 +1220,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "f99d18942917476891c7f68b41f3ccac"
+                        "b906030e505d4cbab33327abe284e884"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1240,8 +1240,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "7d55ac982cc74ead97a7f48e03b12236",
-                    "material_id": "052ee4fc3b074e4783ac339c795c694e",
+                    "id": "db2e3babc80c42f18fa759165065bc1e",
+                    "material_id": "a6978bd632ae4abba186b9c66695dc7a",
                     "target_timerange": {
                         "start": 10180000,
                         "duration": 3590000
@@ -1255,7 +1255,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "28e016605dc944a9b56f8813b29e2fdb"
+                        "af942ecdfe69409f9dad408d6d4d1c17"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1275,8 +1275,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "9a3df82e19fd4e7cad162285906651cd",
-                    "material_id": "0cd90aa52e854331bcc94ab15495ae79",
+                    "id": "9e6fce244a764a008405a693275719d7",
+                    "material_id": "7b75012e8f9544448ace945c1d801651",
                     "target_timerange": {
                         "start": 13920000,
                         "duration": 5047000
@@ -1290,7 +1290,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "151202b6742b4a6394a3c638782cc7f2"
+                        "91c21db343924d7885bad931e2eff7c1"
                     ],
                     "is_tone_modify": false,
                     "clip": null,
@@ -1303,7 +1303,7 @@
         {
             "attribute": 0,
             "flag": 0,
-            "id": "6e85c8c5b48a4425b96354b502f66e2b",
+            "id": "882062ae1f334c0994d0abe8037e3faa",
             "is_default_name": false,
             "name": "字幕",
             "segments": [
@@ -1320,8 +1320,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "86053670759c424face38d0c551042e2",
-                    "material_id": "b483c7b7a1ec47fe8b9967fed04338c7",
+                    "id": "cf25c7d05a5e4ee3bda8146a24a1fb1d",
+                    "material_id": "7dd1266a87e340c8aeb8c58359eaf245",
                     "target_timerange": {
                         "start": 0,
                         "duration": 3800000
@@ -1332,7 +1332,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "87a5011efbc94114b6885d2bc3dd1bc0"
+                        "ec87c84356df444b94dcbaabc4503879"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1370,8 +1370,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "b98003aa407242648cb73e11cf3ff4c5",
-                    "material_id": "d7e0c08e55c4406ca8ffc746a70b6a23",
+                    "id": "de292f6792de4e2b9f748a4258ad959c",
+                    "material_id": "fcc57bf15523431fabdbb337f9087991",
                     "target_timerange": {
                         "start": 3800000,
                         "duration": 3130000
@@ -1382,7 +1382,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "c13c86074dc14797a8e08d85f691c952"
+                        "9e94c765ca6b430aab3f44d812b77cfb"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1420,8 +1420,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "a6e1f7efa2c448b5b8660de301117f0b",
-                    "material_id": "d531a53985024a8b99cdbdbca4de76b2",
+                    "id": "15046480b8fb46089f6359af332b8a0a",
+                    "material_id": "036b6f13ef2e46b08aa94267afd93d72",
                     "target_timerange": {
                         "start": 6930000,
                         "duration": 3250000
@@ -1432,7 +1432,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "82fe5d62b41f47bb8479db6813de9edd"
+                        "e5ad2087b5a349a4b948f24db249baf0"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1470,8 +1470,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "5541804a355d46ed9880fe1371aee8f6",
-                    "material_id": "e8e95bec9d17430ca99acbf42a0db142",
+                    "id": "ac965db55ecf4880bbceca7f417406ab",
+                    "material_id": "13b712edea554824ac1b672628adbad6",
                     "target_timerange": {
                         "start": 10180000,
                         "duration": 3740000
@@ -1482,7 +1482,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "92142c878e734ccfb7254a8fc828e2c6"
+                        "ab13ed057e714241b11496f0997c38d3"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1520,8 +1520,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "b74a93b1ad2d443c8d3f82afdf5fe8b2",
-                    "material_id": "c4d84b1b91234f9387347e071fce28b8",
+                    "id": "b878d26341bf48278dcb9ba4533a6474",
+                    "material_id": "0bfb6af68acb41158c1c68711306626b",
                     "target_timerange": {
                         "start": 13920000,
                         "duration": 5650000
@@ -1532,7 +1532,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "ad6e4b67e2684281aa064d7f595ded0f"
+                        "8e637ba059c2463a85da1127d0034eb9"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1563,7 +1563,7 @@
         {
             "attribute": 0,
             "flag": 0,
-            "id": "4b78b489f5284e43ad0ea98de3f8f0ec",
+            "id": "7161337f964c42bf99133825bf7f7709",
             "is_default_name": false,
             "name": "花字",
             "segments": [
@@ -1580,8 +1580,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "eab78fad560c4dfa8cef63ae04ec2fc4",
-                    "material_id": "6ede4abd7ca04a81af4b27797e406a46",
+                    "id": "85fac84d50f8435c9229d603344b5598",
+                    "material_id": "cf5f726b4f4547dd9aae9ce757454684",
                     "target_timerange": {
                         "start": 0,
                         "duration": 2800000
@@ -1592,7 +1592,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "63c8e228ac7b4d0297908db9852d546f"
+                        "b10c9813cbb4494cbce6b5c0078be233"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1630,8 +1630,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "de24032b4a0b4babac9fcf41f431d269",
-                    "material_id": "d223405aede349d6b51f9c5ac079062f",
+                    "id": "5a31fdfbc5f64f7395dd2e94332b0a16",
+                    "material_id": "f36a365c03d74c4695384cb44ee31071",
                     "target_timerange": {
                         "start": 10480000,
                         "duration": 2600000
@@ -1642,7 +1642,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "61651e7e1ef6413fb561fb358280c23b"
+                        "b53dfac6381244659103aaecbe383463"
                     ],
                     "is_tone_modify": false,
                     "clip": {
@@ -1680,8 +1680,8 @@
                     "track_attribute": 0,
                     "track_render_index": 0,
                     "visible": true,
-                    "id": "00aa527e5d644e76aaa32191b5d7ed4f",
-                    "material_id": "84c4050aa4e2494ebe1e860a4b4e36d5",
+                    "id": "18d195cca4b4407ba7e3712a96385612",
+                    "material_id": "fb67f42c46e84029b8cda10319d56a45",
                     "target_timerange": {
                         "start": 14120000,
                         "duration": 5450000
@@ -1692,7 +1692,7 @@
                     "speed": 1.0,
                     "volume": 1.0,
                     "extra_material_refs": [
-                        "cfa05930a62240d7b58303021d829259"
+                        "55c7f8934d194fbd84e48ccaa2c02465"
                     ],
                     "is_tone_modify": false,
                     "clip": {

@@ -352,7 +352,7 @@ $('draftBtn').addEventListener('click',()=>{
    <tr><td>配音</td><td>${S.length} 段（${R.skill.voice.voice}）</td></tr>
    <tr><td>字幕</td><td>${S.length} 段，白字黑边，按 ${R.skill.subtitle.max_chars_per_line} 字符断行</td></tr>
    <tr><td>花字</td><td>${S.flatMap(s=>s.stickers).map(s=>s.kind+'「'+s.text.replace('\n',' ')+'」').join('；')}</td></tr></table>
-   <p>草稿文件：<a href="draft/draft_content.json" target="_blank" rel="noopener">draft_content.json</a>（素材路径指向本机，换电脑需重新关联素材）。</p>
+   <p>草稿文件：<a href="draft/draft_info.json" target="_blank" rel="noopener">draft_info.json</a>（素材路径指向本机，换电脑需重新关联素材）。</p>
    <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
   $('modal').hidden=false;$('closeM').focus();
 });
