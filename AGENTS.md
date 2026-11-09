@@ -8,7 +8,7 @@ AI 产品经理课程的模拟项目：给一家做出海火车票短视频引�
 
 这个仓库里是一条**真的能跑的流水线**，加两个网页：
 
-选题 → 写脚本（DeepSeek 写 3 版 + 规则审核）→ 读 Skill → 配音（MiniMax）→ 分段 → 素材召回 → 国家/平台规则检查 → 生成剪映草稿 → 自动评分 → 人工换镜头、写回剪映
+选题 → 写脚本（DeepSeek 写 3 版 + 规则审核）→ 读 Skill → 配音（MiniMax）→ 分段 → 素材召回 → 国家/平台规则检查 → 生成剪映草稿 → 草稿检查 → 人工换镜头、写回剪映
 
 - **本地工作台**（`studio.py`）：在浏览器里输入选题，现场跑完整流程，逐句检查画面、换镜头、写回剪映草稿。需要 API key，只在本机跑。
 - **在线展示页**（`index.html`，GitHub Pages）：回放某一次真实运行的结果，不调接口。
@@ -24,13 +24,16 @@ AI 产品经理课程的模拟项目：给一家做出海火车票短视频引�
 | 素材召回 | 按 DeepSeek 给的画面概念加权匹配标签，地点对不上的排除，地点对得上的加分；每个概念至少给一个候选 | 向量检索 |
 | 规则检查 | `data/rules.json` 里 6 条英国 × TikTok 规则 | 合规专员维护的规则库，RAG 检索 |
 | 剪映草稿 | 开源库 pyJianYingDraft 生成**真的剪映草稿**，剪映能直接打开 | 同左 |
-| 评分 | 100 分评分标准的自动可算部分；画面节奏等需人工复核 | 加多模态模型抽帧打分 |
+| 草稿检查 | 读取实际生成的剪映草稿，检查画面和配音文件是否存在、配音期间的画面和字幕轨道覆盖、镜头时长；不分析导出视频，也不提供质量总分 | 画面与脚本匹配、音量、字幕内容、画质、节奏、合规和导出视频需人工核验 |
+| 成片 AI 评测 | 用户在本地选择剪映导出的 MP4、MOV 或 M4V，最长 3 分钟、最大 100 MB；本机语音转写后，将抽样画面和转写文字发送 DeepSeek 评测 | 抽帧可能遗漏内容，转写不是音质分析，字幕、音量、节奏、事实和合规仍需人工核验；调用会产生 API 费用 |
 
 ## 文件
 
 - `pipeline.py`：流水线主程序（`--topic` 现场生成；不带参数跑存档示例；`--redraft` 按人工换过的镜头重写草稿）
 - `llm.py`：DeepSeek / MiniMax 接口（只用标准库）
 - `studio.py`：本地工作台服务器（http://localhost:8770）
+- `draft_review.py`：检查生成的剪映草稿及引用文件
+- `video_review.py`：对用户选择的导出视频抽帧、本地转写并调用 DeepSeek 评测
 - `build_web.py`：把最近一次运行整理成在线展示页（生成 `index.html`、`audio/`、`draft/`）
 - `data/`：`topics.json` 选题池、`script_prompt.md` 脚本提示词、`script_candidates.json` 存档的 3 版脚本、`facts.json` 事实库、`skill.json` 剪辑规则和配音音色、`rules.json` 国家/平台规则、`library.json` 素材标签、`script.json` 国家和平台
 - `web/template.html`：两个网页共用的模板（深色剪辑台风格，颜色都用 `:root` 里的 CSS 变量；`STUDIO` 为 true 时显示输入框和"写入剪映"）
@@ -42,9 +45,11 @@ AI 产品经理课程的模拟项目：给一家做出海火车票短视频引�
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-cp .env.example .env               # 填 DEEPSEEK_API_KEY、MINIMAX_API_KEY
+cp .env.example .env               # 填 DEEPSEEK_API_KEY、MINIMAX_API_KEY；成片评测使用 DEEPSEEK_API_KEY
 .venv/bin/python studio.py         # 打开 http://localhost:8770 ，输入选题点「生成粗剪」
 ```
+
+如果 8770 端口已被占用，用 `PORT=18770 .venv/bin/python studio.py` 启动，并打开 http://localhost:18770。成片评测先在剪映导出视频，再在本地工作台选择文件并点击评测；音频在本地转写，抽帧和转写文字发送到 DeepSeek，会产生费用。首次使用 faster-whisper small.en 需联网下载约 0.5 GB 英语识别模型。在线展示页是静态回放，不能提交视频评测。
 
 命令行也能跑：
 
@@ -66,9 +71,13 @@ python3 build_web.py               # 用最近一次运行重新生成在线展�
 - 不要引入前端框架或构建工具；网页保持单文件
 - 新增素材放进 `clips/` 并在 `data/library.json` 补标签和 `places`；只用可商用素材，网页底部注明出处
 - 脚本里的事实必须能在 `data/facts.json` 找到出处，找不到的写进 claims 交人工核对；不提第三方品牌
+- 成片出现人脸、任何国家国旗或竞品 Logo 任意一项，人工确认后直接判为不合格，不受总分影响。AI 只看抽帧，未发现不等于全片不存在，竞品身份及全片须人工核验。
 - API key 只放 `.env`，不要写进代码、网页或提交记录
-- 改完先跑一遍 studio，输入一个选题生成，再换一个镜头点「写入剪映」，确认视频、配音、评分、弹窗、剪映草稿都正常
+- 改完先跑一遍 studio，输入一个选题生成，再换一个镜头点「写入剪映」，确认视频、配音、草稿检查、弹窗、剪映草稿都正常
 
 ## 发布
+
+在线展示页是静态回放。旧运行数据可能没有新版草稿检查结果；需先重新运行流水线，再执行构建并发布页面。
+
 
 `python3 build_web.py` 后推送到 `main` 分支，GitHub Pages 约 1 分钟自动更新：https://ethan17461.github.io/ai-roughcut-demo/

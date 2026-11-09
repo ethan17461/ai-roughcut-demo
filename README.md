@@ -1,18 +1,28 @@
 # AI 粗剪工作台
 
-出海火车票短视频业务的 AI 粗剪流水线：输入选题 → DeepSeek 写脚本（3 版 + 规则审核）→ MiniMax 英文配音 → 从素材库配画面 → 国家/平台规则检查 → **生成真的剪映草稿** → 自动评分 → 人工换镜头、在剪映里精修。
+出海火车票短视频业务的 AI 粗剪流水线：输入选题 → DeepSeek 写脚本（3 版 + 规则审核）→ MiniMax 英文配音 → 从素材库配画面 → 国家/平台规则检查 → **生成真的剪映草稿** → 草稿检查 → 人工换镜头、在剪映里精修。
 
 在线查看一次真实运行的回放：https://ethan17461.github.io/ai-roughcut-demo/
 
-本地工作台（能输入选题现场生成）：`.venv/bin/python studio.py`，打开 http://localhost:8770 。需要在 `.env` 里填 DeepSeek 和 MiniMax 的 key。
+右侧有两种检查：草稿检查读取实际生成的剪映草稿和引用文件；成片 AI 评测则需要先在剪映导出视频，在本地工作台选择导出的文件并点击评测。选择的文件独立于当前草稿，请确认是要评测的视频。
+
+成片评测支持 MP4、MOV、M4V，最长 3 分钟、最大 100 MB。程序在本机把配音转写成文字，再把抽样画面和转写文字发送给 DeepSeek；原始音频不会发送。DeepSeek 调用会产生 API 费用。本地语音识别默认使用 faster-whisper 的英语 small.en 模型，首次使用需联网下载约 0.5 GB 的模型文件，可能耗时。结果依据抽样画面和转写文字，并非完整观看视频或听取音质；遗漏画面、字幕准确性、音质、事实与合规仍需人工核验。
+
+成片使用七个维度共 100 分：开头吸引力 20、内容价值与故事 20、画面与内容匹配 15、剪辑节奏与完整度 15、配音与声音 10、字幕与手机观看体验 10、行动引导与分享意愿 10。AI 只对有抽样依据的部分小项初评；在“人工核验与补分”中补全其余小项后才显示完整总分。事实、素材使用权、人脸与品牌需要单独核验；分数不能预测爆款。
+
+独立否决规则：确认视频中出现人脸、国旗或竞品 Logo 任意一项，直接判为不合格，分数不能覆盖。AI 只检查抽样画面，能提示疑似风险但无法保证整条视频没有；必须由人观看完整视频并核验，尤其是确认品牌是否为竞品。
+
+在线展示页是某次运行的静态回放，更新代码后需要重新生成并发布页面才能看到新检查结果；旧展示数据可能没有新格式的检查结果。
+
+本地工作台（能输入选题现场生成）：先安装 `requirements.txt` 中的依赖，在 `.env` 里填 DeepSeek 和 MiniMax 的 key；成片评测需要 `DEEPSEEK_API_KEY`。运行 `.venv/bin/python studio.py`，打开 http://localhost:8770 。如果端口被占用，可运行 `PORT=18770 .venv/bin/python studio.py`，改为打开 http://localhost:18770 。不要把密钥发给他人或提交到仓库。
 
 素材来自 Pexels（免费可商用，共 53 段）；选题池的历史数据为示例数据；剪映草稿由开源库 [pyJianYingDraft](https://github.com/GuanYixuan/pyJianYingDraft) 生成。
 
 ## 在自己电脑上继续改
 
 ```bash
-git clone https://github.com/ethan17461/ai-roughcut-demo.git
+git clone https://github.com/yubb6688-alt/ai-roughcut-demo.git
 cd ai-roughcut-demo
 ```
 
-怎么跑、哪些是真的哪些是简化的，都写在 `AGENTS.md`，用 Codex 编辑时它会先读这份说明。要把修改推回这个仓库，需要仓库主人在 Settings → Collaborators 里把你加为协作者。
+怎么跑、哪些是真的哪些是简化的，都写在 `AGENTS.md`。原始项目来自 `ethan17461/ai-roughcut-demo`；这个小组仓库保留原项目历史。

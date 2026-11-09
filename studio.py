@@ -8,6 +8,7 @@ import mimetypes
 import os
 import subprocess
 import sys
+import tempfile
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote, urlparse
@@ -103,6 +104,39 @@ class H(BaseHTTPRequestHandler):
 
     def do_POST(self):
         path = urlparse(self.path).path
+        if path == "/api/video-review":
+            # 只接受工作台自己发起的请求，避免其他网站借本机账号触发付费请求。
+            if self.headers.get("Origin") not in (f"http://127.0.0.1:{PORT}", f"http://localhost:{PORT}"):
+                return self._send(403, {"error": "请从本地工作台发起评测。"})
+            if self.headers.get("Content-Type", "").split(";")[0] != "application/octet-stream":
+                return self._send(415, {"error": "视频上传格式不正确。"})
+            try:
+                size = int(self.headers.get("Content-Length", "0"))
+            except ValueError:
+                return self._send(400, {"error": "视频大小无效。"})
+            if size <= 0 or size > 100 * 1024 * 1024:
+                return self._send(400, {"error": "请选择不超过 100 MB 的视频。"})
+            env = llm.load_env()
+            if not env.get("DEEPSEEK_API_KEY"):
+                return self._send(400, {"error": "请先在 .env 中填写 DEEPSEEK_API_KEY。"})
+            try:
+                from video_review import review_video
+                with tempfile.TemporaryDirectory(prefix="roughcut-review-") as tmp:
+                    video_path = os.path.join(tmp, "video")
+                    with open(video_path, "wb") as f:
+                        remaining = size
+                        while remaining:
+                            chunk = self.rfile.read(min(1024 * 1024, remaining))
+                            if not chunk:
+                                raise ValueError("视频上传未完成。")
+                            f.write(chunk)
+                            remaining -= len(chunk)
+                    review = review_video(video_path, env["DEEPSEEK_API_KEY"], env.get("DEEPSEEK_VIDEO_MODEL") or "deepseek-flash")
+                return self._send(200, {"review": review})
+            except (ValueError, RuntimeError) as e:
+                return self._send(400, {"error": str(e)})
+            except Exception:
+                return self._send(500, {"error": "评测失败，请检查依赖和服务配置后重试。"})
         if path == "/api/run":
             body = self._json()
             topic = (body.get("topic") or "").strip()[:80]

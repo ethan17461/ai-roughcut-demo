@@ -19,6 +19,7 @@ import time
 import pyJianYingDraft as jy
 
 import llm
+from draft_review import review_draft
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(ROOT, "data")
@@ -237,50 +238,6 @@ def check_rules(plan, skill):
     }
 
 
-def score(plan, hits, skill):
-    shots = [s for seg in plan for s in seg["shots"]]
-    covs = [s["coverage"] for s in shots]
-    avg_cov = sum(covs) / len(covs)
-    wrong = [s for s in shots if s.get("excluded")]
-    sem = 0 if wrong else 30 * avg_cov
-    short = [s for s in shots if s["dur"] < 1.0]
-    align = max(0, 10 - 3 * len(short))
-    opening = 15
-    if not hits["R1"]["ok"]:
-        opening -= 8
-    if plan[0]["dur"] > 3.5:
-        opening -= 2
-    rule_checks = [
-        all(seg["subtitle"] for seg in plan),
-        any(st["kind"] == "开头花字" for seg in plan for st in seg["stickers"]),
-        any(st["kind"] == "利益点贴纸" for seg in plan for st in seg["stickers"]),
-        any(st["kind"] == "结尾钩子" and st["dur"] >= skill["cta_min_s"] for seg in plan for st in seg["stickers"]),
-        all(s["dur"] <= skill["max_shot_s"] + 0.05 for s in shots),
-    ]
-    rule_score = 3 * sum(rule_checks)
-    q = sum(s["quality"] for s in shots) / len(shots)
-    quality = 10 * q / 5
-    comp = 15
-    if not hits["R2"]["ok"]:
-        comp -= 8
-    if not hits["R3"]["ok"]:
-        comp -= 3
-    if not hits["R4"]["ok"]:
-        comp -= 5
-    dims = [
-        {"n": "脚本和画面语义匹配", "max": 30, "v": round(sem, 1),
-         "why": "有镜头地点和脚本不符，本项记 0 分" if wrong else f"{len(shots)} 个镜头平均覆盖所在句子 {avg_cov:.0%} 的关键词"},
-        {"n": "配音和画面对齐", "max": 15, "v": align, "why": "切点都对齐句子边界" + (f"，{len(short)} 个镜头短于 1 秒" if short else "") + "；句内画面节奏需人工复核，自动最多给 10 分"},
-        {"n": "结构和开头", "max": 15, "v": opening, "why": f"开头 {plan[0]['dur']:.1f} 秒" + ("，建议压到 3.5 秒内" if plan[0]["dur"] > 3.5 else "") + ("；利益点出现在前 3 秒" if not hits["R1"]["ok"] else "；利益点在后半段")},
-        {"n": "剪辑规则还原", "max": 15, "v": rule_score, "why": f"Skill 规则命中 {sum(rule_checks)}/5" + ("" if rule_checks[4] else f"；有镜头超过 {skill['max_shot_s']} 秒（素材缺口）")},
-        {"n": "画面质量", "max": 10, "v": round(quality, 1), "why": f"所用镜头平均清晰度 {q:.1f} / 5（540p 竖屏素材）"},
-        {"n": "合规", "max": 15, "v": comp, "why": "；".join(h["msg"] for k, h in hits.items() if k in ("R2", "R3", "R4"))},
-    ]
-    total = int(sum(d["v"] for d in dims) + 0.5)  # 四舍五入，和网页 Math.round 一致（Python 的 round 是银行家舍入）
-    band = "低于 70：退回重做" if total < 70 else "70–79：粗剪合格，交人工精修" if total < 80 else "80–89：精修后可发布" if total < 90 else "90+：有爆款潜力"
-    return dims, total, band
-
-
 # ---------------- 剪映草稿 ----------------
 def write_draft(plan, skill, clips, draft_root, draft_name):
     folder = jy.DraftFolder(draft_root)
@@ -372,16 +329,15 @@ def redraft(swaps_path, draft_root):
     hits = check_rules(result["segments"], skill)
     for r in result["rules"]:
         r.update(hits[r["id"]])
-    dims, total, band = score(result["segments"], hits, skill)
-    result["score"] = {"dims": dims, "total": total, "band": band}
     result["run_id"] = time.strftime("%Y%m%d%H%M%S")
     # 写回原来那个草稿所在的文件夹（同名覆盖），不另开新草稿
     draft_root = os.path.dirname(result["draft"]["path"]) or draft_root
     draft_dir, n_shots, n_st = write_draft(result["segments"], skill, lib["clips"], draft_root, result["draft"]["name"])
-    result["log"].append({"step": "人工换镜头", "msg": f"换了 {n} 个镜头，重新写入剪映草稿「{result['draft']['name']}」，重新评分 {total} 分",
+    result["score"] = review_draft(draft_dir, skill)
+    result["log"].append({"step": "人工换镜头", "msg": f"换了 {n} 个镜头，重新写入剪映草稿「{result['draft']['name']}」，已重新检查草稿",
                           "ms": result["log"][-1]["ms"] + int((time.time() - t0) * 1000)})
     save_result(result)
-    print(f"redraft: {n} swaps, score {total}")
+    print(f"redraft: {n} swaps, draft checked")
 
 
 # ---------------- 主流程 ----------------
@@ -548,15 +504,15 @@ def main():
     draft_dir, n_shots, n_st = write_draft(plan, skill, clips, args.draft_root, draft_name)
     log("编排剪映轨道", f"已生成剪映草稿「{draft_name}」：画面 {n_shots} 段、配音 {len(plan)} 段、字幕 {len(plan)} 段、花字 {n_st} 个", t0)
 
-    dims, total, band = score(plan, hits, skill)
-    log("自动评分", f"{total} 分 · {band}", t0)
+    review = review_draft(draft_dir, skill)
+    log("草稿检查", f"完成 {len(review['checks'])} 项检查；画面内容等仍需人工核验", t0)
 
     result = {"mode": "live" if args.topic else "demo", "run_id": time.strftime("%Y%m%d%H%M%S"),
               "topic": topic_out,
               "scripts": {"generated_by": generated_by, "variants": variants, "chosen": chosen["id"], "rejected": rejected, "facts": facts["facts"]},
               "title": script["title"] if args.topic else script["title"], "country": script["country"], "platform": script["platform"],
               "skill": {**skill, "voice": {**voice, "used": voice_name, "engine": engine}}, "total_s": total_s, "segments": plan,
-              "rules": rule_out, "score": {"dims": dims, "total": total, "band": band},
+              "rules": rule_out, "score": review,
               "log": log_lines, "draft": {"name": draft_name, "path": draft_dir, "shots": n_shots, "stickers": n_st},
               "usage": usage_info, "clips": clip_meta(clips, durations)}
     save_result(result)

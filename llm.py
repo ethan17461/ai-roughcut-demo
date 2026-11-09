@@ -17,7 +17,7 @@ def load_env():
             if line and not line.startswith("#") and "=" in line:
                 k, v = line.split("=", 1)
                 env[k.strip()] = v.strip()
-    for k in ("DEEPSEEK_API_KEY", "MINIMAX_API_KEY", "MINIMAX_BASE_URL", "MINIMAX_GROUP_ID"):
+    for k in ("DEEPSEEK_API_KEY", "DEEPSEEK_VIDEO_MODEL", "MINIMAX_API_KEY", "MINIMAX_BASE_URL", "MINIMAX_GROUP_ID", "OPENAI_API_KEY", "OPENAI_VIDEO_MODEL"):
         if os.environ.get(k):
             env[k] = os.environ[k]
     return env
