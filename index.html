@@ -9,15 +9,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
-/* Layout: editing workbench — settings + pipeline left, 9:16 monitor center, score + clip inspector right, multi-track timeline across the bottom. Deliberately dark-only, like the editors it mimics. */
+/* Single-file editing workbench: script navigation, preview, contextual inspection and a persistent timeline. */
 :root{
-  --bg:#10131a; --panel:#171b24; --panel-2:#1e2330; --line:#2a3142; --fg:#e8eaf0; --muted:#949bad; --dim:#6b7285;
+  --bg:#10131a; --panel:#171b24; --panel-2:#1e2330; --line:#2a3142; --fg:#e8eaf0; --muted:#a6adbc; --dim:#8a93a6;
   --accent:#f3c04d; --accent-ink:#1b1505;
   --trk-v:#3ea8a1; --trk-a:#8a7df3; --trk-t:#c7b78c; --trk-s:#e97c62;
   --good:#5cc78f; --warn:#f0a03c; --bad:#ef5f5f;
   --font-ui:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
   --font-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-  --r:8px;
+  --r:8px; --preview-bg:#0c0f15;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -25,24 +25,24 @@
 html,body{margin:0}
 img,video{max-width:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-ui);font-size:14px;line-height:1.5;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px}
 button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
-.wrap{max-width:1360px;margin:0 auto;display:grid;gap:12px}
+.wrap{height:calc(100dvh - 24px);min-height:650px;margin:0 auto;display:grid;grid-template-rows:48px minmax(0,1fr) 240px 20px;gap:12px}
 
 .top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
 .top h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.02em}
 .tag-demo{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:500;vertical-align:middle}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
-.btn{border:1px solid var(--line);background:var(--panel-2);padding:7px 14px;border-radius:var(--r);font-size:13px}
+.btn{min-height:40px;border:1px solid var(--line);background:var(--panel-2);padding:7px 14px;border-radius:var(--r);font-size:13px}
 .btn:hover{border-color:var(--dim)}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
 
-.grid{display:grid;grid-template-columns:270px minmax(0,1fr) 340px;gap:12px;align-items:start}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0}
-.panel h2{margin:0 0 10px;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.08em}
+.grid{display:grid;grid-template-columns:240px minmax(0,1fr) 320px;gap:12px;min-height:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0;min-height:0}
+.panel h2{margin:0 0 12px;font-size:15px;font-weight:500;color:var(--fg)}
 .field{display:grid;gap:4px;margin-bottom:10px}
 .field label{font-size:12px;color:var(--muted)}
 select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:7px 8px;font:inherit;font-size:13px}
@@ -57,8 +57,9 @@ select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var
 .steps .v{color:var(--muted);font-size:12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.monitor{display:grid;justify-items:center;gap:10px}
-.screen{position:relative;width:min(100%,270px);aspect-ratio:9/16;max-width:100%;border-radius:10px;overflow:hidden;background:#05070a;border:1px solid var(--line)}
+.monitor{display:grid;grid-template-rows:24px minmax(0,1fr) 44px;gap:12px;background:var(--preview-bg)}
+.preview-stage{display:flex;align-items:center;justify-content:center;min-height:0;container-type:size}
+.screen{position:relative;width:min(100cqw,calc(100cqh * 9 / 16));height:auto;aspect-ratio:9/16;max-width:100%;border-radius:10px;overflow:hidden;background:#05070a;border:1px solid var(--line)}
 .screen video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .15s}
 .screen video.on{opacity:1}
 .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;color:var(--muted);font-size:13px}
@@ -69,11 +70,10 @@ select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var
 .sub{position:absolute;left:10px;right:10px;bottom:11%;text-align:center}
 .sub .en{font-size:13px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,0 0 6px #000;line-height:1.35}
 .sub .zh{font-size:11px;color:#eee;text-shadow:0 0 3px #000,0 0 3px #000;margin-top:2px}
-.transport{display:flex;align-items:center;gap:10px}
-.play{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--panel-2);display:grid;place-items:center}
+.transport{display:flex;align-items:center;justify-content:center;gap:12px}
+.play{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--panel-2);display:grid;place-items:center}
 .play svg{width:14px;height:14px;fill:var(--fg)}
 .tc{color:var(--muted);font-size:13px}
-.note{font-size:11.5px;color:var(--dim);text-align:center;max-width:300px}
 
 .empty{color:var(--muted);font-size:13px;padding:8px 0}
 .score-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -89,13 +89,12 @@ select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var
 .bar i{display:block;height:100%;background:var(--good);transition:width .3s}
 .bar i.w{background:var(--warn)} .bar i.b{background:var(--bad)}
 .dim .why{font-size:11.5px;color:var(--muted)}
-.sep{border:0;border-top:1px solid var(--line);margin:14px 0}
 .seg-title{font-size:13px;font-weight:500}
 .seg-zh{font-size:12px;color:var(--muted);margin-bottom:6px}
 .lockbtn{font-size:12px;padding:3px 10px;white-space:nowrap}
 .cands{display:grid;gap:8px;margin-top:8px}
 .cand{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2)}
-.cand.sel{border-color:var(--trk-v)}
+.cand.sel{border-color:var(--accent)}
 .thumb{width:44px;aspect-ratio:9/16;border-radius:4px;object-fit:cover;background:#000}
 .cand .nm{font-size:12.5px;font-weight:500}
 .cand .meta{font-size:11px;color:var(--muted)}
@@ -113,10 +112,10 @@ select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
 .tl-scroll{overflow-x:auto}
-.tl{position:relative;min-width:760px;padding:6px 14px 12px}
-.tl-row{display:grid;grid-template-columns:72px 1fr;align-items:center;min-height:44px}
+.tl{position:relative;min-width:600px;padding:6px 14px 12px}
+.tl-row{display:grid;grid-template-columns:72px 1fr;align-items:center;min-height:36px}
 .tl-row .nm{font-size:12px;color:var(--muted)}
-.lane{position:relative;height:36px;border-radius:4px;background:rgba(255,255,255,.025)}
+.lane{position:relative;height:32px;border-radius:4px;background:rgba(255,255,255,.025)}
 .ruler{height:22px;background:none;cursor:pointer}
 .ruler span{position:absolute;top:2px;font-size:10.5px;color:var(--dim);transform:translateX(-50%)}
 .clip{position:absolute;top:2px;bottom:2px;border-radius:5px;padding:3px 7px;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;border:1px solid rgba(0,0,0,.35);text-align:left;line-height:1.35}
@@ -130,7 +129,7 @@ select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var
 .playhead{position:absolute;top:6px;bottom:8px;width:2px;background:var(--accent);pointer-events:none;z-index:3}
 .tl-empty{padding:18px 14px;color:var(--muted);font-size:13px}
 
-.credit{font-size:11.5px;color:var(--dim)}
+.credit{font-size:11px;color:var(--dim);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .credit a{color:var(--muted)}
 
 .modal{position:fixed;inset:0;background:rgba(5,7,10,.7);display:grid;place-items:center;padding:16px;z-index:20}
@@ -141,8 +140,76 @@ select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
 .copied{color:var(--good);font-size:12px}
 
-@media (max-width:1100px){.grid{grid-template-columns:260px minmax(0,1fr)} .inspector{grid-column:1 / -1}}
-@media (max-width:720px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Workspace panels scroll independently so the timeline remains in view. */
+.sidebar{overflow:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.inspector{display:flex;flex-direction:column;overflow:hidden}.inspector>h2,.inspector>#scoreBox,.inspector>.tabs{flex-shrink:0}.inspector>.score-details{flex-shrink:0;max-height:180px;overflow:auto}.inspector>.tab-panel{min-height:0;overflow:auto;scrollbar-width:thin}
+.top-title,.section-head,.tl-tools{display:flex;align-items:center;gap:10px;min-width:0}
+.project-name{font-size:13px;color:var(--muted);border-left:1px solid var(--line);padding-left:16px;margin-left:6px}
+.section-head{justify-content:space-between}.section-head h2{margin:0}
+.badge{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:2px 7px}
+summary{cursor:pointer;color:var(--muted);font-size:13px;padding:8px 0}
+.settings-summary{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.settings-summary .text-btn{flex-shrink:0;white-space:nowrap}
+.settings-summary p{margin:8px 0;color:var(--muted);font-size:12px}
+.text-btn{border:0;background:none;color:var(--accent);padding:4px 0;cursor:pointer;font-size:12px}
+#gen{width:100%;margin-top:4px}select{min-height:40px}
+.script-section{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
+.script-list{display:grid;gap:6px;margin-top:12px}
+.script-item{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:8px;align-items:start;text-align:left;padding:10px 8px;border:1px solid transparent;border-radius:7px;background:transparent;min-height:58px}
+.script-item:hover{background:var(--panel-2)}
+.script-item.active{background:var(--panel-2);border-color:var(--accent)}
+.script-item .num{color:var(--muted);font-size:12px;padding-top:2px}
+.script-item strong{display:block;font-size:13px;font-weight:500}.script-item small{display:block;font-size:12px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:122px}
+.script-item .duration{font-size:11px;color:var(--muted)}
+.flag-icon{color:var(--warn)}
+.score-head{gap:8px}.score-num{font-size:36px}.score-total{font-size:13px;color:var(--muted)}
+.score-caption{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:12px;color:var(--muted)}
+.tabs{display:flex;border-bottom:1px solid var(--line);margin:16px -16px 0;padding:0 12px;gap:4px}
+.tab{flex:1;background:none;border:0;border-bottom:2px solid transparent;padding:12px 4px;color:var(--muted);font-size:13px}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-panel{padding-top:16px}.tab-panel:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.issue{padding:12px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:var(--panel-2)}
+.issue strong{font-size:13px;font-weight:500}.issue p{margin:6px 0 8px;font-size:12px;color:var(--muted);line-height:1.6}
+.issue button{border:0;background:none;padding:4px 0;color:var(--accent);font-size:12px}
+.inspector .empty{line-height:1.8}.seg-zh{margin-top:8px;line-height:1.7}
+.cand .meta{font-size:12px}.cand button{min-height:32px}.cand button:disabled{opacity:.4;cursor:not-allowed}
+.lockbtn{min-height:36px}.inline-hint{color:var(--muted);font-size:12px;line-height:1.6;margin:8px 0}
+.tl-panel{display:grid;grid-template-rows:48px 1fr}.tl-bar{padding:8px 14px;gap:8px}.tl-bar h2{font-size:14px}.tl-tools{font-size:12px;color:var(--muted)}.tl-tools .btn{font-size:12px;min-height:32px;padding:4px 10px}
+.tl-row:first-child{min-height:24px}.tl-scroll{min-width:0;overflow:auto}.clip.v{padding:2px 7px;line-height:1.1;background:color-mix(in srgb,var(--trk-v) 25%,var(--panel));color:var(--fg);border-color:var(--trk-v)}
+.clip.v.flag{background:color-mix(in srgb,var(--warn) 15%,var(--panel));color:var(--fg);border-color:var(--warn)}
+.clip.t,.clip.s{background:color-mix(in srgb,var(--trk-t) 18%,var(--panel));color:var(--fg);border-color:var(--trk-t)}
+.clip.s{background:color-mix(in srgb,var(--trk-s) 18%,var(--panel));border-color:var(--trk-s)}
+#settingsToggle{display:none}body.drawer-open .drawer-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
+.drawer-backdrop{display:none}.drawer-close{display:none}
+.score-details{margin-top:8px}.score-details .dims{padding-bottom:12px}
+button:disabled{cursor:not-allowed;opacity:.45}
+@media (max-width:1199px) and (min-width:761px){
+ .grid{grid-template-columns:minmax(0,1fr) 320px}#settingsToggle{display:block}
+ .sidebar{display:none}body.drawer-open .sidebar{display:block;position:fixed;top:12px;bottom:12px;left:12px;width:280px;z-index:10;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+ .drawer-close{display:block}.project-name{display:none}
+}
+@media (max-width:760px){
+ body{padding:12px}.wrap{height:auto;min-height:0;grid-template-rows:auto auto auto auto;gap:12px}
+ .top{align-items:flex-start}.top h1{font-size:18px}.project-name{display:none}
+ .grid{grid-template-columns:minmax(0,1fr)}.sidebar{max-height:360px}.monitor{height:560px;grid-row:2}
+ .inspector{height:560px;max-height:560px}.tl-panel{min-height:260px;grid-template-rows:auto 1fr}.tl-bar{align-items:flex-start}.tl-tools{flex-wrap:wrap}
+ .legend{display:none}.credit{white-space:normal}.script-item small{max-width:200px}
+ .btn,.tab,.cand button,.text-btn,.issue button{min-height:44px}.screen{max-width:100%}
+}
+
+/* The generation view stays open after completion; its log is a snapshot of this run. */
+.monitor-head{width:100%;gap:8px}.view-switch{display:flex;gap:6px;min-width:0}.view-switch button{border:0;border-radius:6px;background:none;color:var(--muted);padding:5px 9px;font-size:13px;white-space:nowrap}.view-switch button[aria-pressed="true"]{background:var(--panel-2);color:var(--accent)}
+.monitor.flow-mode{grid-template-rows:28px minmax(0,1fr)}.monitor.flow-mode>.preview-stage,.monitor.flow-mode>.transport{display:none}
+.flow-view{display:flex;flex-direction:column;gap:12px;min-height:0}.flow-heading{display:flex;align-items:start;justify-content:space-between;gap:12px;padding-top:4px}.flow-heading strong{font-size:18px;font-weight:500}.flow-heading p{font-size:12px;color:var(--muted);margin:5px 0 0}.flow-heading>.mono{color:var(--accent);font-size:14px;white-space:nowrap}
+#flowProgress{appearance:none;width:100%;height:4px;border:0;border-radius:4px;overflow:hidden;background:var(--panel-2);flex-shrink:0}#flowProgress::-webkit-progress-bar{background:var(--panel-2)}#flowProgress::-webkit-progress-value{background:var(--accent)}#flowProgress::-moz-progress-bar{background:var(--accent)}
+.flow-main{display:grid;grid-template-columns:165px minmax(0,1fr);gap:16px;min-height:0;flex:1}.flow-main .steps{display:flex;flex-direction:column;gap:4px;margin:0;overflow:auto;scrollbar-width:thin}.flow-main .steps li{display:grid;grid-template-columns:20px minmax(0,1fr);border:1px solid transparent;border-radius:7px;padding:4px 7px;gap:7px;font-size:12px;line-height:1.3;min-height:40px;flex-shrink:0}.flow-main .steps li.run{border-color:color-mix(in srgb,var(--accent) 45%,transparent);background:color-mix(in srgb,var(--accent) 8%,var(--panel))}.flow-main .steps .dot{width:18px;height:18px;display:grid;place-items:center;font:10px var(--font-mono);border-width:1px;margin-top:0;flex-shrink:0}.flow-main .steps li.done .dot{color:var(--accent-ink)}.flow-main .steps li.run .dot{animation:none;border-color:var(--accent);color:var(--accent)}.flow-main .steps .v{font-size:11px}
+.flow-feed{overflow:auto;min-width:0;scrollbar-width:thin;padding-right:5px;overscroll-behavior:contain}.flow-entry{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:12px;margin-bottom:10px}.flow-entry.running{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}.flow-entry h3{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px;font-size:13px;font-weight:500}.flow-entry h3 span{font-size:11px;color:var(--accent);white-space:nowrap}.flow-output{display:flex;align-items:start;gap:8px;color:var(--muted);font-size:12px;line-height:1.7;margin:6px 0;animation:stream-in .22s ease-out}.flow-output::before{content:'›';color:var(--accent)}.flow-entry.running h3 span::after{content:' ···';animation:stream-pulse 1.2s ease-in-out infinite}.flow-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:10px;font-size:12px;color:var(--muted);flex-shrink:0}.flow-footer .btn{white-space:nowrap}.flow-footer span{min-width:0}
+@keyframes stream-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}@keyframes stream-pulse{50%{opacity:.35}}
+@media (min-width:1200px) and (max-height:820px){.flow-main .steps li{min-height:39px;padding:5px 7px}.flow-heading strong{font-size:16px}.flow-view{gap:8px}}
+@media (min-width:761px) and (max-width:1000px){.flow-main{grid-template-columns:1fr;grid-template-rows:48px minmax(0,1fr);gap:8px}.flow-main .steps{flex-direction:row;overflow-x:auto}.flow-main .steps li{flex:0 0 130px;min-height:40px;padding:5px}.monitor-head .badge{display:none}}
+@media (max-width:760px){.flow-main{grid-template-columns:1fr;grid-template-rows:52px minmax(0,1fr);gap:8px}.flow-main .steps{flex-direction:row;overflow-x:auto}.flow-main .steps li{flex:0 0 135px;min-height:44px;padding:6px}.flow-heading strong{font-size:16px}.monitor.flow-mode{height:600px}.view-switch button{min-height:36px}.monitor-head .badge{font-size:10px}.flow-footer{flex-wrap:wrap}}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -150,56 +217,71 @@ select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var
 
 <div class="wrap">
   <header class="top">
-    <h1>AI 粗剪工作台 <span class="tag-demo">Demo</span></h1>
+    <div class="top-title"><h1>AI 粗剪工作台 <span class="tag-demo">演示版</span></h1><span class="project-name">伦敦—苏格兰短视频</span></div>
     <div class="actions">
-      <button class="btn" id="regen" disabled>换一批未锁定镜头</button>
-      <button class="btn primary" id="export" disabled>导出剪映草稿</button>
+      <button class="btn" id="settingsToggle" aria-expanded="false" aria-controls="sidebar">制作设置</button>
+      <button class="btn" id="export" disabled>导出示例草稿</button>
     </div>
   </header>
 
   <div class="grid">
-    <section class="panel" aria-labelledby="in-h">
-      <h2 id="in-h">设置</h2>
+    <section class="panel sidebar" id="sidebar" aria-labelledby="in-h">
+      <div class="section-head"><h2 id="in-h">制作设置</h2><button class="text-btn drawer-close" id="closeSettings">收起</button></div>
+      <div id="settingsSummary" class="settings-summary" hidden><p id="settingsText"></p><button class="text-btn" id="editSettings" aria-expanded="false" aria-controls="settingsForm">修改</button></div>
+      <div id="settingsForm">
       <div class="field"><label for="country">目标国家</label>
         <select id="country"><option>英国</option><option>日本</option><option>韩国</option><option>泰国</option></select></div>
       <div class="field"><label for="platform">发布平台</label>
         <select id="platform"><option>TikTok</option><option>Instagram</option><option>YouTube Shorts</option></select></div>
-      <div class="field"><label for="skill">剪辑 Skill（从优秀实践蒸馏）</label>
+      <div class="field"><label for="skill">剪辑模板</label>
         <select id="skill"><option>冷知识路线类 v0.3</option><option>优惠券钩子类 v0.2</option></select></div>
-      <button class="btn primary" id="gen" style="width:100%">生成粗剪</button>
-      <ol class="steps" id="steps" aria-live="polite"></ol>
+      <button class="btn primary" id="gen">生成粗剪</button>
+      <p class="inline-hint" id="settingsHint">固定脚本演示，选择设置不会生成新的国家脚本。</p>
+      </div>
+      <div class="script-section"><div class="section-head"><h2>脚本</h2><span class="badge">5 段 · 20.2 秒</span></div><div class="script-list" id="scriptList"></div></div>
+
     </section>
 
     <section class="panel monitor" aria-label="预览">
-      <div class="screen" id="screen">
-        <div class="ph" id="ph"><div><b>还没有粗剪</b>点「生成粗剪」，AI 跑完流程后这里出视频</div></div>
+      <div class="section-head monitor-head"><div class="view-switch" role="group" aria-label="工作区视图"><button id="showPreview" aria-pressed="true">视频预览</button><button id="showFlow" aria-pressed="false">AI 生成过程</button></div><span class="badge">模拟运行</span></div>
+      <section class="flow-view" id="flowView" aria-label="AI 生成过程" hidden>
+        <div class="flow-heading"><div><strong id="flowTitle">准备生成粗剪</strong><p id="flowStatus" role="status">点击「生成粗剪」，查看每一步的执行过程和产出。</p></div><span class="mono" id="flowCount">0 / 7</span></div>
+        <progress id="flowProgress" max="7" value="0" aria-label="已完成的生成步骤"></progress>
+        <div class="flow-main"><ol class="steps" id="steps" aria-label="生成步骤"></ol><div class="flow-feed" id="flowFeed" role="log" aria-label="生成产出记录" aria-live="polite" aria-relevant="additions"><p class="empty">每一步的结果将在这里逐条出现。</p></div></div>
+        <div class="flow-footer"><span id="flowNext">下一步：读取剪辑模板</span><button class="btn primary" id="viewResult" hidden>查看粗剪 →</button></div>
+      </section>
+      <div class="preview-stage"><div class="screen" id="screen">
+        <div class="ph" id="previewEmpty"><div><b>从一版粗剪开始</b><span id="previewHint">设置制作要求后，点击「生成粗剪」</span></div></div>
         <div class="alt" id="alt" hidden></div>
         <div class="huazi" id="huazi" hidden></div>
         <div class="sub" id="sub" hidden><div class="en" id="subEn"></div><div class="zh" id="subZh"></div></div>
       </div>
-      <div class="transport">
+      </div><div class="transport">
         <button class="play" id="play" aria-label="播放" disabled><svg viewBox="0 0 16 16" id="playIc"><path d="M4 2l10 6-10 6z"/></svg></button>
         <span class="tc mono" id="tc">00:00.0 / 00:00.0</span>
       </div>
-      <p class="note">画面为真实素材；配音在 Demo 里用字幕示意。</p>
     </section>
 
     <section class="panel inspector" aria-labelledby="sc-h">
-      <h2 id="sc-h">粗剪评分（满分 100）</h2>
-      <div id="scoreBox"><p class="empty">生成后自动打分。</p></div>
-      <hr class="sep">
-      <h2>当前片段</h2>
-      <div id="inspect"><p class="empty">点时间线上的视频片段，可替换或锁定镜头。</p></div>
-      <hr class="sep">
-      <h2>国家 / 平台规则（RAG）</h2>
-      <ul class="rules" id="rules"><li><span></span><span>生成后显示命中的规则。</span></li></ul>
+      <h2 id="sc-h">粗剪评估 <span class="badge">规则评分</span></h2>
+      <div id="scoreBox"><p class="empty">生成后，查看评分和需要精修的片段。</p></div>
+      <details id="scoreDetails" class="score-details" hidden><summary>查看评分明细</summary><div id="scoreDims"></div></details>
+      <div class="tabs" role="tablist" aria-label="检查与编辑">
+        <button class="tab" id="tabIssues" role="tab" aria-controls="panelIssues" aria-selected="true" data-tab="Issues">待处理</button>
+        <button class="tab" id="tabClip" role="tab" aria-controls="panelClip" aria-selected="false" tabindex="-1" data-tab="Clip">当前片段</button>
+        <button class="tab" id="tabRules" role="tab" aria-controls="panelRules" aria-selected="false" tabindex="-1" data-tab="Rules">发布检查</button>
+      </div>
+      <div class="tab-panel" id="panelIssues" role="tabpanel" aria-labelledby="tabIssues" tabindex="0"><div id="issues"><p class="empty">生成粗剪后，这里会列出需要检查的问题。</p></div></div>
+      <div class="tab-panel" id="panelClip" role="tabpanel" aria-labelledby="tabClip" tabindex="0" hidden><div id="inspect"><p class="empty">生成后，点击脚本或时间线选择片段。</p></div></div>
+      <div class="tab-panel" id="panelRules" role="tabpanel" aria-labelledby="tabRules" tabindex="0" hidden><p class="inline-hint">以下为演示规则检查，发布前仍需人工核实。</p><ul class="rules" id="rules"><li>生成后显示检查结果。</li></ul></div>
     </section>
   </div>
 
   <section class="panel tl-panel" aria-labelledby="tl-h">
     <div class="tl-bar">
-      <h2 id="tl-h">时间线（剪映式多轨，可继续精修）</h2>
+      <h2 id="tl-h">时间线 <span class="badge">20.2 秒</span></h2>
       <div class="legend"><span style="--c:var(--trk-v)">视频</span><span style="--c:var(--trk-a)">配音</span><span style="--c:var(--trk-t)">字幕</span><span style="--c:var(--trk-s)">花字 / 贴纸</span></div>
+      <div class="tl-tools"><span id="lockCount">已锁定 0/5</span><button class="btn" id="regen" disabled>更换未锁定镜头</button></div>
     </div>
     <div class="tl-scroll"><div class="tl" id="tl"><div class="tl-empty">生成后在这里出现视频、配音、字幕、花字四条轨道。</div></div></div>
   </section>
@@ -212,11 +294,12 @@ select{width:100%;background:var(--panel-2);color:var(--fg);border:1px solid var
     <a href="https://www.pexels.com/video/using-smartphone-display-for-mobile-applications-40326823/" target="_blank" rel="noopener">手机 App</a></p>
 </div>
 
+<button class="drawer-backdrop" id="drawerBackdrop" aria-label="收起制作设置"></button>
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-h">
   <div class="modal-card">
     <div>
-      <h3 id="m-h">剪映草稿（draft_content.json 示意）</h3>
-      <p>按剪映草稿的轨道、片段、素材结构组织。真实对接时按剪映版本适配字段，放进草稿目录后在剪映里打开继续精修。</p>
+      <h3 id="m-h">示例草稿 · draft_content.json</h3>
+      <p>这是轨道与素材结构的示意 JSON，包含占位素材路径，尚未验证直接导入剪映；正式对接需要适配剪映版本。</p>
     </div>
     <pre id="json"></pre>
     <div class="modal-actions"><span class="copied" id="copied" hidden>已复制</span><button class="btn" id="copy">复制 JSON</button><button class="btn primary" id="close">关闭</button></div>
@@ -262,7 +345,7 @@ const pick=s=>s.cands.find(c=>c.id===state.sel[s.id]);
 const TOTAL=SENTS.reduce((a,s)=>a+s.dur,0);
 const starts={};(()=>{let t=0;SENTS.forEach(s=>{starts[s.id]=t;t+=s.dur})})();
 const fmt=t=>{const m=Math.floor(t/60),s=t-m*60;return String(m).padStart(2,'0')+':'+s.toFixed(1).padStart(4,'0')};
-const grad=h=>`linear-gradient(160deg,hsl(${h} 45% 34%),hsl(${(h+40)%360} 40% 16%))`;
+const grad=h=>`linear-gradient(160deg,hsl(${h} 20% 26%),hsl(${(h+40)%360} 20% 14%))`;
 const segAt=t=>{for(const s of SENTS){if(t<starts[s.id]+s.dur)return s}return SENTS[SENTS.length-1]};
 const stkRange=k=>[starts[k.seg]+k.off,k.len];
 SENTS.forEach(s=>state.sel[s.id]=s.cands[0].id);
@@ -293,28 +376,92 @@ function score(){
   ];
   return {dims,total:Math.round(dims.reduce((a,d)=>a+d.v,0))};
 }
-const band=t=>t<70?['bad','低于 70：退回重做']:t<80?['mid','70–79：粗剪合格，交人工精修']:t<90?['ok','80–89：精修后可发布']:['ok','90+：有爆款潜力'];
+const band=t=>t<70?['bad','低于 70：退回重做']:t<80?['mid','粗剪合格']:t<90?['ok','粗剪质量良好']:['ok','粗剪质量较高'];
 
 /* ---------- pipeline ---------- */
 const STEPS=[
- ['读取剪辑 Skill',()=>`${$('skill').value}（12 个爆款工程）`],
- ['生成配音',()=>`${SENTS.length} 句 · ${TOTAL.toFixed(1)} 秒 · 英式女声`],
- ['按语义和气口分段',()=>`${SENTS.length} 段`],
- ['本地素材库语义召回',()=>'1,284 条素材，每句召回 3 个候选；排除地点不符 2 个'],
- ['检索国家 / 平台规则',()=>`${$('country').value} × ${$('platform').value}，命中 ${RULES.length} 条`],
- ['编排剪映轨道',()=>`视频 ${SENTS.length} · 配音 ${SENTS.length} · 字幕 ${SENTS.length} · 花字 ${STICKERS.length}`],
- ['自动评分',()=>{const s=score();return `${s.total} 分 · ${band(s.total)[1]}`}]
+ ['读取剪辑模板','提取风格与剪辑要求'],
+ ['生成配音','逐句输出配音文案'],
+ ['划分脚本片段','确定片段与时间范围'],
+ ['匹配视频素材','逐段选择候选镜头'],
+ ['检查发布规则','检查示例规则'],
+ ['编排多轨时间线','依次建立四条轨道'],
+ ['评估粗剪质量','输出评分与精修建议']
 ];
 function renderSteps(done,run){
-  $('steps').innerHTML=STEPS.map(([k,v],i)=>`<li class="${i<done?'done':i===run?'run':''}"><span class="dot" aria-hidden="true"></span><span>${k}<br><span class="v">${i<done?v():i===run?'处理中…':'等待'}</span></span></li>`).join('');
+  $('steps').innerHTML=STEPS.map(([name],i)=>`<li class="${i<done?'done':i===run?'run':''}" ${i===run?'aria-current="step"':''}><span class="dot" aria-hidden="true">${i<done?'✓':String(i+1).padStart(2,'0')}</span><span>${name}<br><span class="v">${i<done?'已完成':i===run?'正在执行':i===run+1?'即将开始':'等待中'}</span></span></li>`).join('');
+  const current=$('steps').querySelector('[aria-current]');
+  if(current){const list=$('steps');if(list.scrollWidth>list.clientWidth)list.scrollLeft=current.offsetLeft-list.offsetLeft;else if(current.offsetTop-list.offsetTop+current.offsetHeight>list.clientHeight)list.scrollTop=current.offsetTop-list.offsetTop-list.clientHeight+current.offsetHeight;}
+}
+function showWorkspace(flow){
+  document.querySelector('.monitor').classList.toggle('flow-mode',flow);$('flowView').hidden=!flow;
+  $('showFlow').setAttribute('aria-pressed',String(flow));$('showPreview').setAttribute('aria-pressed',String(!flow));
+  if(flow&&state.gen)setPlaying(false);
+}
+$('showFlow').addEventListener('click',()=>showWorkspace(true));
+$('showPreview').addEventListener('click',()=>showWorkspace(false));
+$('viewResult').addEventListener('click',()=>{showWorkspace(false);$('play').focus()});
+function generationOutputs(){
+  const chosen=SENTS.map(pick);
+  return [
+    [`已读取模板：${$('skill').value}`,`制作目标：${$('country').value} · ${$('platform').value} · 9:16 竖屏`,'已整理要求：字幕置底、利益点花字、结尾搜码提示。'],
+    SENTS.map((s,i)=>`配音 ${i+1}/${SENTS.length}：${s.en}（${s.dur.toFixed(1)} 秒，字幕示意）`),
+    SENTS.map((s,i)=>`片段 ${i+1} · ${s.role}｜${fmt(starts[s.id])} → ${fmt(starts[s.id]+s.dur)}`),
+    SENTS.map((s,i)=>`片段 ${i+1}：${pick(s).title} · 匹配 ${Math.round(pick(s).match*100)}%${state.locked.has(s.id)?' · 保留锁定镜头':''}${pick(s).why?' · 提醒：'+pick(s).why:pick(s).warn?' · 风险：'+pick(s).warn:!pick(s).file?' · 需补充真实素材':''}`),
+    RULES.map(r=>`${r.check()?'通过':'需检查'}：${r.k}`),
+    [`已编排 ${SENTS.length} 个视频片段，总长 ${TOTAL.toFixed(1)} 秒。`,`已对齐 ${SENTS.length} 段配音占位，当前以字幕示意。`,`已添加 ${SENTS.length} 段字幕。`,`已添加 ${STICKERS.length} 处花字与贴纸。`],
+    [`规则评分：${score().total}/100 · ${band(score().total)[1]}`,`素材检查：${chosen.filter(c=>c.why||c.warn||!c.file).length} 个片段需要关注；开头时长与转场需人工精修。`,'粗剪已就绪，可以预览、替换镜头或导出示例草稿。']
+  ];
+}
+async function runGenerationFlow(){
+  const outputs=generationOutputs(),delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  $('flowFeed').replaceChildren();$('viewResult').hidden=true;$('flowProgress').value=0;
+  for(let i=0;i<STEPS.length;i++){
+    renderSteps(i,i);$('flowCount').textContent=`${i} / ${STEPS.length}`;$('flowTitle').textContent=STEPS[i][0];$('flowStatus').textContent=`第 ${i+1} 步 · ${STEPS[i][1]}`;
+    $('flowNext').textContent=i<STEPS.length-1?'下一步：'+STEPS[i+1][0]:'下一步：查看粗剪并人工精修';
+    if(i<5)$('tl').querySelector('.tl-empty').textContent=`当前：${STEPS[i][0]}。第 6 步将依次建立视频、配音、字幕和花字轨道。`;
+    const feed=$('flowFeed'),follow=feed.scrollHeight-feed.scrollTop-feed.clientHeight<60;
+    const entry=document.createElement('article');entry.className='flow-entry running';
+    const title=document.createElement('h3');title.textContent=`${String(i+1).padStart(2,'0')} · ${STEPS[i][0]}`;
+    const status=document.createElement('span');status.textContent='执行中';title.append(status);entry.append(title);feed.append(entry);if(follow)feed.scrollTop=feed.scrollHeight;
+    await delay(450);
+    for(let j=0;j<outputs[i].length;j++){
+      const follow=feed.scrollHeight-feed.scrollTop-feed.clientHeight<60;
+      const line=document.createElement('p');line.className='flow-output';line.textContent=outputs[i][j];entry.append(line);if(follow)feed.scrollTop=feed.scrollHeight;
+      if(i===5)renderTimeline(j+1);
+      if(i===6&&j===0)renderScore();
+      await delay(650);
+    }
+    entry.classList.remove('running');status.textContent='已完成';$('flowProgress').value=i+1;
+  }
+  renderSteps(STEPS.length,-1);$('steps').scrollTop=0;$('flowCount').textContent='7 / 7';$('flowTitle').textContent='粗剪已生成';$('flowStatus').textContent='7 个步骤已完成，执行记录已保留。';$('flowNext').textContent='接下来：预览视频，检查待处理问题';$('viewResult').hidden=false;
 }
 
 /* ---------- render ---------- */
 function renderScore(){
   const {dims,total}=score();const [cls,txt]=band(total);
-  $('scoreBox').innerHTML=`<div class="score-head"><span class="score-num mono">${total}</span><span class="band ${cls}">${txt}</span></div>
-   <div class="dims">${dims.map(d=>{const r=d.v/d.max;const c=r<.4?'b':r<.75?'w':'';
-     return `<div class="dim"><div class="t"><span>${d.n}</span><span class="mono">${(Math.round(d.v*10)/10)} / ${d.max}</span></div><div class="bar"><i class="${c}" style="width:${r*100}%"></i></div><div class="why">${d.why}</div></div>`}).join('')}</div>`;
+  $('scoreBox').innerHTML=`<div class="score-head"><span class="score-num mono">${total}</span><span class="score-total">/ 100</span><span class="band ${cls}">${txt}</span></div><div class="score-caption">建议人工精修<span>评分不代表发布效果</span></div>`;
+  $('scoreDetails').hidden=false;
+  $('scoreDims').innerHTML=`<div class="dims">${dims.map(d=>{const r=d.v/d.max;const c=r<.4?'b':r<.75?'w':'';
+    return `<div class="dim"><div class="t"><span>${d.n}</span><span class="mono">${Math.round(d.v*10)/10} / ${d.max}</span></div><div class="bar"><i class="${c}" style="width:${r*100}%"></i></div><div class="why">${d.why}</div></div>`}).join('')}</div>`;
+}
+function clipIssue(s){const c=pick(s);return c.warn||c.why||(!c.file?'示意素材，需补充真实视频':'')}
+function renderScripts(){
+  $('scriptList').innerHTML=SENTS.map((s,i)=>`<button class="script-item ${state.gen&&s.id===state.active?'active':''}" data-seg="${s.id}" ${!state.gen||state.busy?'disabled':''} aria-pressed="${state.gen&&s.id===state.active}"><span class="num mono">${String(i+1).padStart(2,'0')}</span><span><strong>${s.role.split(' · ')[1]}</strong><small>${s.zh}</small></span><span class="duration mono">${s.dur.toFixed(1)}s${state.gen&&clipIssue(s)?'<br><span class="flag-icon" aria-label="需检查">△</span>':''}${state.locked.has(s.id)?'<br>锁定':''}</span></button>`).join('');
+  $('lockCount').textContent=`已锁定 ${state.locked.size}/${SENTS.length}`;
+  $('regen').disabled=!state.gen||state.busy||state.locked.size===SENTS.length;
+}
+function renderIssues(){
+  const issues=SENTS.filter(s=>clipIssue(s)).map(s=>{const c=pick(s);return {id:s.id,title:`第 ${SENTS.indexOf(s)+1} 段 · ${c.warn|| (c.why?'画面与脚本不符':'缺少真实素材')}`,body:c.note||c.why||'当前候选只有示意画面，需要在精修时补充真实视频。',action:'定位并查看候选'};});
+  issues.push({id:'s1',title:'第 1 段 · 开头偏长',body:'当前开头 4.2 秒，建议精修时压到 3 秒内。',action:'定位片段'}, {id:'s3',title:'第 3 段 · 转场对齐',body:'转场略早 0.3 秒，需在精修时调整。',action:'定位片段'});
+  $('issues').innerHTML=issues.map(i=>`<article class="issue"><strong><span class="flag-icon">△</span> ${i.title}</strong><p>${i.body}</p><button data-issue="${i.id}">${i.action} →</button></article>`).join('')+'<p class="inline-hint">贴纸入场动效尚未还原，需在人工精修时补充。</p>';
+  $('tabIssues').textContent=`待处理 ${issues.length}`;
+}
+function switchTab(name){
+  ['Issues','Clip','Rules'].forEach(n=>{const on=n===name;$('tab'+n).setAttribute('aria-selected',String(on));$('tab'+n).tabIndex=on?0:-1;$('panel'+n).hidden=!on;});
+}
+function selectSegment(id){
+  showWorkspace(false);setPlaying(false);state.active=id;state.t=starts[id]+.05;renderInspect();renderTimeline();renderScripts();renderMonitor();switchTab('Clip');
 }
 function renderRules(){
   $('rules').innerHTML=RULES.map(r=>{const ok=r.check();return `<li><span class="${ok?'ok-ic':'bad-ic'}">${ok?'✓':'✕'}</span><span><b>${r.k}</b> · ${r.v}</span></li>`}).join('');
@@ -325,26 +472,27 @@ function renderInspect(){
      <div><div class="seg-title">第 ${SENTS.indexOf(s)+1} 句 · ${s.role}</div><div class="seg-zh">${s.zh}</div></div>
      <button class="btn lockbtn" data-lock="${s.id}">${lk?'已锁定 · 解锁':'锁定'}</button></div>
    <div class="cands">${s.cands.map(c=>{const sel=state.sel[s.id]===c.id;
-     const th=c.file?`<video class="thumb" src="${c.file}#t=1" muted playsinline preload="metadata"></video>`:`<div class="thumb" style="background:${grad(c.hue)}"></div>`;
-     return `<div class="cand ${sel?'sel':''}">${th}<div><div class="nm">${c.title}</div><div class="meta">${c.src} · 清晰度 ${c.q}/5</div>${c.warn?`<span class="chip">${c.warn}</span><div class="meta" style="color:var(--bad)">${c.note}</div>`:''}</div>
-       <div class="match"><span class="mono">${Math.round(c.match*100)}%</span><br>${sel?'<span class="meta">使用中</span>':`<button data-use="${s.id}:${c.id}">${c.warn?'仍要替换':'替换'}</button>`}</div></div>`}).join('')}</div>`;
+     const th=c.file?`<video class="thumb" src="${c.file}#t=1" muted playsinline preload="metadata"></video>`:`<div class="thumb" style="background:${grad(c.hue)};display:grid;place-items:center;font-size:10px;color:var(--muted)">示意</div>`;
+     return `<div class="cand ${sel?'sel':''}">${th}<div><div class="nm">${c.title}</div><div class="meta">${c.file?c.src:"示意素材"} · 清晰度 ${c.q}/5</div>${c.warn?`<span class="chip">${c.warn}</span><div class="meta" style="color:var(--bad)">${c.note}</div>`:''}</div>
+       <div class="match"><span class="mono" title="语义匹配度">${Math.round(c.match*100)}%</span><br>${sel?'<span class="meta">使用中</span>':`<button data-use="${s.id}:${c.id}" ${lk?'disabled title="请先解锁片段"':''}>${c.warn?'仍要替换':'替换'}</button>`}</div></div>`}).join('')}</div>`;
 }
 let pps=40;
-function renderTimeline(){
-  const tl=$('tl');const laneW=Math.max(tl.clientWidth-28-72,660);pps=laneW/TOTAL;const x=t=>t*pps;
+function renderTimeline(trackCount=4){
+  const tl=$('tl');const laneW=Math.max(tl.clientWidth-28-72,500);pps=laneW/TOTAL;const x=t=>t*pps;
   let ruler='';for(let t=0;t<=Math.floor(TOTAL);t+=2)ruler+=`<span class="mono" style="left:${x(t)}px">${fmt(t).slice(1)}</span>`;
   const row=(nm,inner,cls='')=>`<div class="tl-row"><span class="nm">${nm}</span><div class="lane ${cls}">${inner}</div></div>`;
   const box=(cls,st,len,html,extra='')=>`<div class="clip ${cls}" ${extra} style="left:${x(st)}px;width:${x(len)-2}px">${html}</div>`;
   tl.innerHTML=
    row('','<div id="ruler" style="position:absolute;inset:0">'+ruler+'</div>','ruler')+
-   row('视频',SENTS.map(s=>{const c=pick(s);return `<button class="clip v ${state.active===s.id?'active':''} ${c.warn?'flag':''}" data-seg="${s.id}" style="left:${x(starts[s.id])}px;width:${x(s.dur)-2}px">${c.title}${state.locked.has(s.id)?' 🔒':''}<small>${Math.round(c.match*100)}% · ${c.src}</small></button>`}).join(''))+
-   row('配音',SENTS.map((s,i)=>box('a',starts[s.id],s.dur,`配音 ${i+1}`)).join(''))+
+   row('视频',SENTS.map(s=>{const c=pick(s);return `<button class="clip v ${state.active===s.id?'active':''} ${clipIssue(s)?'flag':''}" data-seg="${s.id}" style="left:${x(starts[s.id])}px;width:${x(s.dur)-2}px">${clipIssue(s)?'△ ':''}${c.title}${state.locked.has(s.id)?' · 已锁定':''}<small>${Math.round(c.match*100)}% · ${c.src}</small></button>`}).join(''))+
+   row('配音示意',SENTS.map((s,i)=>box('a',starts[s.id],s.dur,`配音 ${i+1}`)).join(''))+
    row('字幕',SENTS.map(s=>box('t',starts[s.id],s.dur,s.en,`title="${s.en.replace(/"/g,'&quot;')}"`)).join(''))+
    row('花字/贴纸',STICKERS.map(k=>{const [st,len]=stkRange(k);return box('s',st,len,k.text.replace('\n',' '))}).join(''))+
-   '<div class="playhead" id="ph"></div>';
+   '<div class="playhead" id="playhead"></div>';
+  [...tl.querySelectorAll('.tl-row')].forEach((row,i)=>{if(i>trackCount)row.hidden=true});
   placeHead();
 }
-function placeHead(){const ph=$('ph');if(ph)ph.style.left=(14+72+state.t*pps)+'px'}
+function placeHead(){const ph=$('playhead');if(ph)ph.style.left=(14+72+state.t*pps)+'px'}
 function renderMonitor(){
   const s=segAt(state.t);const c=pick(s);
   Object.entries(vids).forEach(([id,v])=>{const on=c.id===id;v.classList.toggle('on',on);
@@ -357,13 +505,13 @@ function renderMonitor(){
   $('huazi').hidden=!k;if(k)$('huazi').innerHTML=k.text.replace('\n','<br>');
   $('tc').textContent=fmt(state.t)+' / '+fmt(TOTAL);placeHead();
 }
-function renderAll(){renderScore();renderRules();renderInspect();renderTimeline();renderMonitor()}
+function renderAll(){renderScore();renderRules();renderInspect();renderTimeline();renderMonitor();renderScripts();renderIssues()}
 
 /* ---------- playback ---------- */
 let raf=0,last=0;
 function tick(ts){if(!state.playing)return;if(last)state.t+=(ts-last)/1000;last=ts;
   if(state.t>=TOTAL){state.t=TOTAL-.01;setPlaying(false);renderMonitor();return}
-  const s=segAt(state.t);if(s.id!==state.active){state.active=s.id;renderInspect();renderTimeline()}
+  const s=segAt(state.t);if(s.id!==state.active){state.active=s.id;renderInspect();renderTimeline();renderScripts()}
   renderMonitor();raf=requestAnimationFrame(tick)}
 function setPlaying(p){state.playing=p;last=0;$('play').setAttribute('aria-label',p?'暂停':'播放');
   $('playIc').innerHTML=p?'<path d="M3 2h4v12H3zM9 2h4v12H9z"/>':'<path d="M4 2l10 6-10 6z"/>';
@@ -371,31 +519,45 @@ function setPlaying(p){state.playing=p;last=0;$('play').setAttribute('aria-label
 
 /* ---------- interactions ---------- */
 document.addEventListener('click',e=>{
-  if(!state.gen)return;
-  const seg=e.target.closest('[data-seg]');
-  if(seg){state.active=seg.dataset.seg;state.t=starts[state.active]+.05;renderInspect();renderTimeline();renderMonitor();return}
+  const tab=e.target.closest('[data-tab]');if(tab){switchTab(tab.dataset.tab);return}
+  if(!state.gen||state.busy)return;
+  const issue=e.target.closest('[data-issue]');if(issue){selectSegment(issue.dataset.issue);$('panelClip').focus();return}
+  const seg=e.target.closest('[data-seg]');if(seg){selectSegment(seg.dataset.seg);return}
   const use=e.target.closest('[data-use]');
-  if(use){const [sid,cid]=use.dataset.use.split(':');state.sel[sid]=cid;renderAll();return}
+  if(use){const [sid,cid]=use.dataset.use.split(':');if(state.locked.has(sid))return;showWorkspace(false);setPlaying(false);state.sel[sid]=cid;renderAll();return}
   const lk=e.target.closest('[data-lock]');
-  if(lk){const id=lk.dataset.lock;state.locked.has(id)?state.locked.delete(id):state.locked.add(id);renderInspect();renderTimeline();return}
-  if(e.target.closest('#ruler')){const r=$('ruler').getBoundingClientRect();state.t=Math.max(0,Math.min(TOTAL-.01,(e.clientX-r.left)/pps));state.active=segAt(state.t).id;renderInspect();renderTimeline();renderMonitor()}
+  if(lk){const id=lk.dataset.lock;state.locked.has(id)?state.locked.delete(id):state.locked.add(id);renderInspect();renderTimeline();renderScripts();return}
+  if(e.target.closest('#ruler')){showWorkspace(false);setPlaying(false);const r=$('ruler').getBoundingClientRect();state.t=Math.max(0,Math.min(TOTAL-.01,(e.clientX-r.left)/pps));state.active=segAt(state.t).id;renderInspect();renderTimeline();renderScripts();renderMonitor()}
 });
-$('play').addEventListener('click',()=>setPlaying(!state.playing));
+document.querySelector('.tabs').addEventListener('keydown',e=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+  const tabs=[...document.querySelectorAll('[data-tab]')];const i=tabs.indexOf(document.activeElement);if(i<0)return;e.preventDefault();
+  const next=e.key==='Home'?0:e.key==='End'?2:(i+(e.key==='ArrowRight'?1:2))%3;switchTab(tabs[next].dataset.tab);tabs[next].focus();
+});
+function toggleDrawer(open){document.body.classList.toggle('drawer-open',open);$('settingsToggle').setAttribute('aria-expanded',String(open));if(open)$('closeSettings').focus();else $('settingsToggle').focus()}
+$('settingsToggle').addEventListener('click',()=>toggleDrawer(!document.body.classList.contains('drawer-open')));
+$('closeSettings').addEventListener('click',()=>toggleDrawer(false));$('drawerBackdrop').addEventListener('click',()=>toggleDrawer(false));
+$('editSettings').addEventListener('click',()=>{$('settingsForm').hidden=!$('settingsForm').hidden;$('editSettings').textContent=$('settingsForm').hidden?'修改':'收起';$('editSettings').setAttribute('aria-expanded',String(!$('settingsForm').hidden))});
+$('play').addEventListener('click',()=>{if(state.gen&&!state.busy)setPlaying(!state.playing)});
 $('regen').addEventListener('click',()=>{
-  SENTS.forEach(s=>{if(state.locked.has(s.id))return;const ok=s.cands.filter(c=>!c.warn);const i=ok.findIndex(c=>c.id===state.sel[s.id]);state.sel[s.id]=ok[(i+1)%ok.length].id});
-  renderAll();
+  if(!state.gen||state.busy)return;setPlaying(false);
+  SENTS.forEach(s=>{if(state.locked.has(s.id))return;const ok=s.cands.filter(c=>!c.warn);const i=ok.findIndex(c=>c.id===state.sel[s.id]);state.sel[s.id]=ok[(i+1)%ok.length].id});renderAll();
 });
+let generatedSettings=null;
+function currentSettings(){return {country:$('country').value,platform:$('platform').value,skill:$('skill').value}}
+['country','platform','skill'].forEach(id=>$(id).addEventListener('change',()=>{if(state.gen)$('settingsHint').textContent='设置已调整，重新生成后应用；当前粗剪保留原设置。'}));
 $('gen').addEventListener('click',async()=>{
-  if(state.busy)return;state.busy=true;setPlaying(false);
-  ['gen','regen','export','play'].forEach(id=>$(id).disabled=true);$('gen').textContent='生成中…';
+  if(state.busy)return;state.busy=true;setPlaying(false);state.gen=false;state.t=0;state.active='s1';
+  ['gen','regen','export','play','country','platform','skill'].forEach(id=>$(id).disabled=true);$('gen').textContent='生成中…';
+  showWorkspace(true);$('showPreview').disabled=true;$('viewResult').hidden=true;document.body.classList.remove('drawer-open');$('settingsToggle').setAttribute('aria-expanded','false');document.querySelector('.monitor').scrollIntoView({block:'nearest'});$('showFlow').focus();$('previewEmpty').hidden=false;$('sub').hidden=true;$('huazi').hidden=true;$('alt').hidden=true;Object.values(vids).forEach(v=>v.classList.remove('on'));
+  $('scoreBox').innerHTML='<p class="empty">正在生成，完成后更新评估…</p>';$('scoreDetails').hidden=true;$('issues').innerHTML='<p class="empty">生成完成后更新问题清单。</p>';$('inspect').innerHTML='<p class="empty">生成中，暂时不能编辑片段。</p>';$('rules').innerHTML='<li>生成完成后更新检查结果。</li>';$('tl').innerHTML='<div class="tl-empty">正在编排轨道…</div>';renderScripts();
   SENTS.forEach(s=>{if(!state.locked.has(s.id))state.sel[s.id]=s.cands[0].id});
-  const fast=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  for(let i=0;i<STEPS.length;i++){renderSteps(i,i);await new Promise(r=>setTimeout(r,fast?0:650))}
-  renderSteps(STEPS.length,-1);
-  state.gen=true;state.t=0;state.active='s1';$('ph').hidden=true;$('sub').hidden=false;
-  renderAll();
-  ['gen','regen','export','play'].forEach(id=>$(id).disabled=false);$('gen').textContent='重新生成';state.busy=false;
-  setPlaying(true);
+  await runGenerationFlow();
+  generatedSettings=currentSettings();$('showPreview').disabled=false;
+  state.gen=true;state.busy=false;state.t=0;state.active='s1';$('previewEmpty').hidden=true;$('sub').hidden=false;
+  ['gen','export','play','country','platform','skill'].forEach(id=>$(id).disabled=false);$('gen').textContent='重新生成';$('gen').classList.remove('primary');$('export').classList.add('primary');
+  $('settingsForm').hidden=true;$('settingsSummary').hidden=false;$('settingsText').textContent=`${generatedSettings.country} · ${generatedSettings.platform} / ${generatedSettings.skill}`;$('editSettings').textContent='修改';$('editSettings').setAttribute('aria-expanded','false');$('settingsHint').textContent='重新生成会保留已锁定镜头；固定脚本仅用于演示。';
+  document.body.classList.remove('drawer-open');$('settingsToggle').setAttribute('aria-expanded','false');switchTab('Issues');renderAll();$('viewResult').focus({preventScroll:true});
 });
 
 /* ---------- export ---------- */
@@ -403,7 +565,7 @@ function draft(){
   const us=t=>Math.round(t*1e6);
   return {
     draft_name:'UK_sleeper_route_roughcut_v1',canvas_config:{width:1080,height:1920,ratio:'9:16'},duration:us(TOTAL),
-    meta:{skill:$('skill').value,country:$('country').value,platform:$('platform').value,score:score().total},
+    meta:{...generatedSettings,score:score().total},
     materials:{
       videos:SENTS.map(s=>{const c=pick(s);return {id:'mat_'+c.id,path:c.file?c.file:`nas://素材库/${c.title}.mp4`}}),
       audios:SENTS.map((s,i)=>({id:'tts_'+(i+1),path:`tts/line_${i+1}.mp3`,text:s.en})),
@@ -418,16 +580,20 @@ function draft(){
     ]
   };
 }
-$('export').addEventListener('click',()=>{$('json').textContent=JSON.stringify(draft(),null,2);$('copied').hidden=true;$('modal').hidden=false;$('close').focus()});
-$('close').addEventListener('click',()=>{$('modal').hidden=true});
-$('modal').addEventListener('click',e=>{if(e.target.id==='modal')$('modal').hidden=true});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')$('modal').hidden=true});
+$('export').addEventListener('click',()=>{setPlaying(false);$('json').textContent=JSON.stringify(draft(),null,2);$('copied').hidden=true;$('modal').hidden=false;$('close').focus()});
+function closeExport(){$('modal').hidden=true;$('export').focus()}
+$('close').addEventListener('click',closeExport);
+$('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeExport()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(!$('modal').hidden)closeExport();else if(document.body.classList.contains('drawer-open'))toggleDrawer(false)}
+  if(e.key==='Tab'&&!$('modal').hidden){const buttons=[...$('modal').querySelectorAll('button')];if(e.shiftKey&&document.activeElement===buttons[0]){e.preventDefault();buttons.at(-1).focus()}else if(!e.shiftKey&&document.activeElement===buttons.at(-1)){e.preventDefault();buttons[0].focus()}}
+});
 $('copy').addEventListener('click',async()=>{
   try{await navigator.clipboard.writeText($('json').textContent);$('copied').textContent='已复制';$('copied').hidden=false}
   catch(err){const r=document.createRange();r.selectNodeContents($('json'));const s=getSelection();s.removeAllRanges();s.addRange(r);$('copied').textContent='已选中，按 Ctrl/⌘+C 复制';$('copied').hidden=false}
 });
 
-renderSteps(0,-1);
+renderSteps(0,-1);renderScripts();
 let rt;addEventListener('resize',()=>{if(!state.gen)return;clearTimeout(rt);rt=setTimeout(renderTimeline,120)});
 </script>
 </body>
