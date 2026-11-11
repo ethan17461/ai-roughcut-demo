@@ -18,6 +18,16 @@
 
 素材来自 Pexels（免费可商用，共 53 段）；选题池的历史数据为示例数据；剪映草稿由开源库 [pyJianYingDraft](https://github.com/GuanYixuan/pyJianYingDraft) 生成。
 
+## 数据复盘
+
+`review.py` 做的是发布之后的最小一段：导入每天的取数表，把播放数对回每条作品，出作品日报（过千播的标"值得继续测"，取数失败的标"待补"并保留上次读数，平台返回 0 记为零播），再按题材算千播率，回写到选题打分里。下一次选题用的就是复盘出来的数，不再是示例值。它还会挑一条过千的和一条同题材没过千的，让模型对照两条脚本，给一项下周可以试的改动。
+
+```bash
+.venv/bin/python review.py
+```
+
+结果写在 `data/review/review.json`，网页右上角点「数据复盘」能看。发布记录和播放数是模拟的（`data/review/`），对账、去重、千播标记和回写是程序真的在算。
+
 ## 换模型
 
 写脚本和成片评测各用哪家、哪个模型，都在 `.env` 里配置，不用改代码。写脚本的几行以 `SCRIPT_` 开头，成片评测的以 `VIDEO_` 开头（要选能看图的模型），不填就用 DeepSeek。接口只要兼容 OpenAI 的 `/chat/completions` 格式就行，写法见 `.env.example`。实测过在 DeepSeek 和 MiniMax 之间切换，记录在 `docs/evidence/20_换模型实测记录.txt`。配音目前固定用 MiniMax，换供应商要另写适配。

@@ -74,6 +74,18 @@ def places_of(text):
     return sorted({PLACES[w] for w in words(text) if w in PLACES})
 
 
+def with_review_rates(topics):
+    """数据复盘（review.py）写出了各题材的千播率，就拿它替换选题池里的示例爆款率。"""
+    path = os.path.join(DATA, "review", "review.json")
+    if not os.path.exists(path):
+        return topics
+    review = json.load(open(path, encoding="utf-8"))
+    rates = {**topics["genre_hit_rate"], **review.get("genre_hit_rate", {})}
+    works = sum(1 for r in review.get("rows", []) if r.get("views") is not None)
+    return dict(topics, genre_hit_rate=rates,
+                note=f"历史爆款率来自数据复盘：{works} 条作品的千播率（{review.get('latest')} 取数；发布记录和播放数是模拟的）。营销节点来自营销部门的年度 roadmap。")
+
+
 def select_topic(topics):
     rates = topics["genre_hit_rate"]
     top_rate = max(rates.values())
@@ -364,6 +376,7 @@ def main():
     usage_info = {}
 
     # 选题
+    topics = with_review_rates(topics)   # 有复盘结果就用复盘出来的千播率，没有才用示例值
     scored = select_topic(topics)
     if args.topic:
         topic_title = args.topic.strip()

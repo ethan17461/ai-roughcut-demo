@@ -25,7 +25,10 @@ lock = threading.Lock()
 def page():
     tpl = open(os.path.join(ROOT, "web", "template.html"), encoding="utf-8").read()
     result = open(os.path.join(OUT, "result.json"), encoding="utf-8").read()
-    return tpl.replace("/*__RESULT__*/null", result).replace("/*__STUDIO__*/false", "true")
+    review_path = os.path.join(ROOT, "data", "review", "review.json")
+    review = open(review_path, encoding="utf-8").read() if os.path.exists(review_path) else "null"
+    return (tpl.replace("/*__RESULT__*/null", result).replace("/*__REVIEW__*/null", review)
+               .replace("/*__STUDIO__*/false", "true"))
 
 
 def run_pipeline(args):

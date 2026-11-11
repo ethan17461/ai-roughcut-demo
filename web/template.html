@@ -170,7 +170,7 @@ table.skill tr.grp td{color:var(--accent);font-weight:700;padding-top:12px;borde
       <h1>AI 粗剪工作台 <span class="pill">真实流水线结果</span></h1>
       <p>选题 → 写脚本 → 配音 → 素材召回 → 国家和平台规则 → 剪映草稿 → 草稿检查 → 人工精修</p>
     </div>
-    <button class="btn" id="draftBtn" disabled>查看生成的剪映草稿</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="reviewBtn" hidden>数据复盘</button><button class="btn" id="draftBtn" disabled>查看生成的剪映草稿</button></div>
   </header>
 
   <section class="panel" id="askPanel" hidden aria-labelledby="ask-h">
@@ -245,6 +245,7 @@ table.skill tr.grp td{color:var(--accent);font-weight:700;padding-top:12px;borde
 const R = /*__RESULT__*/null;
 const STUDIO = /*__STUDIO__*/false;  // 本地工作台（studio.py 提供）时为 true：能输入选题现场生成、能把换过的镜头写回剪映
 const HOSTED = /*__HOSTED__*/false;  // 云端仅提供成片评测，不能生成或写入剪映草稿
+const REVIEW = /*__REVIEW__*/null;  // 数据复盘的结果（review.py 生成），没有就不显示入口
 const $=id=>document.getElementById(id);
 const S=R.segments;
 const V=R.run_id?`?v=${R.run_id}`:'';
@@ -438,6 +439,28 @@ function openSkill(){
    <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
   $('modal').hidden=false;
 }
+function openReview(){
+  const V=REVIEW,num=n=>n==null?'—':Number(n).toLocaleString('en-US');
+  const tag=t=>`<span class="band ${t==='值得继续测'?'ok':t==='待补'?'mid':t==='零播'?'bad':''}">${esc(t)}</span>`;
+  const rows=V.rows.map(r=>`<tr><td>${esc(r.work_id)}　${esc(r.title)}</td><td>${esc(r.platform)}<br><small>${esc(r.account)}</small></td><td>${esc(r.genre)}</td><td class="mono">${num(r.views)}${r.delta==null?'':` <small>${r.delta>=0?'+':''}${num(r.delta)}</small>`}</td><td>${r.tags.map(tag).join(' ')}${r.note?`<br><small>${esc(r.note)}</small>`:''}</td></tr>`).join('');
+  const pending=V.rows.filter(r=>r.tags.includes('待补')),hits=V.rows.filter(r=>r.tags.includes('值得继续测'));
+  const genres=Object.entries(V.genres).map(([g,x])=>`<tr><td>${esc(g)}</td><td class="mono">${x.works}</td><td class="mono">${x.hits}</td><td class="mono">${(x.rate*100).toFixed(0)}%</td><td><small>${esc(x.note||'')}</small></td></tr>`).join('');
+  const before=Object.fromEntries(V.topics_before.map(t=>[t.id,t.score]));
+  const topics=V.topics_after.map(t=>{const d=t.score-before[t.id];return `<tr><td>${esc(t.id)}　${esc(t.title)}</td><td>${esc(t.genre.join('、'))}</td><td class="mono">${before[t.id].toFixed(2)}</td><td class="mono">${t.score.toFixed(2)}</td><td class="mono" style="color:var(${d>0.005?'--good':d<-0.005?'--bad':'--dim'})">${d>0.005?'↑':d<-0.005?'↓':'—'} ${Math.abs(d)>0.005?Math.abs(d).toFixed(2):''}</td></tr>`}).join('');
+  const T=V.retest;
+  const retest=T?`<h4>复测建议</h4><p>拿一条过千的和一条同题材、同平台没过千的对照：<b style="color:var(--fg)">${esc(T.high.work_id)}</b>「${esc(T.high.title)}」${num(T.high.views)} 播，<b style="color:var(--fg)">${esc(T.low.work_id)}</b>「${esc(T.low.title)}」${num(T.low.views)} 播。</p>
+    ${T.difference?`<ul class="ck"><li><b style="color:var(--fg)">看得见的差异：</b>${esc(T.difference)}</li><li><b style="color:var(--fg)">下周试一项改动：</b>${esc(T.change)}</li><li><b style="color:var(--fg)">看什么指标：</b>${esc(T.metric)}</li></ul><p><small>由 ${esc(T.model)} 对照两条脚本整理，只说看得见的差异，不下因果结论。运营复核，组长决定排不排进下周的脚本单。</small></p>`:`<p>${esc(T.error||'这次没有生成复测建议。')}</p>`}`:'';
+  $('modalCard').innerHTML=`<h3>数据复盘 · 作品日报</h3><p>${esc(V.note)} 对账、去重、千播标记和回写选题是程序真的在算。最近一次取数：${esc(V.latest)}，共导入 ${V.reports.length} 张取数表。</p>
+   <table><tr><th>作品</th><th>平台 · 账号</th><th>题材</th><th>累计播放</th><th>状态</th></tr>${rows}</table>
+   <p>要人处理的：${pending.length} 条待补（取数失败，保留上次的读数）；${V.unmatched.length} 行对不上发布记录${V.unmatched.length?'（'+V.unmatched.map(u=>esc(u.work_id)+' @ '+esc(u.platform)).join('、')+'）':''}。这次有 ${hits.length} 条过了 ${num(V.hit_views)} 播，标为"值得继续测"。平台返回 0 记为零播，和取数失败分开。</p>
+   <h4>题材表现 → 回写选题打分</h4>
+   <table><tr><th>题材</th><th>作品数</th><th>千播数</th><th>回写的爆款率</th><th></th></tr>${genres}</table>
+   <table><tr><th>选题池里的选题</th><th>题材</th><th>原来（示例值）</th><th>现在（复盘值）</th><th>变化</th></tr>${topics}</table>
+   <p><small>爆款率 =（千播数 + 1）÷（作品数 + 2），样本少时不会出现 0% 或 100%。选题得分 = 爆款率 × 0.5 + 营销节点 × 0.3 + 利益点可植入度 × 0.2，下一次选题直接用复盘出来的数。</small></p>
+   ${retest}
+   <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
+  $('modal').hidden=false;
+}
 function openScript(){
   const X=R.scripts;
   $('modalCard').innerHTML=`<h3>脚本初稿与审核</h3><p>生成：${esc(X.generated_by)}。三版都按"冷知识开头 → 路线 → 画面 → 利益点 → 搜码钩子"的结构写，再按规则和事实库逐条审核。</p>
@@ -592,7 +615,8 @@ if(STUDIO){
 }
 
 renderSteps(0,-1);
-// #done-<秒>：直接显示生成后的状态（截图、演示用）；#topic / #script / #skill 打开对应弹窗
+if(REVIEW&&!HOSTED){$('reviewBtn').hidden=false;$('reviewBtn').addEventListener('click',openReview);if(location.hash==='#review')openReview();}
+// #done-<秒>：直接显示生成后的状态（截图、演示用）；#topic / #script / #skill / #review 打开对应弹窗
 const hm=location.hash.match(/^#done(?:-([\d.]+))?/);
 if(!HOSTED&&['#topic','#script','#skill'].includes(location.hash)){renderSteps(R.log.length,-1);({'#topic':openTopic,'#script':openScript,'#skill':openSkill})[location.hash]();}
 if(!HOSTED&&hm)showDone(parseFloat(hm[1]||'1'));
