@@ -18,6 +18,22 @@
 
 素材来自 Pexels（免费可商用，共 53 段）；选题池的历史数据为示例数据；剪映草稿由开源库 [pyJianYingDraft](https://github.com/GuanYixuan/pyJianYingDraft) 生成。
 
+## 换模型
+
+写脚本和成片评测各用哪家、哪个模型，都在 `.env` 里配置，不用改代码。写脚本的几行以 `SCRIPT_` 开头，成片评测的以 `VIDEO_` 开头（要选能看图的模型），不填就用 DeepSeek。接口只要兼容 OpenAI 的 `/chat/completions` 格式就行，写法见 `.env.example`。实测过在 DeepSeek 和 MiniMax 之间切换，记录在 `docs/evidence/20_换模型实测记录.txt`。配音目前固定用 MiniMax，换供应商要另写适配。
+
+## 剪辑 Skill
+
+剪辑规则写在 `data/skill.json`：11 条规则，分结构、镜头、字幕、花字、配音五组，每条标了来源（访谈、行业规范，或先填的示例值）。流水线按这些规则剪，网页上点「读取 Skill」那一步能看到每条规则在这次粗剪里实际做到的数值。
+
+规则里的数值目前多数是示例。`tools/distill_skill.py` 能从成片里量出镜头时长、语速、每句词数、开头是否提价格、结尾是否有引导，和 Skill 的设定值并排列出来：
+
+```bash
+.venv/bin/python tools/distill_skill.py 成片1.mp4 成片2.mp4
+```
+
+拿到业务方的爆款成片后，用它量出来的值替换示例值。字幕样式、花字设计和选什么画面量不了，要人看。
+
 ## 小组共用 Dify 视频评测
 
 组员直接打开 [小组视频评测](https://udify.app/workflow/JVeJSkbtopElpyFe)，上传视频、选择语音语言后点击“运行”。无需下载项目或填写密钥，也不依赖维护者的电脑开机。首次使用时，脚本和人工核验可以留空。

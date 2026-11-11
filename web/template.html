@@ -57,6 +57,11 @@ a{color:var(--muted)}
 .var ol li{margin:2px 0}
 .var ol small{color:var(--muted)}
 .ck{list-style:none;margin:8px 0 0;padding:0;font-size:12px;display:grid;gap:3px;color:var(--muted)}
+.modal-card h4{margin:6px 0 0;font-size:14px}
+.modal-card small{color:var(--dim)}
+.modal-card .band:not(.ok):not(.mid):not(.bad){background:var(--panel-3);color:var(--muted)}
+table.skill td:nth-child(2){white-space:nowrap}
+table.skill tr.grp td{color:var(--accent);font-weight:700;padding-top:12px;border-bottom-color:var(--dim)}
 .steps .ms{font-size:11px;color:var(--dim);padding-top:2px}
 .dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--dim);margin-top:3px}
 .steps li.done .dot{background:var(--good);border-color:var(--good)}
@@ -252,7 +257,7 @@ const voiceName=R.skill.voice.used||R.skill.voice.voice;
 const isInput=R.topic.chosen==='INPUT';
 
 /* ---------- static info ---------- */
-$('kv').innerHTML=`<dt>国家 / 平台</dt><dd>${esc(R.country)} · ${esc(R.platform)}</dd><dt>剪辑 Skill</dt><dd>${esc(R.skill.name)}</dd><dt>配音</dt><dd>${esc(voiceName)}</dd><dt>选题</dt><dd>${isInput?'人工输入':esc(R.topic.chosen)} · ${esc(R.title)}</dd><dt>脚本</dt><dd>${R.mode==='live'?'DeepSeek':'AI'} 初稿 ${R.scripts.variants.length} 版 → 采用 ${R.scripts.chosen} 版</dd>`;
+$('kv').innerHTML=`<dt>国家 / 平台</dt><dd>${esc(R.country)} · ${esc(R.platform)}</dd><dt>剪辑 Skill</dt><dd>${esc(R.skill.name)}</dd><dt>配音</dt><dd>${esc(voiceName)}</dd><dt>选题</dt><dd>${isInput?'人工输入':esc(R.topic.chosen)} · ${esc(R.title)}</dd><dt>脚本</dt><dd>${R.mode==='live'?esc(R.models?.script?.provider||'DeepSeek'):'AI'} 初稿 ${R.scripts.variants.length} 版 → 采用 ${R.scripts.chosen} 版</dd>${R.models?`<dt>模型</dt><dd id="kvModels">${['script','tts','video'].filter(k=>R.models[k]).map(k=>({script:'写脚本',tts:'配音',video:'成片评测'})[k]+' '+esc(R.models[k].provider)+' · '+esc(R.models[k].model)).join('<br>')}<br><small style="color:var(--dim)">在 .env 里改，不用动代码</small></dd>`:''}`;
 $('monNote').textContent=`画面是素材库里的真实镜头，配音是真实合成的音频（${voiceName}）。${STUDIO?'右边换了镜头后，点「写入剪映」就会重新生成剪映草稿。':'网页里换镜头只影响预览，正式修改在剪映里做。'}`;
 $('foot').innerHTML=`<div>素材：Pexels 免费可商用实拍，共 ${Object.keys(R.clips).length} 段（${Object.entries(R.clips).map(([id,c])=>`<a href="${c.pexels}" target="_blank" rel="noopener">${id}</a>`).join(' ')}）。</div><div>说明：素材标签为人工看画面标注；${R.mode==='live'?'脚本由 DeepSeek 现写，并给每句标出需要的画面概念和地点，':'存档脚本按关键词表找画面概念，'}召回按概念和地点匹配。真实落地时换成多模态模型自动打标和向量检索。剪映草稿由开源工具 pyJianYingDraft 生成。</div>`;
 
@@ -272,7 +277,7 @@ const swaps=()=>{const o={};S.forEach(seg=>seg.shots.forEach((sh,j)=>{if(sh.clip
 
 /* ---------- render ---------- */
 function renderSteps(done,run,log=R.log){
-  $('steps').innerHTML=log.map((l,i)=>`<li data-step="${esc(l.step)}" class="${i<done?'done':i===run?'run':''} ${l.step==='选题'||l.step==='写脚本'?'link':''}"><span class="dot" aria-hidden="true"></span><span><span class="k">${esc(l.step)}</span><span class="v">${i<done?esc(l.step==='自动评分'&&!Array.isArray(R.score?.checks)?'旧版估算已停用，请重新生成后查看检查结果':l.msg):i===run?'处理中…':'等待'}</span></span><span class="ms mono">${i<done&&l.ms!=null?l.ms+' ms':''}</span></li>`).join('');
+  $('steps').innerHTML=log.map((l,i)=>`<li data-step="${esc(l.step)}" class="${i<done?'done':i===run?'run':''} ${['选题','写脚本','读取 Skill'].includes(l.step)?'link':''}"><span class="dot" aria-hidden="true"></span><span><span class="k">${esc(l.step)}</span><span class="v">${i<done?esc(l.step==='自动评分'&&!Array.isArray(R.score?.checks)?'旧版估算已停用，请重新生成后查看检查结果':l.msg):i===run?'处理中…':'等待'}</span></span><span class="ms mono">${i<done&&l.ms!=null?l.ms+' ms':''}</span></li>`).join('');
 }
 function renderScore(){
   const result=R.score||{};
@@ -398,6 +403,41 @@ function openTopic(){
    <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
   $('modal').hidden=false;
 }
+function openSkill(){
+  const K=R.skill,rules=K.rules||[];
+  const shots=S.flatMap(s=>s.shots),subs=S.map(s=>s.subtitle||''),words=S.map(s=>s.en.trim().split(/\s+/).length);
+  const sticker=kind=>{for(const s of S){const x=(s.stickers||[]).find(t=>t.kind===kind);if(x)return {...x,seg:s}}return null};
+  const maxShot=Math.max(...shots.map(x=>x.dur)),lines=subs.flatMap(x=>x.split('\n')),maxLine=Math.max(...lines.map(l=>l.length)),maxLines=Math.max(...subs.map(x=>x.split('\n').length));
+  const open=sticker('开头花字'),ben=sticker('利益点贴纸'),cta=sticker('结尾钩子'),r1=(R.rules.find(r=>r.id==='R1')||{}).ok!==false;
+  const per=S.map(s=>s.shots.length);
+  // 每条规则在这条粗剪上实际做到了什么：[是否符合, 说明]
+  const got={
+    S1:[S.length===5&&Math.max(...words)<=14,`${S.length} 句，最长一句 ${Math.max(...words)} 个词`],
+    S2:[r1,r1?'第 1 句没有价格或优惠':'第 1 句出现了价格或优惠'],
+    S3:[maxShot<=K.max_shot_s+0.05,`最长的镜头 ${maxShot.toFixed(2)} 秒`],
+    S4:[Math.max(...per)<=3,`${shots.length} 个镜头，每句 ${Math.min(...per)===Math.max(...per)?per[0]:Math.min(...per)+'–'+Math.max(...per)} 个`],
+    S5:[shots.every(x=>x.src_in==null||x.src_in>=K.clip_skip_head_s-0.01),`都从素材第 ${K.clip_skip_head_s} 秒之后取`],
+    S6:[maxLine<=K.subtitle.max_chars_per_line&&maxLines<=2,`最长一行 ${maxLine} 个字符，最多 ${maxLines} 行`],
+    S8:[!open||open.dur<=K.opening_huazi_max_s+0.01,open?`「${open.text}」停 ${open.dur} 秒`:'这条没有开头花字'],
+    S9:[!!ben,ben?`「${ben.text}」在第 ${ben.seg.i+1} 句开始后 ${(ben.start-ben.seg.start).toFixed(1)} 秒出现，停 ${ben.dur} 秒`:'这条没有利益点贴纸'],
+    S10:[!!cta&&cta.dur>=K.cta_min_s,cta?`「${cta.text}」停 ${cta.dur} 秒`:'这条没有结尾引导'],
+    S11:[true,voiceName],
+  };
+  const tone=s=>s.startsWith('访谈')?'ok':s==='行业规范'?'mid':'';
+  let group='';
+  const rows=rules.map(r=>{const g=got[r.id],head=r.group!==group?(group=r.group,`<tr class="grp"><td colspan="3">${esc(r.group)}</td></tr>`):'';
+    return head+`<tr><td>${esc(r.rule)}<br><small>${esc(r.why||'')}</small></td><td><span class="band ${tone(r.source)}">${esc(r.source)}</span></td><td>${g?`<span class="${g[0]?'ok-ic':'bad-ic'}">${g[0]?'✓':'✕'}</span> ${esc(g[1])}`:'<small>看成片判断</small>'}</td></tr>`}).join('');
+  const M=K.measured;
+  const measured=M?`<h4>从成片量出来的值</h4><p>来源：${esc(M.source)}。共 ${M.videos} 条、${M.shots} 个镜头。</p>
+    <table><tr><th>项目</th><th>Skill 里的设定</th><th>成片实测</th><th>判断</th></tr>${(M.compare||[]).map(c=>`<tr><td>${esc(c.item)}</td><td>${esc(c.setting)}</td><td>${esc(c.measured)}</td><td>${esc(c.verdict)}</td></tr>`).join('')}</table>
+    <p>量得了的：镜头时长、语速、每句词数、开头是否提价格、结尾是否有引导。字幕样式、花字设计和选什么画面，量不了，要人看。</p>`:'';
+  $('modalCard').innerHTML=`<h3>剪辑 Skill · ${esc(K.name)}</h3><p>${esc(K.from)}。</p>
+   <table class="skill"><tr><th>规则和原因</th><th>来源</th><th>这条粗剪做到了吗</th></tr>${rows}</table>
+   <p>来源说明：<span class="band ok">访谈</span> 业务方在访谈里说的做法；<span class="band mid">行业规范</span> 公开的通行标准；<span class="band">示例值</span> 先填的占位数字，等真实爆款成片蒸馏后替换。</p>
+   ${measured}
+   <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
+  $('modal').hidden=false;
+}
 function openScript(){
   const X=R.scripts;
   $('modalCard').innerHTML=`<h3>脚本初稿与审核</h3><p>生成：${esc(X.generated_by)}。三版都按"冷知识开头 → 路线 → 画面 → 利益点 → 搜码钩子"的结构写，再按规则和事实库逐条审核。</p>
@@ -408,7 +448,7 @@ function openScript(){
    <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="closeM">关闭</button></div>`;
   $('modal').hidden=false;
 }
-$('steps').addEventListener('click',e=>{const li=e.target.closest('li.link.done');if(!li||state.running)return;li.dataset.step==='选题'?openTopic():openScript()});
+$('steps').addEventListener('click',e=>{const li=e.target.closest('li.link.done');if(!li||state.running)return;({'选题':openTopic,'写脚本':openScript,'读取 Skill':openSkill})[li.dataset.step]()});
 $('modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.id==='closeM')$('modal').hidden=true});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('modal').hidden=true});
 
@@ -552,9 +592,9 @@ if(STUDIO){
 }
 
 renderSteps(0,-1);
-// #done-<秒>：直接显示生成后的状态（截图、演示用）；#topic / #script 打开对应弹窗
+// #done-<秒>：直接显示生成后的状态（截图、演示用）；#topic / #script / #skill 打开对应弹窗
 const hm=location.hash.match(/^#done(?:-([\d.]+))?/);
-if(!HOSTED&&(location.hash==='#topic'||location.hash==='#script')){renderSteps(R.log.length,-1);location.hash==='#topic'?openTopic():openScript();}
+if(!HOSTED&&['#topic','#script','#skill'].includes(location.hash)){renderSteps(R.log.length,-1);({'#topic':openTopic,'#script':openScript,'#skill':openSkill})[location.hash]();}
 if(!HOSTED&&hm)showDone(parseFloat(hm[1]||'1'));
 else if(!HOSTED&&STUDIO&&R.mode==='live')showDone(1);
 </script>

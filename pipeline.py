@@ -111,7 +111,7 @@ def write_scripts_llm(topic, market, platform, facts, lib):
         "事实库": [f["text"] for f in facts["facts"]],
         "提醒": "事实库里没有的班次、时刻、价格不要写；实在要写就写进 claims，交人工核对。优惠只能用事实库里的 up to 30%（分段买票）和搜码 UK20 额外 20%。不要提任何第三方品牌或公司名（铁路公司、App、食品等），我们自己的 App 就叫 the app。",
     }, ensure_ascii=False)
-    data, usage = llm.deepseek_json(system, user)
+    data, usage = llm.script_json(system, user)
     variants = data["variants"][:3]
     for i, v in enumerate(variants):
         v["id"] = "ABC"[i]
@@ -381,7 +381,7 @@ def main():
     if args.topic:
         raw, usage, sys_prompt, user_prompt = write_scripts_llm(topic_title, args.market, args.platform, facts, lib)
         usage_info["deepseek"] = usage
-        generated_by = f"DeepSeek（deepseek-chat，{time.strftime('%Y-%m-%d %H:%M')} 现场生成，{usage.get('total_tokens', '?')} tokens，{usage.get('seconds')} 秒）"
+        generated_by = f"{usage['provider']}（{usage['model']}，{time.strftime('%Y-%m-%d %H:%M')} 现场生成，{usage.get('total_tokens', '?')} tokens，{usage.get('seconds')} 秒）"
     else:
         raw, generated_by = cands["variants"], cands["generated_by"]
     variants = []
@@ -393,9 +393,10 @@ def main():
     chosen = passed[0] if passed else min(variants, key=lambda v: sum(not c["ok"] for c in v["checks"]))
     rejected = [f"{v['id']} 版：{next(c['msg'] for c in v['checks'] if not c['ok'])}" for v in variants if not v["ok"]]
     script["lines"] = [dict(l) for l in chosen["lines"]]
-    who = "DeepSeek" if args.topic else "脚本 Agent"
+    who = usage_info["deepseek"]["provider"] if args.topic else "脚本 Agent"
+    models = llm.models_in_use() if args.topic else {}   # 存档示例不调模型
     log("写脚本", f"{who} 出 {len(variants)} 版初稿，审核拦下 {len(rejected)} 版，采用 {chosen['id']} 版" + ("" if passed else "（3 版都没全过，选问题最少的一版，需人工改）"), t0)
-    log("读取 Skill", f"{skill['name']}：单镜头 ≤ {skill['max_shot_s']} 秒、字幕/花字样式、利益点和结尾钩子规则", t0)
+    log("读取 Skill", f"{skill['name']}：{len(skill.get('rules', []))} 条规则，单镜头 ≤ {skill['max_shot_s']} 秒、字幕/花字样式、利益点和结尾钩子", t0)
 
     durations = {c["id"]: jy.VideoMaterial(os.path.join(ROOT, c["file"])).duration / US for c in clips}
     log("读取素材库", f"{len(clips)} 段实拍，已打标签（地点、场景、清晰度、风险）", t0)
@@ -426,6 +427,8 @@ def main():
     if engine == "minimax":
         usage_info["minimax"] = {"characters": chars, "voice": voice["minimax_voice"]}
     voice_name = f"MiniMax {voice['minimax_voice']}" if engine == "minimax" else voice["voice"]
+    if models and engine != "minimax":   # 配音实际退回了系统语音，如实记录
+        models["tts"] = {"provider": "macOS 系统语音", "model": voice["voice"]}
     log("生成配音", f"{len(lines)} 句，共 {sum(l['voice_s'] for l in lines):.1f} 秒（{voice_name}）" + (f"；{fallback_note}，改用系统语音" if fallback_note else ""), t0)
 
     # 分段：每句一段，段与段之间留气口
@@ -514,7 +517,7 @@ def main():
               "skill": {**skill, "voice": {**voice, "used": voice_name, "engine": engine}}, "total_s": total_s, "segments": plan,
               "rules": rule_out, "score": review,
               "log": log_lines, "draft": {"name": draft_name, "path": draft_dir, "shots": n_shots, "stickers": n_st},
-              "usage": usage_info, "clips": clip_meta(clips, durations)}
+              "usage": usage_info, "models": models or None, "clips": clip_meta(clips, durations)}
     save_result(result)
     print("done:", os.path.join(OUT, "result.json"))
 

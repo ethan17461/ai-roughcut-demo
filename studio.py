@@ -71,7 +71,8 @@ class H(BaseHTTPRequestHandler):
             with lock:
                 return self._send(200, dict(job))
         if path == "/api/keys":
-            return self._send(200, {"deepseek": llm.has("DEEPSEEK_API_KEY"), "minimax": llm.has("MINIMAX_API_KEY")})
+            return self._send(200, {"deepseek": bool(llm.model_config("script")["api_key"]), "minimax": llm.has("MINIMAX_API_KEY"),
+                                    "models": llm.models_in_use()})
         # 静态文件：clips/、thumbs/；audio/ 直接读 output/tts/（每次生成都是新的）
         if path.startswith("/audio/"):
             f = os.path.join(OUT, "tts", os.path.basename(path))
@@ -116,9 +117,9 @@ class H(BaseHTTPRequestHandler):
                 return self._send(400, {"error": "视频大小无效。"})
             if size <= 0 or size > 100 * 1024 * 1024:
                 return self._send(400, {"error": "请选择不超过 100 MB 的视频。"})
-            env = llm.load_env()
-            if not env.get("DEEPSEEK_API_KEY"):
-                return self._send(400, {"error": "请先在 .env 中填写 DEEPSEEK_API_KEY。"})
+            cfg = llm.model_config("video")   # 成片评测用哪家哪个模型，在 .env 里配
+            if not cfg["api_key"]:
+                return self._send(400, {"error": "请先在 .env 中填写 DEEPSEEK_API_KEY（或 VIDEO_API_KEY）。"})
             try:
                 from video_review import review_video
                 with tempfile.TemporaryDirectory(prefix="roughcut-review-") as tmp:
@@ -137,7 +138,8 @@ class H(BaseHTTPRequestHandler):
                             draft = json.load(f)
                     except (OSError, ValueError):
                         draft = None
-                    review = review_video(video_path, env["DEEPSEEK_API_KEY"], env.get("DEEPSEEK_VIDEO_MODEL") or "deepseek-flash", draft)
+                    review = review_video(video_path, cfg["api_key"], cfg["model"], draft, cfg["base_url"])
+                    review["usage"]["provider"] = cfg["provider"]
                 return self._send(200, {"review": review})
             except (ValueError, RuntimeError) as e:
                 return self._send(400, {"error": str(e)})
@@ -148,8 +150,8 @@ class H(BaseHTTPRequestHandler):
             topic = (body.get("topic") or "").strip()[:80]
             if not topic:
                 return self._send(400, {"error": "请先输入选题"})
-            if not llm.has("DEEPSEEK_API_KEY"):
-                return self._send(400, {"error": "还没填 DeepSeek key：请在 .env 里填 DEEPSEEK_API_KEY"})
+            if not llm.model_config("script")["api_key"]:
+                return self._send(400, {"error": "还没填写脚本用的 key：请在 .env 里填 DEEPSEEK_API_KEY（或 SCRIPT_API_KEY）"})
             with lock:
                 if job["running"]:
                     return self._send(409, {"error": "上一个还在生成"})

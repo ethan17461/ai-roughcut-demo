@@ -6,6 +6,7 @@
 """
 import array
 import base64
+import functools
 import glob
 import json
 import math
@@ -32,7 +33,7 @@ WORKERS = 6        # 合规请求的并发数
 SCORE_FRAMES = 60  # 打分请求最多带多少帧
 PASS_SCORE = 70    # 低于这个总分转人工
 MAX_LOW = 2        # 低置信项超过这个数转人工
-API_URL = 'https://api.deepseek.com/chat/completions'
+DEFAULT_BASE_URL = 'https://api.deepseek.com'   # 换模型在 .env 里配 VIDEO_BASE_URL / VIDEO_MODEL，见 llm.model_config
 # deepseek-flash 高峰期价格（美元 / 百万 token）和汇率，只用来在页面上估算费用。
 PRICE_IN, PRICE_OUT, USD_CNY = 0.3, 1.2, 7.2
 
@@ -98,20 +99,35 @@ def _post(url, key, body, content_type):
         with urllib.request.urlopen(req, timeout=180) as response:
             return json.load(response)
     except urllib.error.HTTPError as exc:
+        if exc.code == 400 and b'response_format' in exc.read(2000):
+            raise NoJsonMode() from exc
         # 不把密钥、请求内容或上游返回的正文暴露给浏览器。
-        raise RuntimeError(f'DeepSeek 请求失败（HTTP {exc.code}），请检查密钥、额度和模型权限。') from exc
+        raise RuntimeError(f'模型接口请求失败（HTTP {exc.code}），请检查密钥、额度和模型权限。') from exc
     except (urllib.error.URLError, TimeoutError, ValueError) as exc:
-        raise RuntimeError('连接 DeepSeek 失败或返回内容无效，请检查网络后重试。') from exc
+        raise RuntimeError('连接模型接口失败或返回内容无效，请检查网络后重试。') from exc
 
 
-def _chat(api_key, model, content, max_tokens):
-    """发一次请求，返回 (模型输出的 JSON 对象, token 用量)。"""
+class NoJsonMode(Exception):
+    """这个模型不支持 response_format=json_object，要靠提示词约束输出格式。"""
+
+
+def _chat(api_key, model, content, max_tokens, base_url=DEFAULT_BASE_URL):
+    """发一次请求，返回 (模型输出的 JSON 对象, token 用量)。接口是 OpenAI 兼容格式，哪家都行。"""
     request = {'model': model, 'messages': [{'role': 'user', 'content': content}],
-               'response_format': {'type': 'json_object'}, 'max_tokens': max_tokens, 'temperature': 0,
-               'thinking': {'type': 'disabled'}}
-    response = _post(API_URL, api_key, json.dumps(request).encode(), 'application/json')
+               'response_format': {'type': 'json_object'}, 'max_tokens': max_tokens, 'temperature': 0}
+    if 'deepseek' in base_url:
+        request['thinking'] = {'type': 'disabled'}   # DeepSeek 特有：关掉思考模式才直接出 JSON
+    url = base_url.rstrip('/') + '/chat/completions'
     try:
-        raw = json.loads(response['choices'][0]['message']['content'])
+        response = _post(url, api_key, json.dumps(request).encode(), 'application/json')
+    except NoJsonMode:
+        request.pop('response_format')
+        response = _post(url, api_key, json.dumps(request).encode(), 'application/json')
+    try:
+        text = response['choices'][0]['message']['content'].strip()
+        if text.startswith('```'):   # 有的模型会把 JSON 包在代码块里
+            text = text.split('\n', 1)[1].rsplit('```', 1)[0]
+        raw = json.loads(text)
     except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
         raise ValueError('AI 没有返回有效的 JSON。') from exc
     if not isinstance(raw, dict):
@@ -494,10 +510,14 @@ def conclude(dims, risks, coverage, draft):
     return {'result': '转人工' if reasons else '通过', 'reasons': reasons}, total
 
 
-def review_video(path, api_key, model='deepseek-flash', draft=None):
-    """draft 是流水线保存的 result.json 内容；不传或对不上时，草稿计算项改由 AI 判断。"""
+def review_video(path, api_key, model='deepseek-flash', draft=None, base_url=DEFAULT_BASE_URL):
+    """draft 是流水线保存的 result.json 内容；不传或对不上时，草稿计算项改由 AI 判断。
+
+    model 和 base_url 决定用哪家的哪个模型（要能看图），由调用方从 .env 读出来传入。
+    """
     if not api_key:
-        raise ValueError('请先在 .env 中填写 DEEPSEEK_API_KEY。')
+        raise ValueError('请先在 .env 中填写 DEEPSEEK_API_KEY（或 VIDEO_API_KEY）。')
+    call = functools.partial(_chat, base_url=base_url)
     if not os.path.isfile(path) or not 0 < os.path.getsize(path) <= MAX_BYTES:
         raise ValueError('请选择不超过 100 MB 的视频文件。')
     try:
@@ -514,7 +534,7 @@ def review_video(path, api_key, model='deepseek-flash', draft=None):
         raise ValueError('视频时长需在 3 分钟以内。')
 
     with tempfile.TemporaryDirectory(prefix='roughcut-review-') as tmp, ThreadPoolExecutor(max_workers=1) as background:
-        compliance = background.submit(check_compliance, extract_frames(path, tmp, CHECK_WIDTH), api_key, model)
+        compliance = background.submit(check_compliance, extract_frames(path, tmp, CHECK_WIDTH), api_key, model, call)
         frames = extract_frames(path, tmp, SCORE_WIDTH)  # 合规请求在后台跑，同时在本机转写
         sound = os.path.join(tmp, 'audio.mp3')
         _ffmpeg(['-i', path, '-vn', '-ac', '1', '-ar', '16000', '-b:a', '32k', sound])
@@ -535,7 +555,7 @@ def review_video(path, api_key, model='deepseek-flash', draft=None):
     scored['subtitle_mobile'] = score_mobile(width, height)
 
     fallback = [cid for cid in FALLBACK_ITEMS if scored.get(cid, {}).get('score') is None]
-    judged, summary, score_usage = ai_score(frames, timeline, transcript, list(AI_ITEMS) + fallback, api_key, model)
+    judged, summary, score_usage = ai_score(frames, timeline, transcript, list(AI_ITEMS) + fallback, api_key, model, call)
     for cid in fallback:
         judged[cid]['confidence'] = 'low'
         if matched:
@@ -553,7 +573,7 @@ def review_video(path, api_key, model='deepseek-flash', draft=None):
         'total': total, 'verdict': verdict, 'dimensions': dims, 'summary': summary, 'risks': risks,
         'compliance': coverage, 'draft': draft_info, 'pass_score': PASS_SCORE, 'max_low': MAX_LOW,
         'audio': dict(measured, words_per_minute=speech_rate(segments)),
-        'usage': {'requests': len(usages), 'prompt_tokens': tokens_in, 'completion_tokens': tokens_out,
+        'usage': {'requests': len(usages), 'prompt_tokens': tokens_in, 'completion_tokens': tokens_out, 'model': model,
                   'cost_cny': round((tokens_in * PRICE_IN + tokens_out * PRICE_OUT) / 1e6 * USD_CNY, 3)},
         'limitations': ['合规按每秒 2 帧全检，语音在本地转成文字后评测。AI 可能漏判或误判，发布前由组长确认。'],
         'transcript': transcript, 'duration_seconds': round(duration, 2)}
