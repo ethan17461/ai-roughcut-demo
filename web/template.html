@@ -131,6 +131,16 @@ a{color:var(--muted)}
 .video-review input{max-width:100%;font:inherit;font-size:12px;color:var(--muted)}
 .video-review .btn{justify-self:start}
 .review-list{padding-left:18px;color:var(--muted);font-size:12px}
+.video-review h3{margin:14px 0 0;font-size:13px}
+.video-review video{width:100%;max-height:340px;border-radius:8px;background:#000}
+.video-review .why{margin-top:3px}
+.video-review .why b{color:var(--fg)}
+.src{margin:0 6px;padding:0 6px;border:1px solid var(--line);border-radius:999px;font-size:10.5px;color:var(--dim);white-space:nowrap}
+.src.low{color:var(--warn);border-color:rgba(240,160,60,.55)}
+.seek{padding:1px 8px;border:1px solid var(--line);border-radius:999px;background:var(--panel-2);font-size:11.5px;color:var(--fg);cursor:pointer}
+.seek:hover{border-color:var(--accent)}
+.tip{color:var(--dim)}
+.video-review select,.video-review input[type=text]{font:inherit;font-size:12px;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:2px 6px;max-width:100%}
 @media (max-width:740px){.ask{grid-template-columns:1fr 1fr}.ask input{grid-column:1 / -1}}
 .foot{font-size:12px;color:var(--dim);display:grid;gap:4px}
 .modal{position:fixed;inset:0;background:rgba(5,7,10,.72);display:grid;place-items:center;padding:16px;z-index:20}
@@ -153,7 +163,7 @@ a{color:var(--muted)}
   <header class="top">
     <div>
       <h1>AI 粗剪工作台 <span class="pill">真实流水线结果</span></h1>
-      <p>选题 → 写脚本 → 配音 → 素材召回 → 国家和平台规则 → 剪映草稿 → 自动评分 → 人工精修</p>
+      <p>选题 → 写脚本 → 配音 → 素材召回 → 国家和平台规则 → 剪映草稿 → 草稿检查 → 人工精修</p>
     </div>
     <button class="btn" id="draftBtn" disabled>查看生成的剪映草稿</button>
   </header>
@@ -195,8 +205,8 @@ a{color:var(--muted)}
       <div id="videoReviewPanel" hidden>
         <h2>成片 AI 评测</h2>
         <div class="video-review">
-          <p class="empty">先在剪映导出视频，再选择 MP4、MOV 或 M4V 文件（不超过 100 MB、3 分钟）。这份文件独立于当前草稿，请确认选对视频。</p>
-          <p class="empty" id="reviewPrivacy">点击评测后，程序会在本机将配音转成文字，并将抽取的画面和转写文字发送给 DeepSeek 评测；不会发送原始音频。调用 DeepSeek 可能产生 API 费用。</p>
+          <p class="empty">先在剪映导出视频，再选择 MP4、MOV 或 M4V 文件（不超过 100 MB、3 分钟）。请选刚导出的这一条：评测会用到这次粗剪的镜头、字幕和脚本数据。</p>
+          <p class="empty" id="reviewPrivacy">点击评测后，程序会在本机把配音转成文字，再按每秒 2 帧把画面连同转写文字发给 DeepSeek；不会发送原始音频。24 秒的视频约 ¥0.13。</p>
           <p class="empty" id="reviewModel">首次使用需要联网下载本地语音识别模型（约 0.5 GB），可能需要较长时间。默认针对英语配音。</p>
           <label for="reviewFile">选择导出的视频</label>
           <input id="reviewFile" type="file" accept=".mp4,.mov,.m4v,video/mp4,video/quicktime">
@@ -282,7 +292,7 @@ function renderScore(){
     return `<div class="dim"><div class="t"><span>${esc(c.name)}</span><span class="band ${cls}">${esc(statusLabel[status]||status)}</span></div><div class="why">${esc(c.evidence)}</div></div>`;
   }).join('');
   const pending=(result.pending||[]).map(item=>`<li>${esc(typeof item==='string'?item:(item.name||item.evidence||''))}</li>`).join('');
-  $('scoreBox').innerHTML=`<p class="empty">${esc(result.subject||'检查对象：本次生成的草稿')}</p><div class="dims">${checks||'<p class="empty">暂无检查结果。</p>'}</div>${pending?`<p class="empty" style="margin-top:12px">还需要人工检查：</p><ul class="rules">${pending}</ul>`:''}`;
+  $('scoreBox').innerHTML=`<p class="empty">${esc(result.subject||'检查对象：本次生成的草稿')}</p><div class="dims">${checks||'<p class="empty">暂无检查结果。</p>'}</div>${pending?`<p class="empty" style="margin-top:12px">还需要人工检查：</p><ul class="review-list">${pending}</ul>`:''}`;
 }
 function renderRules(){
   const sc=shotFlags();
@@ -409,8 +419,86 @@ if(STUDIO){
     document.body.classList.add('hosted');
     document.querySelector('.top h1').innerHTML='AI 粗剪工作台 <span class="pill">成片评测</span>';
     document.querySelector('.top p').textContent='上传已导出的视频，评估画面与口播；当前网页不能生成或写入剪映草稿。';
-    $('reviewPrivacy').textContent='点击评测后，视频会上传到本服务，在服务端提取音频并转写；抽取的画面和转写文字会发送给 DeepSeek。调用可能产生 API 费用。';
+    $('reviewPrivacy').textContent='点击评测后，视频会上传到本服务，在服务端提取音频并转写；每秒 2 帧的画面和转写文字会发送给 DeepSeek。调用会产生 API 费用。';
     $('reviewModel').textContent='服务端使用轻量英语语音识别模型，转写可能出错，请人工核对。视频较长时评测可能需要较长时间。';
+  }
+  /* ---------- 成片评测结果：总分 + 结论，合规命中可以点时间跳过去看，人只在需要时处理 ---------- */
+  const SRC={draft:'草稿计算',measure:'测量',ai:'AI 判断'};
+  const RISK_OPTS={
+    face:[['fix','确认露脸，退回修改'],['none','看不清脸或误报，可保留']],
+    flag:[['fix','退回修改'],['keep','保留并说明'],['none','误报，没有国旗']],
+    logo:[['fix','是竞品标识，退回修改'],['none','不是竞品，可保留']],
+  };
+  let reviewUrl=null;
+  function renderReview(v,file){
+    const box=$('videoReviewResult'),sec=n=>Number(n).toFixed(1);
+    if(reviewUrl)URL.revokeObjectURL(reviewUrl);
+    reviewUrl=URL.createObjectURL(file);
+    const seek=(a,b)=>`<button type="button" class="seek" data-seek="${esc(a)}">${sec(a)}–${sec(b)} 秒</button>`;
+    const risks=v.risks.map(r=>{
+      const hit=r.status==='hit';
+      const opts=hit?(RISK_OPTS[r.id]||[['fix','退回修改'],['none','误报']]):[['fix','人工发现，退回修改']];
+      return `<div class="dim"><div class="t"><span>${esc(r.name)}</span><span class="band ${hit?'bad':r.status==='clear'?'ok':'mid'}">${hit?`发现 ${r.spans.length} 处`:r.status==='clear'?'未发现':'没查完'}</span></div>`
+        +r.spans.map(sp=>`<div class="why">${seek(sp.start,sp.end)} ${esc(sp.what)}</div>`).join('')
+        +`<div class="why"><label>人工处理：<select data-risk="${esc(r.id)}"><option value="ai">${hit?'待处理':'按 AI 结果'}</option>${opts.map(([k,t])=>`<option value="${k}">${t}</option>`).join('')}</select></label> <input type="text" data-risk-note="${esc(r.id)}" placeholder="写明保留理由" hidden></div></div>`;
+    }).join('');
+    const unchecked=(v.compliance.unchecked||[]).map(([a,b])=>seek(a,b)).join(' ');
+    const needLook=unchecked||v.risks.some(r=>r.spans.length);
+    const dims=v.dimensions.map((d,di)=>`<div class="dim"><div class="t"><span>${esc(d.name)}</span><span class="mono" data-dim-score="${di}"></span></div>`
+      +d.criteria.map((c,ci)=>`<div class="why"><span data-crit="${di}:${ci}"></span>${esc(c.reason)}${c.suggestion?` <span class="tip">建议：${esc(c.suggestion)}</span>`:''}</div>`).join('')+'</div>').join('');
+    const manual=v.dimensions.map((d,di)=>d.criteria.map((c,ci)=>`<div class="why"><label>${esc(c.name)}：<select data-review-score="${di}:${ci}"><option value="">${c.score==null?'未评':`按自动结果（${esc(c.score)} 分）`}</option>${[[0,'不满足'],[c.partial,'部分满足'],[c.max,'满足']].map(([n,t])=>`<option value="${esc(n)}">${esc(n)} 分（${t}）</option>`).join('')}</select></label></div>`).join('')).join('');
+    const u=v.usage||{};
+    box.innerHTML=`<div class="score-head"><span class="score-num mono" id="reviewTotal"></span><span> / 100 分</span><span class="band" id="reviewVerdict"></span></div>
+      <p class="empty" id="reviewVerdictNote"></p><ul class="review-list" id="reviewReasons"></ul>
+      ${v.summary?`<p class="empty">${esc(v.summary)}</p>`:''}
+      <h3>合规：人脸、国旗、品牌标识</h3>
+      <p class="empty">已按每秒 ${esc(v.compliance.fps)} 帧检查 ${esc(v.compliance.checked)} / ${esc(v.compliance.frames)} 帧。${unchecked?`没查成的片段：${unchecked}。`:''}${needLook?'点时间可以直接跳到那一段。':''}</p>
+      <video id="reviewPlayer" src="${reviewUrl}" controls playsinline preload="metadata" ${needLook?'':'hidden'}></video>
+      <div class="dims">${risks}</div>
+      <h3>评分</h3>
+      ${v.draft.matched?'':'<p class="empty">导出视频和当前草稿对不上，本该由草稿计算的项目改由 AI 判断。</p>'}
+      <div class="dims">${dims}</div>
+      <details><summary>人工改分（可选）</summary><p class="empty">不改就按自动结果；改过的项目按人工分数算。</p>${manual}</details>
+      ${v.transcript?`<details><summary>查看语音转写</summary><p class="empty">${esc(v.transcript)}</p></details>`:''}
+      <p class="empty">视频 ${esc(v.duration_seconds)} 秒，${esc(u.requests)} 次请求，共 ${esc((u.prompt_tokens||0)+(u.completion_tokens||0))} token，约 ¥${esc(u.cost_cny)}。${esc((v.limitations||[])[0]||'')}</p>`;
+    // 结论规则和 video_review.py 的 conclude() 一致，只是把人工处理的结果也算进去。
+    const refresh=()=>{
+      let total=0,factHuman=false;const missing=[],low=[];
+      v.dimensions.forEach((d,di)=>{
+        let pts=0,un=0;
+        d.criteria.forEach((c,ci)=>{
+          const sel=box.querySelector(`[data-review-score="${di}:${ci}"]`),human=sel.value!=='';
+          const score=human?Number(sel.value):c.score,lowc=!human&&score!=null&&c.confidence==='low';
+          box.querySelector(`[data-crit="${di}:${ci}"]`).innerHTML=`${esc(c.name)} <b>${score==null?'未评':esc(score)}</b> / ${esc(c.max)}<span class="src${lowc?' low':''}">${human?'人工':(SRC[c.source]||'AI 判断')+(lowc?'（低置信）':'')}</span>`;
+          if(score==null){missing.push(c.name);un++}else{pts+=score;if(lowc)low.push(c.name)}
+          if(c.id==='content_fact'&&human)factHuman=true;
+        });
+        total+=pts;
+        box.querySelector(`[data-dim-score="${di}"]`).textContent=`${Number(pts.toFixed(1))} / ${d.max}`+(un?`（${un} 项未评）`:'');
+      });
+      const fail=[],reasons=[];
+      v.risks.forEach(r=>{
+        const sel=box.querySelector(`[data-risk="${r.id}"]`).value,note=box.querySelector(`[data-risk-note="${r.id}"]`);
+        note.hidden=sel!=='keep';
+        if(sel==='fix')fail.push(`${r.name}：人工确认要退回修改`);
+        else if(sel==='keep'&&!note.value.trim())reasons.push(`${r.name}：选了保留，请写明理由`);
+        else if(sel==='ai')r.spans.forEach(sp=>reasons.push(`${r.name}：${sec(sp.start)}–${sec(sp.end)} 秒，${sp.what}`));
+      });
+      if(!v.compliance.complete)reasons.push(`有 ${v.compliance.frames-v.compliance.checked} 帧画面没检查成功，需要人看这几段`);
+      if(missing.length)reasons.push('无法自动评分：'+missing.join('、'));
+      if(low.length>v.max_low)reasons.push(`${low.length} 项 AI 把握不足：${low.join('、')}`+(v.draft.matched?'':'（导出视频和当前草稿对不上，这些项改由 AI 判断）'));
+      const sum=Number(total.toFixed(1));
+      if(!missing.length&&sum<v.pass_score)reasons.push(`总分 ${sum} 低于 ${v.pass_score} 分`);
+      if((v.draft.claims||[]).length&&!factHuman)reasons.push('脚本里有待核对的说法：'+v.draft.claims.join('；'));
+      const res=fail.length?'不合格':reasons.length?'转人工':'通过';
+      $('reviewTotal').textContent=String(sum);
+      const badge=$('reviewVerdict');badge.textContent=res;badge.className='band '+(res==='通过'?'ok':res==='转人工'?'mid':'bad');
+      $('reviewVerdictNote').textContent=res==='通过'?'AI 评测通过，可进入发布审核。':res==='转人工'?'人只需要看下面这几处：':'退回修改，原因：';
+      $('reviewReasons').innerHTML=(fail.length?fail:reasons).map(x=>`<li>${esc(x)}</li>`).join('');
+    };
+    box.onchange=refresh;box.oninput=refresh;
+    box.onclick=e=>{const b=e.target.closest('[data-seek]');if(!b)return;const pl=$('reviewPlayer');pl.hidden=false;pl.currentTime=Number(b.dataset.seek);pl.play().catch(()=>{})};
+    refresh();
   }
   $('videoReviewPanel').hidden=false;
   $('reviewFile').addEventListener('change',()=>{
@@ -424,50 +512,17 @@ if(STUDIO){
     if(file.size>100*1024*1024){$('reviewStatus').textContent='视频超过 100 MB，请先压缩或选择较小的文件。';return}
     if(file.size===0){$('reviewStatus').textContent='视频文件为空，请重新选择。';return}
     $('reviewGo').disabled=true;$('reviewFile').disabled=true;
-    $('reviewStatus').textContent=HOSTED?'正在上传视频、提取画面并在服务端转写声音，再请求 DeepSeek 评测；可能需要较长时间，请不要关闭页面。':'正在提取画面、在本地转写声音并请求 DeepSeek 评测。首次使用需要下载语音模型，可能需要较长时间，请不要关闭页面。';
+    $('reviewStatus').textContent=HOSTED?'正在上传视频、按每秒 2 帧检查画面并在服务端转写声音，再请 DeepSeek 打分；请不要关闭页面。':'正在按每秒 2 帧检查画面、在本地转写声音，并请 DeepSeek 打分。24 秒的视频大约 15 秒；首次使用要先下载语音模型，会久一些。';
     $('videoReviewResult').innerHTML='';
     try{
       const response=await fetch('/api/video-review',{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:file});
       const data=await response.json();
       if(!response.ok||data.error)throw new Error(data.error||'请求失败，请稍后再试。');
       const v=data.review;
-      if(!v||!Array.isArray(v.dimensions))throw new Error('评测结果格式不完整，请重试。');
+      if(!v||!Array.isArray(v.dimensions)||!Array.isArray(v.risks)||!v.compliance||!v.draft)throw new Error('评测结果格式不完整，请重试。');
       if(v.dimensions.some(d=>!Array.isArray(d.criteria)))throw new Error('评测标准格式不完整，请重试。');
-      const dims=v.dimensions.map((d,di)=>`<div class="dim"><div class="t"><span>${esc(d.name)}</span><span class="mono" data-dim-score="${di}">待核验 / ${esc(d.max)}</span></div>${d.criteria.map((c,ci)=>`<div class="why">${esc(c.name)}：<span data-criterion-score="${di}:${ci}">待评</span>。AI 依据：${esc(c.reason||'无')}</div>${c.suggestion?`<div class="why">AI 建议：${esc(c.suggestion)}</div>`:''}`).join('')}</div>`).join('');
-      const manual=v.dimensions.map((d,di)=>`<div class="dim"><div class="t"><span>${esc(d.name)}</span></div>${d.criteria.map((c,ci)=>`<div class="why"><label>${esc(c.name)}：<select data-review-score="${di}:${ci}"><option value="">待评</option>${[[0,'未满足'],[c.partial,'部分满足'],[c.max,'满足']].map(([n,label])=>`<option value="${esc(n)}" ${c.score===n?'selected':''}>${esc(n)} 分（${label}）</option>`).join('')}</select></label><span> ${c.score==null?'待人工评定':'初始为 AI 评分'}。</span></div>`).join('')}</div>`).join('');
-      const gates=['事实准确','素材使用权'];
-      const hardRules=[{id:'face',name:'人脸'},{id:'flag',name:'国旗'},{id:'competitor_logo',name:'竞品 Logo'}].map(rule=>{
-        const found=Array.isArray(v.risks)?v.risks.find(r=>r.id===rule.id):null;
-        return {...rule,status:found?.status==='suspected'?'suspected':'unknown',evidence:found?.evidence||'抽样未能确认，请人工检查完整视频。'};
-      });
-      const limitations=(v.limitations||[]).map(x=>`<li>${esc(x)}</li>`).join('');
       $('reviewStatus').textContent='评测完成：'+file.name;
-      $('videoReviewResult').innerHTML=`<div class="score-head"><span class="score-num mono" id="reviewTotal">待评</span><span> / 100 分</span></div><p class="empty" id="reviewProgress"></p><p class="empty" id="reviewHardStatus"></p><p class="empty">${esc(v.summary||'评分为质量参考，不能预测是否爆款。')}</p><div class="dims">${dims}</div><p class="empty">视频 ${esc(v.duration_seconds)} 秒；抽取 ${Array.isArray(v.frame_times)?v.frame_times.length:0} 帧。结果是 AI 基于抽样画面和语音转写的意见，仍需人工确认，不能预测是否爆款。</p><details><summary>人工核验与补分</summary><p class="empty">可修改 AI 分数，或补上待评项目；选择“待评”可清除分数。所有项目评分后才显示总分。</p><div class="dims">${manual}</div><p class="empty">人脸、国旗、竞品 Logo 任意一项确认出现即不合格；AI 仅检查抽样画面，需人工观看完整视频确认。</p>${hardRules.map((rule,i)=>`<div class="why"><label>${esc(rule.name)}：<select data-review-hard="${i}"><option value="unknown">待核验</option><option value="found">确认出现</option><option value="absent">确认未出现</option></select></label> · AI 抽样：${rule.status==='suspected'?'疑似出现':'未能确认'}；${esc(rule.evidence)}</div>`).join('')}<p class="empty">发布前还请检查下列事项；存在问题或尚未核验时，请先处理。</p>${gates.map((name,i)=>`<div class="why"><label>${name}：<select data-review-gate="${i}"><option value="unknown">待核验</option><option value="pass">已确认无问题</option><option value="block">需处理</option></select></label></div>`).join('')}<p class="empty" id="reviewGateStatus"></p></details>${limitations?`<p class="empty">评测限制：</p><ul class="review-list">${limitations}</ul>`:''}${v.transcript?`<details><summary>查看语音转写</summary><p class="empty">${esc(v.transcript)}</p></details>`:''}`;
-      const box=$('videoReviewResult');
-      const refreshReview=()=>{
-        let total=0,missing=0,assessedMax=0;
-        v.dimensions.forEach((d,di)=>{
-          let points=0,unassessed=0;
-          d.criteria.forEach((c,ci)=>{
-            const input=box.querySelector(`[data-review-score="${di}:${ci}"]`),raw=input.value.trim(),value=Number(raw);
-            const item=box.querySelector(`[data-criterion-score="${di}:${ci}"]`);
-            if(raw===''||!Number.isFinite(value)||value<0||value>c.max||!input.validity.valid){missing++;unassessed++;item.textContent='待评';}
-            else{points+=value;assessedMax+=c.max;item.textContent=`${value} / ${c.max}（${input.dataset.edited?'人工评分':'AI 初评'}）`;}
-          });
-          total+=points;
-          box.querySelector(`[data-dim-score="${di}"]`).textContent=unassessed?`已评 ${Number(points.toFixed(1))} 分，${unassessed} 项待评 / ${d.max}`:`${Number(points.toFixed(1))} / ${d.max}`;
-        });
-        $('reviewTotal').textContent=missing?'待评':String(Number(total.toFixed(1)));
-        const hardStates=[...box.querySelectorAll('[data-review-hard]')].map(el=>el.value);
-        const suspected=hardRules.filter((rule,i)=>rule.status==='suspected'&&hardStates[i]==='unknown').map(rule=>rule.name);
-        $('reviewHardStatus').textContent=hardStates.includes('found')?'判定：不合格（确认出现人脸、国旗或竞品 Logo，与分数无关）。':hardStates.includes('unknown')?`判定：待核验（请检查完整视频的人脸、国旗和竞品 Logo）。${suspected.length?' AI 抽样疑似出现：'+suspected.join('、')+'。':''}`:'人脸、国旗、竞品 Logo 三项已人工确认未出现；其他发布前事项仍需核验。';
-        const states=[...box.querySelectorAll('[data-review-gate]')].map(el=>el.value);
-        const gateMessage=states.includes('block')?'发布前核验：存在需处理的问题。':states.includes('unknown')?'发布前核验：仍有项目待确认。':'发布前核验：已人工确认各项。';
-        $('reviewProgress').textContent=(missing?`已评 ${Number(total.toFixed(1))} / ${assessedMax} 分；${missing} 项待人工确认，尚不能计算完整总分。`:'全部项目已评分。')+' '+gateMessage;
-        $('reviewGateStatus').textContent=gateMessage;
-      };
-      const reviewChanged=e=>{if(e.target.matches('[data-review-score]'))e.target.dataset.edited='1';refreshReview();};
-      box.oninput=reviewChanged;box.onchange=reviewChanged;refreshReview();
+      renderReview(v,file);
     }catch(err){$('reviewStatus').textContent='评测失败：'+err.message}
     finally{$('reviewGo').disabled=false;$('reviewFile').disabled=false}
   });

@@ -40,7 +40,7 @@ LEXICON = {
     "london": ["london"], "evening": ["night"],
 }
 PLACES = {"london": "伦敦", "euston": "伦敦", "scotland": "苏格兰", "highland": "苏格兰", "highlands": "苏格兰"}
-COUNTRIES = {"英国", "法国", "意大利", "荷兰", "瑞士", "德国", "西班牙", "葡萄牙", "奥地利", "比利时"}
+COUNTRIES = {"英国", "法国", "意大利", "荷兰", "瑞士", "德国", "西班牙", "葡萄牙", "奥地利", "比利时", "墨西哥"}
 
 log_lines = []
 

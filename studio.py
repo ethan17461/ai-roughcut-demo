@@ -131,7 +131,13 @@ class H(BaseHTTPRequestHandler):
                                 raise ValueError("视频上传未完成。")
                             f.write(chunk)
                             remaining -= len(chunk)
-                    review = review_video(video_path, env["DEEPSEEK_API_KEY"], env.get("DEEPSEEK_VIDEO_MODEL") or "deepseek-flash")
+                    # 带上最近一次粗剪的数据：镜头、字幕、花字、脚本审核这些能直接算分，不用 AI 猜。
+                    try:
+                        with open(os.path.join(OUT, "result.json"), encoding="utf-8") as f:
+                            draft = json.load(f)
+                    except (OSError, ValueError):
+                        draft = None
+                    review = review_video(video_path, env["DEEPSEEK_API_KEY"], env.get("DEEPSEEK_VIDEO_MODEL") or "deepseek-flash", draft)
                 return self._send(200, {"review": review})
             except (ValueError, RuntimeError) as e:
                 return self._send(400, {"error": str(e)})

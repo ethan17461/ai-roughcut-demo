@@ -939,11 +939,10 @@
   {
    "id": "m52",
    "file": "clips/m52.mp4",
-   "title": "手机上的二维码电子票",
+   "title": "手机上的新冠健康通行码（不是车票，别配车票或 App 的句子）",
    "tags": [
-    "phone",
-    "ticket",
-    "app"
+    "qr",
+    "health-pass"
    ],
    "location": "未知",
    "places": [],
@@ -961,8 +960,10 @@
     "station",
     "gate"
    ],
-   "location": "未知",
-   "places": [],
+   "location": "墨西哥城地铁（屏幕上是西班牙语票价）",
+   "places": [
+    "墨西哥"
+   ],
    "quality": 4,
    "issues": [
     "people"
